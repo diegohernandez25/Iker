@@ -81,20 +81,20 @@ def create_tables():
                     Column('date', Date, nullable=False))
 
     meta.create_all(engine)
-    print('tables created.')
 
-
-@app.route('/')
-def hello_world():
-    return 'Hello World!'
 
 @app.route('/service', methods=['GET', 'POST'])
 def service():
     if request.method == 'POST':
-        pass
+        crt_service_cnt()
 
     else:
         pass
+
+def crt_service_cnt(content):
+    assert isinstance(content,dict)
+    assert (set(content.keys()).issubset(['name', 'information'])), 'Keys are not according to the operation mapping.'
+    return
 
 @app.route('/<id>/owner', methods=['POST'])
 def create_owner(id):
@@ -102,6 +102,10 @@ def create_owner(id):
         pass
     else:
         pass
+
+def crt_owner_cnt(id, content):
+    assert isinstance(id, int)
+    assert (set(content.keys()).issubset(['name', 'information'])), 'Keys are not according to the operation mapping.'
 
 @app.route('/<id>/owner/<owner_id>', methods=['GET', 'DELETE'])
 def owner(id, owner_id):
@@ -117,6 +121,12 @@ def create_domain(id, owner_id):
     else:
         pass
 
+def crt_domain_cnt(id,owner_id,content):
+    assert isinstance(id, int)
+    assert isinstance(owner_id, int)
+    assert (set(content.keys()).issubset(['name', 'information'])), 'Keys are not according to the operation mapping.'
+
+
 @app.route('/<id>/owner/<owner_id>/domain/<domain_id>', methods=['GET', 'DELETE', 'POST'])
 def domain(id, owner_id, domain_id):
     if request.method == 'GET':
@@ -125,12 +135,29 @@ def domain(id, owner_id, domain_id):
         pass
     else:
         pass
+
+def crt_lease_domain_elements_cnt(id, owner_id, domain_id, content):
+    assert isinstance(id, int)
+    assert isinstance(owner_id, int)
+    assert isinstance(domain_id, int)
+    assert (set(content.keys()).issubset(
+        ['name', 'information', 'init_time', 'end_time', 'price'])), 'Keys are not according to the operation mapping.'
+
+
 @app.route('/<id>/owner/<owner_id>/domain/<domain_id>/element', methods=['POST'])
 def create_element(id, owner_id, domain_id):
     if request.method == 'POST':
         pass
     else:
         pass
+
+def crt_element_cnt(id, owner_id, domain_id, content):
+    assert isinstance(id, int)
+    assert isinstance(owner_id, int)
+    assert isinstance(domain_id, int)
+    assert (set(content.keys()).issubset(
+        ['name', 'information'])), 'Keys are not according to the operation mapping.'
+
 
 @app.route('/<id>/owner/<owner_id>/domain/<domain_id>/element/<element_id>', methods=['GET','DELETE', 'POST'])
 def element(id, owner_id, domain_id, element_id):
@@ -141,12 +168,26 @@ def element(id, owner_id, domain_id, element_id):
     else: #delete
         pass
 
+def crt_elem_lease_cnt(id, owner_id, domain_id, element_id, content):
+    assert isinstance(id, int)
+    assert isinstance(owner_id, int)
+    assert isinstance(domain_id, int)
+    assert isinstance(element_id, int)
+    assert (set(content.keys()).issubset(
+        ['name', 'information', 'init_time', 'end_time', 'price'])), 'Keys are not according to the operation mapping.'
+
+
 @app.route('/<id>/client', methods=['POST'])
 def create_client(id):
     if request.method == 'POST':
         pass
     else:
         pass
+
+def crt_client_cnt(id, content):
+    assert isinstance(id, int)
+    assert (set(content.keys()).issubset(
+        ['name', 'information'])), 'Keys are not according to the operation mapping.'
 
 
 @app.route('/<id>/owner/<owner_id>/domain/<domain_id>/element/<element_id>/leases', methods=['GET'])
@@ -157,6 +198,7 @@ def leases(id, owner_id, domain_id, element_id):
         pass
 
 
+
 @app.route('/<id>/owner/<owner_id>/domain/<domain_id>/element/<element_id>/<lease_id>', methods=['GET', 'POST', 'DELETE'])
 def lease(id, owner_id, domain_id, element_id, lease_id):
     if request.method == 'GET':
@@ -165,6 +207,15 @@ def lease(id, owner_id, domain_id, element_id, lease_id):
         pass
     else: #DELETE
         pass
+
+def crt_reserve_cnt(id, owner_id, domain_id, element_id,lease_id, content):
+    assert isinstance(id, int)
+    assert isinstance(owner_id, int)
+    assert isinstance(domain_id, int)
+    assert isinstance(element_id, int)
+    assert isinstance(lease_id, int)
+    assert (set(content.keys()).issubset(
+        ['name', 'information'])), 'Keys are not according to the operation mapping.'
 
 @app.route('/<id>/client/<client_id>', methods=['GET','DELETE'])
 def client(id, client_id):
