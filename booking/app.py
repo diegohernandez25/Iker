@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, redirect, url_for, request
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Date, ForeignKey, Float
 from sqlalchemy.sql import select, text, bindparam, and_
 
@@ -52,7 +52,7 @@ def create_tables():
                    Column('url', String, nullable=False),
                    Column('date', Date, nullable=False))
 
-    AvailableElement = Table('available_element', meta,
+    Lease = Table('lease', meta,
                     Column('id', Integer, primary_key=True),
                     Column('id_owner', Integer, ForeignKey("owner.id"), primary_key=True),
                     Column('id_service', Integer, ForeignKey("service.id"), primary_key=True),
@@ -74,7 +74,7 @@ def create_tables():
                     Column('id_service', Integer, ForeignKey("service.id"), primary_key=True),
                     Column('id_domain', Integer, ForeignKey("domain.id"), primary_key=True),
                     Column('id_element', Integer, ForeignKey("element.id"), primary_key=True),
-                    Column('id_available_element', Integer, ForeignKey("available_element.id"), primary_key=True),
+                    Column('id_lease', Integer, ForeignKey("lease.id"), primary_key=True),
                     Column('id_client', Integer, ForeignKey("client.id"), primary_key=True),
                     Column('information', String),
                     Column('url', String, nullable=False),
@@ -88,7 +88,108 @@ def create_tables():
 def hello_world():
     return 'Hello World!'
 
+@app.route('/service', methods=['GET', 'POST'])
+def service():
+    if request.method == 'POST':
+        pass
+
+    else:
+        pass
+
+@app.route('/<id>/owner', methods=['POST'])
+def create_owner(id):
+    if request.method == 'POST':
+        pass
+    else:
+        pass
+
+@app.route('/<id>/owner/<owner_id>', methods=['GET', 'DELETE'])
+def owner(id, owner_id):
+    if request.method == 'GET':
+        pass
+    else:
+        pass
+
+@app.route('/<id>/owner/<owner_id>/domain', methods=['POST'])
+def create_domain(id, owner_id):
+    if request.method == 'POST':
+        pass
+    else:
+        pass
+
+@app.route('/<id>/owner/<owner_id>/domain/<domain_id>', methods=['GET', 'DELETE', 'POST'])
+def domain(id, owner_id, domain_id):
+    if request.method == 'GET':
+        pass
+    if request.method == 'POST': #lease all elements of domain.
+        pass
+    else:
+        pass
+@app.route('/<id>/owner/<owner_id>/domain/<domain_id>/element', methods=['POST'])
+def create_element(id, owner_id, domain_id):
+    if request.method == 'POST':
+        pass
+    else:
+        pass
+
+@app.route('/<id>/owner/<owner_id>/domain/<domain_id>/element/<element_id>', methods=['GET','DELETE', 'POST'])
+def element(id, owner_id, domain_id, element_id):
+    if request.method == 'GET':
+        pass
+    elif request.method == 'POST':
+        pass
+    else: #delete
+        pass
+
+@app.route('/<id>/client', methods=['POST'])
+def create_client(id):
+    if request.method == 'POST':
+        pass
+    else:
+        pass
+
+
+@app.route('/<id>/owner/<owner_id>/domain/<domain_id>/element/<element_id>/leases', methods=['GET'])
+def leases(id, owner_id, domain_id, element_id):
+    if request.method == 'GET':
+        pass
+    else:
+        pass
+
+
+@app.route('/<id>/owner/<owner_id>/domain/<domain_id>/element/<element_id>/<lease_id>', methods=['GET', 'POST', 'DELETE'])
+def lease(id, owner_id, domain_id, element_id, lease_id):
+    if request.method == 'GET':
+        pass
+    elif request.method == 'POST': #make a reservation
+        pass
+    else: #DELETE
+        pass
+
+@app.route('/<id>/client/<client_id>', methods=['GET','DELETE'])
+def client(id, client_id):
+    if request.method == 'GET':
+        pass
+    else:
+        pass
+
+@app.route('/<id>/client/<client_id>/leases', methods=['GET'])
+def client_leases(id, client_id):
+    if request.method == 'GET':
+        pass
+    else:
+        pass
+
+@app.route('/<id>/client/<client_id>/<lease_id>', methods=['GET', 'DELETE'])
+def client_lease(id, client_id, lease_id):
+    if request.method == 'GET':
+        pass
+    else: #Cancels reservation
+        pass
+
 
 if __name__ == '__main__':
     create_tables()
     app.run()
+
+
