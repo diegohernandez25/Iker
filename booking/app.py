@@ -1,12 +1,21 @@
-from flask import Flask, redirect, url_for, request
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Date, ForeignKey, Float
+from flask import Flask, redirect, url_for, request, jsonify
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Date, ForeignKey, Float, update, insert
 from sqlalchemy.sql import select, text, bindparam, and_
+import datetime
+import json
+
 
 app = Flask(__name__)
 
 #Database
 engine = create_engine('sqlite:///booking.db', echo = True)
 meta = MetaData()
+tables = dict()
+
+
+MAIN_URL = 'localhost:8080'
+
+
 
 #Create Tables
 def create_tables():
@@ -14,16 +23,17 @@ def create_tables():
                     Column('id', Integer, primary_key = True),
                     Column('name', String, nullable=False),
                     Column('information', String),
-                    Column('url', String, nullable=False),
-                    Column('date', Date, nullable=False))
+                    Column('url', String),
+                    Column('date', String, nullable=False))
+
 
     Owner = Table('owner', meta,
                     Column('id', Integer, primary_key=True),
                     Column('id_service', Integer, ForeignKey("service.id"), primary_key=True),
                     Column('name', String, nullable=False),
                     Column('information', String),
-                    Column('url', String, nullable=False),
-                    Column('date', Date, nullable=False))
+                    Column('url', String),
+                    Column('date', String, nullable=False))
 
     Domain = Table('domain', meta,
                     Column('id', Integer, primary_key=True),
@@ -31,8 +41,9 @@ def create_tables():
                     Column('id_service', Integer,ForeignKey("service.id"), primary_key=True),
                     Column('name', String, nullable=False),
                     Column('information', String),
-                    Column('url', String, nullable=False),
-                    Column('date', Date, nullable=False))
+                    Column('url', String),
+                    Column('date', String, nullable=False)
+                   )
 
     Element = Table('element', meta,
                     Column('id', Integer, primary_key=True),
@@ -41,32 +52,20 @@ def create_tables():
                     Column('id_domain', Integer, ForeignKey("domain.id"), primary_key=True),
                     Column('name', String, nullable=False),
                     Column('information', String),
-                    Column('url', String, nullable=False),
-                    Column('date', Date, nullable=False))
+                    Column('url', String),
+                    Column('date', String, nullable=False),
+                    Column('init_time', String, nullable=False),
+                    Column('end_time', String),
+                    Column('price', Float)
+                    )
 
     Client = Table('client', meta,
                    Column('id', Integer, primary_key=True),
                    Column('id_service', Integer, ForeignKey("service.id"), primary_key=True),
                    Column('name', String, nullable=False),
                    Column('information', String),
-                   Column('url', String, nullable=False),
-                   Column('date', Date, nullable=False))
-
-    Lease = Table('lease', meta,
-                    Column('id', Integer, primary_key=True),
-                    Column('id_owner', Integer, ForeignKey("owner.id"), primary_key=True),
-                    Column('id_service', Integer, ForeignKey("service.id"), primary_key=True),
-                    Column('id_domain', Integer, ForeignKey("domain.id"), primary_key=True),
-                    Column('id_element', Integer, ForeignKey("element.id"), primary_key=True),
-                    Column('name', String, nullable=False),
-                    Column('information', String),
-                    Column('url', String, nullable=False),
-                    Column('date', Date, nullable=False),
-                    Column('init_time', Date, nullable=False),
-                    Column('end_time', Date),
-                    Column('price', Float)
-                    )
-
+                   Column('url', String),
+                   Column('date', String, nullable=False))
 
     Reservation = Table('reservation', meta,
                     Column('id', Integer, primary_key=True),
@@ -74,26 +73,68 @@ def create_tables():
                     Column('id_service', Integer, ForeignKey("service.id"), primary_key=True),
                     Column('id_domain', Integer, ForeignKey("domain.id"), primary_key=True),
                     Column('id_element', Integer, ForeignKey("element.id"), primary_key=True),
-                    Column('id_lease', Integer, ForeignKey("lease.id"), primary_key=True),
                     Column('id_client', Integer, ForeignKey("client.id"), primary_key=True),
                     Column('information', String),
-                    Column('url', String, nullable=False),
-                    Column('date', Date, nullable=False))
+                    Column('url', String),
+                    Column('date', String, nullable=False))
 
     meta.create_all(engine)
+    return {'reservation': Reservation, 'client': Client, 'element': Element, 'domain': Domain, 'Owner': owner,
+            'service': Service}
 
 
 @app.route('/service', methods=['GET', 'POST'])
 def service():
-    if request.method == 'POST':
-        crt_service_cnt()
+    global tables
 
+    #>  Create a new Service.
+    if request.method == 'POST':
+        jsonreq = request.json
+        assert isinstance(jsonreq, dict)
+        assert (set(jsonreq.keys()).issubset(['name', 'information'])), 'Keys are not according to the operation mapping.'
+
+        conn = engine.connect()
+        service = Table('service', meta, autoload=True, autoload_with=engine)
+        time = str(datetime.datetime.now())
+
+        query = service.insert().values(name=jsonreq['name'], information=json.dumps(jsonreq['information']), date=time)
+        result = conn.execute(query)
+        pkey = result.inserted_primary_key[0]
+
+        query = update(service).values(url="/" + str(pkey))
+        query = query.where(service.c.id == pkey)
+        result = conn.execute(query)
+
+        query = select([service]).where(service.c.id == pkey)
+        result = conn.execute(query)
+
+        tmp_lst = list()
+        for row in result:
+            tmp_lst.append(row)
+        conn.close()
+
+        id, name, info, url, date = tmp_lst[0]
+
+        return jsonify(url=MAIN_URL+url,
+                       id=id)
+
+    #> Gets all services urls
     else:
-        pass
+        conn = engine.connect()
+        service = Table('service', meta, autoload=True, autoload_with=engine)
+        query = select([service])
+        result = conn.execute(query)
+
+        tmp_dict = dict()
+        for row in result:
+            tmp_dict[row[0]] = {"url":MAIN_URL + row[3], "name":row[1]}
+        conn.close()
+        return json.dumps(tmp_dict)
+
 
 def crt_service_cnt(content):
-    assert isinstance(content,dict)
-    assert (set(content.keys()).issubset(['name', 'information'])), 'Keys are not according to the operation mapping.'
+
+
     return
 
 @app.route('/<id>/owner', methods=['POST'])
@@ -240,7 +281,7 @@ def client_lease(id, client_id, lease_id):
 
 
 if __name__ == '__main__':
-    create_tables()
+    tables = create_tables()
     app.run()
 
 
