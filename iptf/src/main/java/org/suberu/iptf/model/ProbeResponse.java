@@ -21,10 +21,13 @@ public class ProbeResponse   {
   private List<List<Float>> waypoints = new ArrayList<List<Float>>();
 
   @JsonProperty("cost")
-  private String cost = null;
+  private Float cost = null;
 
   @JsonProperty("time")
   private BigDecimal time = null;
+
+  @JsonProperty("dist")
+  private Float dist = null;
 
   public ProbeResponse waypoints(List<List<Float>> waypoints) {
     this.waypoints = waypoints;
@@ -52,7 +55,7 @@ public class ProbeResponse   {
     this.waypoints = waypoints;
   }
 
-  public ProbeResponse cost(String cost) {
+  public ProbeResponse cost(Float cost) {
     this.cost = cost;
     return this;
   }
@@ -64,11 +67,11 @@ public class ProbeResponse   {
   @NotNull
 
 
-  public String getCost() {
+  public Float getCost() {
     return cost;
   }
 
-  public void setCost(String cost) {
+  public void setCost(Float cost) {
     this.cost = cost;
   }
 
@@ -93,6 +96,26 @@ public class ProbeResponse   {
     this.time = time;
   }
 
+  public ProbeResponse dist(Float dist) {
+    this.dist = dist;
+    return this;
+  }
+
+  /**
+   * Get dist
+   * @return dist
+  **/
+  @NotNull
+
+
+  public Float getDist() {
+    return dist;
+  }
+
+  public void setDist(Float dist) {
+    this.dist = dist;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -105,12 +128,13 @@ public class ProbeResponse   {
     ProbeResponse probeResponse = (ProbeResponse) o;
     return Objects.equals(this.waypoints, probeResponse.waypoints) &&
         Objects.equals(this.cost, probeResponse.cost) &&
-        Objects.equals(this.time, probeResponse.time);
+        Objects.equals(this.time, probeResponse.time) &&
+        Objects.equals(this.dist, probeResponse.dist);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(waypoints, cost, time);
+    return Objects.hash(waypoints, cost, time, dist);
   }
 
   @Override
@@ -121,6 +145,7 @@ public class ProbeResponse   {
     sb.append("    waypoints: ").append(toIndentedString(waypoints)).append("\n");
     sb.append("    cost: ").append(toIndentedString(cost)).append("\n");
     sb.append("    time: ").append(toIndentedString(time)).append("\n");
+    sb.append("    dist: ").append(toIndentedString(dist)).append("\n");
     sb.append("}");
     return sb.toString();
   }

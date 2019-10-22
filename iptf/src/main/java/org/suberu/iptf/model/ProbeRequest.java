@@ -35,13 +35,16 @@ public class ProbeRequest   {
   private Boolean avoidTolls = null;
 
   @JsonProperty("StartTime")
-  private Float startTime = null;
+  private BigDecimal startTime = null;
 
   @JsonProperty("EndTime")
-  private Float endTime = null;
+  private BigDecimal endTime = null;
 
   @JsonProperty("MaxDetour")
   private BigDecimal maxDetour = null;
+
+  @JsonProperty("FuelType")
+  private String fuelType = null;
 
   public ProbeRequest startCoords(List<Float> startCoords) {
     this.startCoords = startCoords;
@@ -158,7 +161,7 @@ public class ProbeRequest   {
     this.avoidTolls = avoidTolls;
   }
 
-  public ProbeRequest startTime(Float startTime) {
+  public ProbeRequest startTime(BigDecimal startTime) {
     this.startTime = startTime;
     return this;
   }
@@ -168,16 +171,17 @@ public class ProbeRequest   {
    * @return startTime
   **/
 
+  @Valid
 
-  public Float getStartTime() {
+  public BigDecimal getStartTime() {
     return startTime;
   }
 
-  public void setStartTime(Float startTime) {
+  public void setStartTime(BigDecimal startTime) {
     this.startTime = startTime;
   }
 
-  public ProbeRequest endTime(Float endTime) {
+  public ProbeRequest endTime(BigDecimal endTime) {
     this.endTime = endTime;
     return this;
   }
@@ -187,12 +191,13 @@ public class ProbeRequest   {
    * @return endTime
   **/
 
+  @Valid
 
-  public Float getEndTime() {
+  public BigDecimal getEndTime() {
     return endTime;
   }
 
-  public void setEndTime(Float endTime) {
+  public void setEndTime(BigDecimal endTime) {
     this.endTime = endTime;
   }
 
@@ -217,6 +222,26 @@ public class ProbeRequest   {
     this.maxDetour = maxDetour;
   }
 
+  public ProbeRequest fuelType(String fuelType) {
+    this.fuelType = fuelType;
+    return this;
+  }
+
+  /**
+   * fuel type of the car (can be \"petrol\",\"diesel\" or \"gpl\")
+   * @return fuelType
+  **/
+  @NotNull
+
+
+  public String getFuelType() {
+    return fuelType;
+  }
+
+  public void setFuelType(String fuelType) {
+    this.fuelType = fuelType;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -234,12 +259,13 @@ public class ProbeRequest   {
         Objects.equals(this.avoidTolls, probeRequest.avoidTolls) &&
         Objects.equals(this.startTime, probeRequest.startTime) &&
         Objects.equals(this.endTime, probeRequest.endTime) &&
-        Objects.equals(this.maxDetour, probeRequest.maxDetour);
+        Objects.equals(this.maxDetour, probeRequest.maxDetour) &&
+        Objects.equals(this.fuelType, probeRequest.fuelType);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(startCoords, endCoords, consumption, avoidHighways, avoidTolls, startTime, endTime, maxDetour);
+    return Objects.hash(startCoords, endCoords, consumption, avoidHighways, avoidTolls, startTime, endTime, maxDetour, fuelType);
   }
 
   @Override
@@ -255,6 +281,7 @@ public class ProbeRequest   {
     sb.append("    startTime: ").append(toIndentedString(startTime)).append("\n");
     sb.append("    endTime: ").append(toIndentedString(endTime)).append("\n");
     sb.append("    maxDetour: ").append(toIndentedString(maxDetour)).append("\n");
+    sb.append("    fuelType: ").append(toIndentedString(fuelType)).append("\n");
     sb.append("}");
     return sb.toString();
   }
