@@ -2,7 +2,7 @@ package org.suberu.iptf;
 
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
-import org.suberu.iptf.model.*;
+import org.suberu.iptf.apimodel.*;
 
 
 @RestController
