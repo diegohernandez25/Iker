@@ -27,20 +27,24 @@ def home(request):
 #5. Devolver lista de trips com info necessaria para a aplicação móvel
 class getTrips(APIView):
     def get(self, request):
-        #Obter a lista de todas as trips que cuprem os requisitos de partida e chegada na query
-        getTripsReq = requests.get(url = ipgfEndpoint+"/getTrips", params = {'init_coords':request.query_params.get('init_coords'), 
-            'final_coords':request.query_params.get('final_coords'),
-            'init_time':request.query_params.get('init_time') })
-        listOfTripIDS = getTripsReq.json()
+        try:
+            #Obter a lista de todas as trips que cuprem os requisitos de partida e chegada na query
+            getTripsReq = requests.get(url = ipgfEndpoint+"/getTrips", params = {'init_coords':request.query_params.get('init_coords'), 
+                'final_coords':request.query_params.get('final_coords'),
+                'init_time':request.query_params.get('init_time') })
+            listOfTripIDS = getTripsReq.json()
 
-        #filtrar todos os ids de trips que teem lugares disponiveis
-        listOfTripIDS=list(filter(lambda id: requests.get(url = reservasEndpoint+"/getAvailableElements"+"/"+id)['availableSeats']>=request.query_params.get('seats'), listOfTripIDS))
-        
-        responseJSON='{}'
-        #Obter informacao acerca das trips
-        for tripID in listOfTripIDS:
-            tripInfo=request.get(url=ipgfEndpoint+"/tripDetails"+"/"+tripID).json()
-            rating=requests.get(url=reviewEndpoint+"/object"+"/"+tripInfo['driver'])
-            #Construir reponseJSON
+            #filtrar todos os ids de trips que teem lugares disponiveis
+            listOfTripIDS=list(filter(lambda id: requests.get(url = reservasEndpoint+"/getAvailableElements"+"/"+id)['availableSeats']>=request.query_params.get('seats'), listOfTripIDS))
+            
+            responseJSON='{}'
+            #Obter informacao acerca das trips
+            for tripID in listOfTripIDS:
+                tripInfo=request.get(url=ipgfEndpoint+"/tripDetails"+"/"+tripID).json()
+                rating=requests.get(url=reviewEndpoint+"/object"+"/"+tripInfo['driver'])
+                #Construir reponseJSON
 
-        return JsonResponse(responseJSON)
+            return JsonResponse(responseJSON)
+
+        except:
+            return JsonResponse({'response':'lul'})
