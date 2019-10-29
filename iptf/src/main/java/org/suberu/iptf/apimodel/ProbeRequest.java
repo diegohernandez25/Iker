@@ -1,4 +1,4 @@
-package org.suberu.iptf.model;
+package org.suberu.iptf.apimodel;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -27,9 +27,6 @@ public class ProbeRequest   {
   @JsonProperty("Consumption")
   @Valid
   private List<Float> consumption = new ArrayList<Float>();
-
-  @JsonProperty("AvoidHighways")
-  private Boolean avoidHighways = null;
 
   @JsonProperty("AvoidTolls")
   private Boolean avoidTolls = null;
@@ -119,26 +116,6 @@ public class ProbeRequest   {
 
   public void setConsumption(List<Float> consumption) {
     this.consumption = consumption;
-  }
-
-  public ProbeRequest avoidHighways(Boolean avoidHighways) {
-    this.avoidHighways = avoidHighways;
-    return this;
-  }
-
-  /**
-   * disallows the trip planner to use highways
-   * @return avoidHighways
-  **/
-  @NotNull
-
-
-  public Boolean isAvoidHighways() {
-    return avoidHighways;
-  }
-
-  public void setAvoidHighways(Boolean avoidHighways) {
-    this.avoidHighways = avoidHighways;
   }
 
   public ProbeRequest avoidTolls(Boolean avoidTolls) {
@@ -255,7 +232,6 @@ public class ProbeRequest   {
     return Objects.equals(this.startCoords, probeRequest.startCoords) &&
         Objects.equals(this.endCoords, probeRequest.endCoords) &&
         Objects.equals(this.consumption, probeRequest.consumption) &&
-        Objects.equals(this.avoidHighways, probeRequest.avoidHighways) &&
         Objects.equals(this.avoidTolls, probeRequest.avoidTolls) &&
         Objects.equals(this.startTime, probeRequest.startTime) &&
         Objects.equals(this.endTime, probeRequest.endTime) &&
@@ -265,7 +241,7 @@ public class ProbeRequest   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(startCoords, endCoords, consumption, avoidHighways, avoidTolls, startTime, endTime, maxDetour, fuelType);
+    return Objects.hash(startCoords, endCoords, consumption, avoidTolls, startTime, endTime, maxDetour, fuelType);
   }
 
   @Override
@@ -276,7 +252,6 @@ public class ProbeRequest   {
     sb.append("    startCoords: ").append(toIndentedString(startCoords)).append("\n");
     sb.append("    endCoords: ").append(toIndentedString(endCoords)).append("\n");
     sb.append("    consumption: ").append(toIndentedString(consumption)).append("\n");
-    sb.append("    avoidHighways: ").append(toIndentedString(avoidHighways)).append("\n");
     sb.append("    avoidTolls: ").append(toIndentedString(avoidTolls)).append("\n");
     sb.append("    startTime: ").append(toIndentedString(startTime)).append("\n");
     sb.append("    endTime: ").append(toIndentedString(endTime)).append("\n");

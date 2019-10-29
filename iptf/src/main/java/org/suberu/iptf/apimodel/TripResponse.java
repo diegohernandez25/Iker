@@ -1,4 +1,4 @@
-package org.suberu.iptf.model;
+package org.suberu.iptf.apimodel;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,80 +10,39 @@ import org.springframework.validation.annotation.Validated;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
-/**
+/*
  * TripResponse
  */
 @Validated
 
-public class TripResponse   {
-  @JsonProperty("StartCoords")
+public class TripResponse{
+  @JsonProperty("coords")
   @Valid
-  private List<Float> startCoords = new ArrayList<Float>();
-
-  @JsonProperty("EndCoords")
-  @Valid
-  private List<Float> endCoords = new ArrayList<Float>();
+  private List<List<Float>> coords = new ArrayList<>();
 
   @JsonProperty("StartTime")
-  private Boolean startTime = null;
+  private Long startTime = null;
 
-  @JsonProperty("Date")
-  private Float date = null;
+  @JsonProperty("EndTime")
+  private Long endTime = null;
 
   @JsonProperty("MaxDetour")
   private BigDecimal maxDetour = null;
 
-  public TripResponse startCoords(List<Float> startCoords) {
-    this.startCoords = startCoords;
+  public TripResponse coords(List<List<Float>> coords) {
+    this.coords = coords;
     return this;
   }
 
-  public TripResponse addStartCoordsItem(Float startCoordsItem) {
-    this.startCoords.add(startCoordsItem);
-    return this;
+  public List<List<Float>> getCoords() {
+    return coords;
   }
 
-  /**
-   * Get startCoords
-   * @return startCoords
-  **/
-  @NotNull
-
-
-  public List<Float> getStartCoords() {
-    return startCoords;
+  public void setCoords(List<List<Float>> coords) {
+    this.coords = coords;
   }
 
-  public void setStartCoords(List<Float> startCoords) {
-    this.startCoords = startCoords;
-  }
-
-  public TripResponse endCoords(List<Float> endCoords) {
-    this.endCoords = endCoords;
-    return this;
-  }
-
-  public TripResponse addEndCoordsItem(Float endCoordsItem) {
-    this.endCoords.add(endCoordsItem);
-    return this;
-  }
-
-  /**
-   * Get endCoords
-   * @return endCoords
-  **/
-  @NotNull
-
-
-  public List<Float> getEndCoords() {
-    return endCoords;
-  }
-
-  public void setEndCoords(List<Float> endCoords) {
-    this.endCoords = endCoords;
-  }
-
-  public TripResponse startTime(Boolean startTime) {
+  public TripResponse startTime(Long startTime) {
     this.startTime = startTime;
     return this;
   }
@@ -95,32 +54,18 @@ public class TripResponse   {
   @NotNull
 
 
-  public Boolean isStartTime() {
-    return startTime;
-  }
-
-  public void setStartTime(Boolean startTime) {
+  public void setStartTime(Long startTime) {
     this.startTime = startTime;
   }
 
-  public TripResponse date(Float date) {
-    this.date = date;
-    return this;
+
+
+  public Long getEndTime() {
+    return endTime;
   }
 
-  /**
-   * Get date
-   * @return date
-  **/
-  @NotNull
-
-
-  public Float getDate() {
-    return date;
-  }
-
-  public void setDate(Float date) {
-    this.date = date;
+  public void setEndTime(Long date) {
+    this.endTime = date;
   }
 
   public TripResponse maxDetour(BigDecimal maxDetour) {
@@ -154,16 +99,15 @@ public class TripResponse   {
       return false;
     }
     TripResponse tripResponse = (TripResponse) o;
-    return Objects.equals(this.startCoords, tripResponse.startCoords) &&
-        Objects.equals(this.endCoords, tripResponse.endCoords) &&
+    return Objects.equals(this.coords, tripResponse.coords) &&
         Objects.equals(this.startTime, tripResponse.startTime) &&
-        Objects.equals(this.date, tripResponse.date) &&
+        Objects.equals(this.endTime, tripResponse.endTime) &&
         Objects.equals(this.maxDetour, tripResponse.maxDetour);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(startCoords, endCoords, startTime, date, maxDetour);
+    return Objects.hash(coords, startTime, endTime, maxDetour);
   }
 
   @Override
@@ -171,10 +115,9 @@ public class TripResponse   {
     StringBuilder sb = new StringBuilder();
     sb.append("class TripResponse {\n");
     
-    sb.append("    startCoords: ").append(toIndentedString(startCoords)).append("\n");
-    sb.append("    endCoords: ").append(toIndentedString(endCoords)).append("\n");
+    sb.append("    coords: ").append(toIndentedString(coords)).append("\n");
     sb.append("    startTime: ").append(toIndentedString(startTime)).append("\n");
-    sb.append("    date: ").append(toIndentedString(date)).append("\n");
+    sb.append("    date: ").append(toIndentedString(endTime)).append("\n");
     sb.append("    maxDetour: ").append(toIndentedString(maxDetour)).append("\n");
     sb.append("}");
     return sb.toString();
