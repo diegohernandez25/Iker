@@ -1,12 +1,12 @@
 probe_trip="
 {
   \"StartCoords\": [
-    40.642438,
-    -8.655375
+    40.632933, 
+	-8.659798
   ],
   \"EndCoords\": [
-    40.633309,
-    -8.659626
+	40.209366,
+	-8.444125
   ],
   \"Consumption\": [
     5,
@@ -17,7 +17,8 @@ probe_trip="
   \"AvoidTolls\": true,
   \"StartTime\": 1569885623,
   \"EndTime\": 1569885623,
-  \"MaxDetour\": 0
+  \"MaxDetour\": 0,
+  \"FuelType\": \"petrol\"
 }
 "
 
@@ -41,7 +42,8 @@ register_trip="
   \"AvoidTolls\": true,
   \"StartTime\": 1569885623,
   \"EndTime\": 1569885623,
-  \"MaxDetour\": 0
+  \"MaxDetour\": 0,
+  \"FuelType\": \"petrol\"
 }
 "
 

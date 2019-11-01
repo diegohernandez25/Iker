@@ -16,7 +16,7 @@ import javax.validation.constraints.*;
 @Validated
 
 public class TripResponse{
-  @JsonProperty("coords")
+  @JsonProperty("Coords")
   @Valid
   private List<List<Float>> coords = new ArrayList<>();
 

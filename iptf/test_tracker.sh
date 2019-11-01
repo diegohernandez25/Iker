@@ -18,5 +18,7 @@ curl -X POST localhost:8081/start_trip?$start_trip
 echo;echo
 curl -H "Content-Type: application/json" -d "$trip_update" -X POST localhost:8081/trip_update
 echo;echo
+curl -X GET localhost:8081/get_last_pos?$end_trip
+echo;echo
 curl -X POST localhost:8081/end_trip?$end_trip
 echo

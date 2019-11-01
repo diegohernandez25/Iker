@@ -17,6 +17,7 @@ public class Trip implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 	private Boolean finished;
+	private Boolean ongoing;
 	private Integer maxDetour;
 	private Float dist;
 	private Boolean avoidTolls;
@@ -32,6 +33,9 @@ public class Trip implements Serializable {
 	private Date endTime;
 
 	@OneToMany(cascade = {CascadeType.ALL})
+	private List<Waypoint> history;
+
+	@OneToMany(cascade = {CascadeType.ALL})
 	private List<Waypoint> coords;
 	@OneToMany(cascade = {CascadeType.ALL})
 	private List<Waypoint> waypoints;
@@ -43,6 +47,7 @@ public class Trip implements Serializable {
 	public Trip(List<List<Float>> c,List<List<Float>> wp,Date st,Date et,int md,boolean at,String ft,List<Float> cons,float d){
 		coords=Waypoint.toListWaypoints(c);
 		waypoints=Waypoint.toListWaypoints(wp);
+		history=new ArrayList<>();
 		maxDetour=md;
 		startTime=st;
 		endTime=et;
@@ -53,6 +58,14 @@ public class Trip implements Serializable {
 		cons120=cons.get(2);
 		dist=d;
 		finished=false;
+		ongoing=false;
+	}
+
+	public List<List<Float>> getHistory(){
+		return Waypoint.toListLists(history);
+	}
+	public void setHistory(List<List<Float>> llf){
+		history=Waypoint.toListWaypoints(llf);
 	}
 
 	public float getDist(){ return dist; }
@@ -85,6 +98,9 @@ public class Trip implements Serializable {
 
 	public boolean isFinished() { return finished; }
 	public void setFinished() { finished=true; }
+
+	public boolean isOngoing() { return ongoing; }
+	public void setOngoing() { ongoing=true; }
 
 	public Integer getId(){ return id; }
 
