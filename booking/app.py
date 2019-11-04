@@ -102,10 +102,10 @@ def create_tables():
 
     Reservation = Table('reservation', meta,
                     Column('id', Integer, primary_key=True),
-                    Column('id_service', Integer, ForeignKey("element.id_service"), primary_key=True),
-                    Column('id_owner', Integer, ForeignKey("element.id_owner"), primary_key=True),
-                    Column('id_domain', Integer, ForeignKey("element.id_domain"), primary_key=True),
-                    Column('id_element', Integer, ForeignKey("element.id"), primary_key=True),
+                    Column('id_service', Integer, ForeignKey("element.id_service")),
+                    Column('id_owner', Integer, ForeignKey("element.id_owner")),
+                    Column('id_domain', Integer, ForeignKey("element.id_domain")),
+                    Column('id_element', Integer, ForeignKey("element.id")),
                     Column('id_client', Integer, ForeignKey("client.id")),
                     Column('information', String),
                     Column('url', String),
@@ -347,8 +347,10 @@ def domain(id, owner_id, domain_id):
 @app.route('/<id>/owner/<owner_id>/domain/<domain_id>/element', methods=['POST'])
 def create_element(id, owner_id, domain_id):
     conn = engine.connect()
-    owner = Table('owner', meta, autoload=True, autoload_with=engine)
-    query = select([domain]).where(and_(domain.c.id_service == id, domain.c.id_owner == owner_id, domain.c.id == domain_id))
+    domain = Table('domain', meta, autoload=True, autoload_with=engine)
+
+    query = select([domain.c.id_owner]).where((domain.c.id == domain_id) & (domain.c.id_service == id))
+
     result = conn.execute(query)
     tmp_lst = list()
     for row in result:
@@ -373,27 +375,31 @@ def create_element(id, owner_id, domain_id):
         element = Table('element', meta, autoload=True, autoload_with=engine)
         time = str(datetime.datetime.now())
 
-        query = select([func.max(element.columns.id)]).where(and_(element.c.id_service == id, element.c.id_owner == owner_id, element.c.id_domain == domain_id))
+        query = select([func.max(element.columns.id)]).where(
+            and_(element.c.id_service == id, element.c.id_owner == owner_id, element.c.id_domain == domain_id))
         result = conn.execute(query)
         tmp_l = list()
         for row in result:
             tmp_l.append(row)
         e = tmp_l[0][0]
         element_id = 0 if e == None else e + 1
-
-        app.logger.info('owner:\t' + str(owner_id))
-
+        print('element_id')
         query = element.insert().values(name=jsonreq['name'], information=json.dumps(jsonreq['information']), date=time,
-                                      id_service=id, id_owner=owner_id, id_domain= domain_id, id=element_id, init_time=jsonreq['init_time'],
+                                        id_service=id, id_owner=owner_id, id_domain=domain_id, id=element_id,
+                                        init_time=jsonreq['init_time'],
                                         end_time=jsonreq['end_time'], price=jsonreq['price'])
         result = conn.execute(query)
 
-        url = "/" + str(id) + "/owner/" + str(owner_id) + "/domain/"+ str(domain_id)+"/element/"+str(element_id)
+        url = "/" + str(id) + "/owner/" + str(owner_id) + "/domain/" + str(domain_id) + "/element/" + str(element_id)
         query = update(element).values(url=url)
-        query = query.where(and_(element.c.id_service == id, element.c.id_owner == owner_id, element.c.id_domain == domain_id, element.c.id_element==element_id))
+        query = query.where(
+            (element.c.id_service == id) & (element.c.id_owner == owner_id) & (element.c.id_domain == domain_id) & (
+                        element.c.id == element_id))
         result = conn.execute(query)
 
-        query = select([element]).where(and_(element.c.id_service == id, element.c.id_owner == owner_id, element.c.id_domain == domain_id, element.c.id_element==element_id))
+        query = select([element]).where(
+            (element.c.id_service == id) & (element.c.id_owner == owner_id) & (element.c.id_domain == domain_id) & (
+                        element.c.id == element_id))
         result = conn.execute(query)
 
         tmp_lst = list()
@@ -406,91 +412,178 @@ def create_element(id, owner_id, domain_id):
                        id=id)
 
 
-
-def crt_element_cnt(id, owner_id, domain_id, content):
-
 @app.route('/<id>/owner/<owner_id>/domain/<domain_id>/element/<element_id>', methods=['GET','DELETE', 'POST'])
 def element(id, owner_id, domain_id, element_id):
-    if request.method == 'GET':
-        pass
-    elif request.method == 'POST':
-        pass
-    else: #delete
-        pass
+    conn = engine.connect()
+    element = Table('element', meta, autoload=True, autoload_with=engine)
 
-def crt_elem_lease_cnt(id, owner_id, domain_id, element_id, content):
-    assert isinstance(id, int)
-    assert isinstance(owner_id, int)
-    assert isinstance(domain_id, int)
-    assert isinstance(element_id, int)
-    assert (set(content.keys()).issubset(
-        ['name', 'information', 'init_time', 'end_time', 'price'])), 'Keys are not according to the operation mapping.'
+    query = select([element]).where(
+        (element.c.id_service == id) & (element.c.id_owner == owner_id) & (element.c.id_domain == domain_id) & (
+                element.c.id == element_id))
+    result = conn.execute(query)
+    tmp_lst = list()
+    for row in result:
+        tmp_lst.append(row)
+    conn.close()
+
+    if len(tmp_lst) == 0:
+        raise InvalidUsage('This view is gone', status_code=410)
+
+    if request.method == 'GET':
+        id, id_service, id_owner, id_domain, name, information, url, date, init_time, end_time, price = tmp_lst[0]
+
+        response = {"id":id, "id_service": id_service, "id_momain": id_domain, "name":name, "information":information, "url":url,
+                    "date":date, "init_time":init_time, "end_time":end_time, "price":price, "reserved": False}
+        return json.dumps(response)
+
+    elif request.method == 'POST':
+        jsonreq = request.json
+        conn = engine.connect()
+        reservation = Table('reservation', meta, autoload=True, autoload_with=engine)
+        # TODO: Check if reservation is available
+        # TODO: Check if user exists
+        result = conn.execute(query)
+        time = str(datetime.datetime.now())
+        query = reservation.insert().values(id_service=id, id_owner=owner_id, id_domain=domain_id,
+                                            id_element=element_id, information=json.dumps(jsonreq['information']),
+                                            date=time, id_client=jsonreq['id_client'])
+        result = conn.execute(query)
+        conn.close()
+    else:
+        conn = engine.connect()
+        query = delete(element).where(
+            (element.c.id_service == id) & (element.c.id_owner == owner_id) & (element.c.id_domain == domain_id) & (
+                    element.c.id == element_id))
+        result = conn.execute(query)
+        conn.close()
+        return "OK"
 
 
 @app.route('/<id>/client', methods=['POST'])
 def create_client(id):
+    conn = engine.connect()
+    service = Table('service', meta, autoload=True, autoload_with=engine)
+    query = select([service.columns.id]).where(service.c.id == id)
+    result = conn.execute(query)
+    tmp_lst = list()
+    for row in result:
+        tmp_lst.append(row)
+    conn.close()
+
+    if len(tmp_lst) == 0:
+        raise InvalidUsage('This view is gone', status_code=410)
+
+    id_service = tmp_lst[0][0]
+
+    jsonreq = request.json
+
     if request.method == 'POST':
-        pass
-    else:
-        pass
+        # assert isinstance(id, Integer)
+        # assert (set(jsonreq.keys()).issubset(['name', 'information'])), 'Keys are not according to the operation mapping.'
+        conn = engine.connect()
 
-def crt_client_cnt(id, content):
-    assert isinstance(id, int)
-    assert (set(content.keys()).issubset(
-        ['name', 'information'])), 'Keys are not according to the operation mapping.'
+        client = Table('client', meta, autoload=True, autoload_with=engine)
+        time = str(datetime.datetime.now())
 
+        query = select([func.max(client.columns.id)]).where(client.c.id_service == id)
+        result = conn.execute(query)
+        tmp_l = list()
+        for row in result:
+            tmp_l.append(row)
+        e = tmp_l[0][0]
+        client_id = 0 if e == None else e + 1
 
-@app.route('/<id>/owner/<owner_id>/domain/<domain_id>/element/<element_id>/leases', methods=['GET'])
-def leases(id, owner_id, domain_id, element_id):
-    if request.method == 'GET':
-        pass
-    else:
-        pass
+        query = client.insert().values(name=jsonreq['name'], information=json.dumps(jsonreq['information']), date=time,
+                                      id_service=id_service, id=client_id)
+        result = conn.execute(query)
+        pkey = result.inserted_primary_key[0]
 
+        url = "/" + str(id_service) + "/client/" + str(client_id)
+        query = update(client).values(url=url)
+        query = query.where(and_(client.c.id == client_id, client.c.id_service == id))
+        result = conn.execute(query)
 
+        query = select([client]).where(and_(client.c.id == client_id, client.c.id_service == id))
+        result = conn.execute(query)
 
-@app.route('/<id>/owner/<owner_id>/domain/<domain_id>/element/<element_id>/<lease_id>', methods=['GET', 'POST', 'DELETE'])
-def lease(id, owner_id, domain_id, element_id, lease_id):
-    if request.method == 'GET':
-        pass
-    elif request.method == 'POST': #make a reservation
-        pass
-    else: #DELETE
-        pass
+        tmp_lst = list()
+        for row in result:
+            tmp_lst.append(row)
+        conn.close()
+        id, id_service, name, info, url, date = tmp_lst[0]
+        return jsonify(url=MAIN_URL + url,
+                       id=id)
 
-def crt_reserve_cnt(id, owner_id, domain_id, element_id,lease_id, content):
-    assert isinstance(id, int)
-    assert isinstance(owner_id, int)
-    assert isinstance(domain_id, int)
-    assert isinstance(element_id, int)
-    assert isinstance(lease_id, int)
-    assert (set(content.keys()).issubset(
-        ['name', 'information'])), 'Keys are not according to the operation mapping.'
 
 @app.route('/<id>/client/<client_id>', methods=['GET','DELETE'])
 def client(id, client_id):
+    conn = engine.connect()
+    client = Table('client', meta, autoload=True, autoload_with=engine)
+    element = Table('element', meta, autoload=True, autoload_with=engine)
+    reservation = Table('reservation', meta, autoload=True, autoload_with=engine)
+    query = select([client]).where(and_(client.columns.id == client_id, client.columns.id_service == id))
+    result = conn.execute(query)
+    tmp_lst = list()
+    for row in result:
+        tmp_lst.append(row)
+    conn.close()
+
+    if len(tmp_lst) == 0:
+        raise InvalidUsage('This view is gone', status_code=410)
+
     if request.method == 'GET':
-        pass
+        ###
+        conn = engine.connect()
+        query = select([reservation])
+        query = query.select_from(client.join(reservation,
+                                              client.columns.id == reservation.columns.id_client))  # .where(and_(client.columns.id == client_id, client.columns.id_service == id))
+        result = conn.execute(query)
+        d_res = dict()
+        for e in result:
+            eid, eid_service, eid_owner, eid_domain, eid_element, eid_client, einformation, eurl, edate = e
+            d_res[id] = {'id': id, 'id_service': eid_service, 'id_owner': eid_owner, 'id_domain': eid_domain,
+                         'id_element': eid_element, 'id_client': eid_client, 'information': einformation, 'url': eurl,
+                         'date': edate}
+
+        print('d_res:\t', repr(d_res))
+        conn.close()
+        ###
+        id, id_service, name, information, url, date = tmp_lst[0]
+        response = {"name": name, "id_service": id_service, "id": id, "information": information, "date": date, "reservations":d_res}
+        return json.dumps(response)
+
     else:
-        pass
+        conn = engine.connect()
+        query = delete(client).where(
+            and_(client.columns.id == client_id, client.columns.id_service == id))
+        result = conn.execute(query)
+        conn.close()
+        return "OK"
 
-@app.route('/<id>/client/<client_id>/leases', methods=['GET'])
-def client_leases(id, client_id):
-    if request.method == 'GET':
-        pass
-    else:
-        pass
 
-@app.route('/<id>/client/<client_id>/<lease_id>', methods=['GET', 'DELETE'])
-def client_lease(id, client_id, lease_id):
-    if request.method == 'GET':
-        pass
-    else: #Cancels reservation
-        pass
 
+@app.route('/<id>/reservation/<reservation_id>', methods=['DELETE'])
+def client_leases(id, reservation_id):
+    conn = engine.connect()
+    reservation = Table('element', meta, autoload=True, autoload_with=engine)
+    query = select([reservation]).where(reservation.c.id_service == reservation_id)
+    result = conn.execute(query)
+    tmp_lst = list()
+    for row in result:
+        tmp_lst.append(row)
+    conn.close()
+
+    if len(tmp_lst) == 0:
+        raise InvalidUsage('This view is gone', status_code=410)
+
+    if request.method == 'DELETE':
+        conn = engine.connect()
+        query = delete(reservation).where(reservation.c.id == reservation_id)
+        result = conn.execute(query)
+        conn.close()
+        return "OK"
 
 if __name__ == '__main__':
     tables = create_tables()
     app.run()
-
 
