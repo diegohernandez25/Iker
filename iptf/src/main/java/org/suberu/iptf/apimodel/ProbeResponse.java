@@ -1,4 +1,4 @@
-package org.suberu.iptf.model;
+package org.suberu.iptf.apimodel;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;

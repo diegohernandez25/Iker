@@ -1,8 +1,9 @@
-package org.suberu.iptf.model;
+package org.suberu.iptf.apimodel;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
@@ -10,11 +11,14 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * GetTripsRequest
+ * AddSubtripRequest
  */
 @Validated
 
-public class GetTripsRequest   {
+public class AddSubtripRequest   {
+  @JsonProperty("TripId")
+  private BigDecimal tripId = null;
+
   @JsonProperty("StartCoords")
   @Valid
   private List<Float> startCoords = new ArrayList<Float>();
@@ -23,15 +27,32 @@ public class GetTripsRequest   {
   @Valid
   private List<Float> endCoords = new ArrayList<Float>();
 
-  @JsonProperty("StartTime")
-  private Float startTime = null;
+  public AddSubtripRequest tripId(BigDecimal tripId) {
+    this.tripId = tripId;
+    return this;
+  }
 
-  public GetTripsRequest startCoords(List<Float> startCoords) {
+  /**
+   * the id of the trip to add the subtrip
+   * @return tripId
+  **/
+
+  @Valid
+
+  public BigDecimal getTripId() {
+    return tripId;
+  }
+
+  public void setTripId(BigDecimal tripId) {
+    this.tripId = tripId;
+  }
+
+  public AddSubtripRequest startCoords(List<Float> startCoords) {
     this.startCoords = startCoords;
     return this;
   }
 
-  public GetTripsRequest addStartCoordsItem(Float startCoordsItem) {
+  public AddSubtripRequest addStartCoordsItem(Float startCoordsItem) {
     this.startCoords.add(startCoordsItem);
     return this;
   }
@@ -51,12 +72,12 @@ public class GetTripsRequest   {
     this.startCoords = startCoords;
   }
 
-  public GetTripsRequest endCoords(List<Float> endCoords) {
+  public AddSubtripRequest endCoords(List<Float> endCoords) {
     this.endCoords = endCoords;
     return this;
   }
 
-  public GetTripsRequest addEndCoordsItem(Float endCoordsItem) {
+  public AddSubtripRequest addEndCoordsItem(Float endCoordsItem) {
     this.endCoords.add(endCoordsItem);
     return this;
   }
@@ -76,25 +97,6 @@ public class GetTripsRequest   {
     this.endCoords = endCoords;
   }
 
-  public GetTripsRequest startTime(Float startTime) {
-    this.startTime = startTime;
-    return this;
-  }
-
-  /**
-   * the date for the trip
-   * @return startTime
-  **/
-
-
-  public Float getStartTime() {
-    return startTime;
-  }
-
-  public void setStartTime(Float startTime) {
-    this.startTime = startTime;
-  }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -104,25 +106,25 @@ public class GetTripsRequest   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    GetTripsRequest getTripsRequest = (GetTripsRequest) o;
-    return Objects.equals(this.startCoords, getTripsRequest.startCoords) &&
-        Objects.equals(this.endCoords, getTripsRequest.endCoords) &&
-        Objects.equals(this.startTime, getTripsRequest.startTime);
+    AddSubtripRequest addSubtripRequest = (AddSubtripRequest) o;
+    return Objects.equals(this.tripId, addSubtripRequest.tripId) &&
+        Objects.equals(this.startCoords, addSubtripRequest.startCoords) &&
+        Objects.equals(this.endCoords, addSubtripRequest.endCoords);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(startCoords, endCoords, startTime);
+    return Objects.hash(tripId, startCoords, endCoords);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class GetTripsRequest {\n");
+    sb.append("class AddSubtripRequest {\n");
     
+    sb.append("    tripId: ").append(toIndentedString(tripId)).append("\n");
     sb.append("    startCoords: ").append(toIndentedString(startCoords)).append("\n");
     sb.append("    endCoords: ").append(toIndentedString(endCoords)).append("\n");
-    sb.append("    startTime: ").append(toIndentedString(startTime)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -138,4 +140,5 @@ public class GetTripsRequest   {
     return o.toString().replace("\n", "\n    ");
   }
 }
+
 

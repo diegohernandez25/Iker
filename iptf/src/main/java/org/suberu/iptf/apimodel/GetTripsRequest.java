@@ -1,9 +1,8 @@
-package org.suberu.iptf.model;
+package org.suberu.iptf.apimodel;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.validation.annotation.Validated;
@@ -11,11 +10,11 @@ import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * TripResponse
+ * GetTripsRequest
  */
 @Validated
 
-public class TripResponse   {
+public class GetTripsRequest   {
   @JsonProperty("StartCoords")
   @Valid
   private List<Float> startCoords = new ArrayList<Float>();
@@ -25,31 +24,25 @@ public class TripResponse   {
   private List<Float> endCoords = new ArrayList<Float>();
 
   @JsonProperty("StartTime")
-  private Boolean startTime = null;
+  private Float startTime = null;
 
-  @JsonProperty("Date")
-  private Float date = null;
-
-  @JsonProperty("MaxDetour")
-  private BigDecimal maxDetour = null;
-
-  public TripResponse startCoords(List<Float> startCoords) {
+  public GetTripsRequest startCoords(List<Float> startCoords) {
     this.startCoords = startCoords;
     return this;
   }
 
-  public TripResponse addStartCoordsItem(Float startCoordsItem) {
+  public GetTripsRequest addStartCoordsItem(Float startCoordsItem) {
     this.startCoords.add(startCoordsItem);
     return this;
   }
 
   /**
-   * Get startCoords
+   * the coordinates of the starting point (x,y)
    * @return startCoords
   **/
   @NotNull
 
-
+@Size(min=2,max=2) 
   public List<Float> getStartCoords() {
     return startCoords;
   }
@@ -58,23 +51,23 @@ public class TripResponse   {
     this.startCoords = startCoords;
   }
 
-  public TripResponse endCoords(List<Float> endCoords) {
+  public GetTripsRequest endCoords(List<Float> endCoords) {
     this.endCoords = endCoords;
     return this;
   }
 
-  public TripResponse addEndCoordsItem(Float endCoordsItem) {
+  public GetTripsRequest addEndCoordsItem(Float endCoordsItem) {
     this.endCoords.add(endCoordsItem);
     return this;
   }
 
   /**
-   * Get endCoords
+   * the coordinates of the final destination (x,y)
    * @return endCoords
   **/
   @NotNull
 
-
+@Size(min=2,max=2) 
   public List<Float> getEndCoords() {
     return endCoords;
   }
@@ -83,65 +76,23 @@ public class TripResponse   {
     this.endCoords = endCoords;
   }
 
-  public TripResponse startTime(Boolean startTime) {
+  public GetTripsRequest startTime(Float startTime) {
     this.startTime = startTime;
     return this;
   }
 
   /**
-   * Get startTime
+   * the date for the trip
    * @return startTime
   **/
-  @NotNull
 
 
-  public Boolean isStartTime() {
+  public Float getStartTime() {
     return startTime;
   }
 
-  public void setStartTime(Boolean startTime) {
+  public void setStartTime(Float startTime) {
     this.startTime = startTime;
-  }
-
-  public TripResponse date(Float date) {
-    this.date = date;
-    return this;
-  }
-
-  /**
-   * Get date
-   * @return date
-  **/
-  @NotNull
-
-
-  public Float getDate() {
-    return date;
-  }
-
-  public void setDate(Float date) {
-    this.date = date;
-  }
-
-  public TripResponse maxDetour(BigDecimal maxDetour) {
-    this.maxDetour = maxDetour;
-    return this;
-  }
-
-  /**
-   * Get maxDetour
-   * @return maxDetour
-  **/
-  @NotNull
-
-  @Valid
-
-  public BigDecimal getMaxDetour() {
-    return maxDetour;
-  }
-
-  public void setMaxDetour(BigDecimal maxDetour) {
-    this.maxDetour = maxDetour;
   }
 
 
@@ -153,29 +104,25 @@ public class TripResponse   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    TripResponse tripResponse = (TripResponse) o;
-    return Objects.equals(this.startCoords, tripResponse.startCoords) &&
-        Objects.equals(this.endCoords, tripResponse.endCoords) &&
-        Objects.equals(this.startTime, tripResponse.startTime) &&
-        Objects.equals(this.date, tripResponse.date) &&
-        Objects.equals(this.maxDetour, tripResponse.maxDetour);
+    GetTripsRequest getTripsRequest = (GetTripsRequest) o;
+    return Objects.equals(this.startCoords, getTripsRequest.startCoords) &&
+        Objects.equals(this.endCoords, getTripsRequest.endCoords) &&
+        Objects.equals(this.startTime, getTripsRequest.startTime);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(startCoords, endCoords, startTime, date, maxDetour);
+    return Objects.hash(startCoords, endCoords, startTime);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class TripResponse {\n");
+    sb.append("class GetTripsRequest {\n");
     
     sb.append("    startCoords: ").append(toIndentedString(startCoords)).append("\n");
     sb.append("    endCoords: ").append(toIndentedString(endCoords)).append("\n");
     sb.append("    startTime: ").append(toIndentedString(startTime)).append("\n");
-    sb.append("    date: ").append(toIndentedString(date)).append("\n");
-    sb.append("    maxDetour: ").append(toIndentedString(maxDetour)).append("\n");
     sb.append("}");
     return sb.toString();
   }
