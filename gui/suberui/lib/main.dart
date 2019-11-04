@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:english_words/english_words.dart';
+
 
 void main() => runApp(MyApp());
 
@@ -169,6 +171,31 @@ class MainPage extends StatelessWidget {
             ),
           ),
         ]),
+      ),
+    );
+  }
+}
+
+
+
+class SearchTripPage extends StatelessWidget {
+
+
+  List<String> items= List<String>.generate(10, (i) => "Trip $i");
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Search for Trip"),
+      ),
+      body: Center(
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+
+            ]
+        ),
       ),
     );
   }
