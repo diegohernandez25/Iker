@@ -130,42 +130,45 @@ class MainPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Main Page"),
+        backgroundColor: Colors.teal[500],
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Row(
-              children: <Widget>[
-                Image(
-                  image: AssetImage('Images/face.png')
-                ),
+            mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                Image.asset('Images/face.png', width: 150, height: 150),
+                const SizedBox(width: 10),
                 Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text('Diogo Fernandes')
+                    Text('Diogo Fernandes') // ADD MORE INFO
                   ],
                 )
               ]
             ),
           const SizedBox(height: 30),
-          RaisedButton(
-            onPressed: () {},
-            child: const Text(
-                'Nice to meet you!',
-                style: TextStyle(fontSize: 20)
+          SizedBox(
+            width: 200,
+            child: RaisedButton(
+              onPressed: () {},
+              child: const Text(
+                  'Search Trip',
+                  style: TextStyle(fontSize: 20)
+              ),
             ),
           ),
-          const SizedBox(height: 20),
-          FlatButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MainPage()),
-              );
-            },
-            child: const Text(
-                'You already know me',
-                style: TextStyle(fontSize: 20)
+          const SizedBox(height: 10),
+          SizedBox(
+            width: 200,
+            child: RaisedButton(
+              onPressed: () {},
+              child: const Text(
+                  'Create Trip',
+                  style: TextStyle(fontSize: 20)
+              ),
             ),
           ),
         ]),
