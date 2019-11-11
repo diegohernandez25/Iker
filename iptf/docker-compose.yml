@@ -1,0 +1,19 @@
+version: '2'
+services:
+  spring:
+    build: .
+    container_name: spring
+    network_mode: "host"
+    command: 'java -jar /Iptf.jar'
+
+  iptf_db:
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: topsecretpassword
+      MYSQL_PASSWORD: 123qwe
+      MYSQL_USER: esuser
+      MYSQL_DATABASE: suberu_iptf
+    network_mode: "host"
+    volumes:
+      - /dev/shm/db_data:/var/lib/mysql
