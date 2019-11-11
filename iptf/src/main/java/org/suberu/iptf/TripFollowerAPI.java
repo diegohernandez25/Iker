@@ -34,7 +34,6 @@ public class TripFollowerAPI{
 
 		t.setOngoing();
 		triprep.save(t);
-		//Response: 201,400
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
@@ -49,12 +48,13 @@ public class TripFollowerAPI{
 		t.setHistory(hist);
 		triprep.save(t);
 
-		//Response: 200,400
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/get_last_pos",method=RequestMethod.GET)
-	public TripUpdateBody getLastPos(@RequestParam("TripId") int tripid,HttpServletRequest ht){
+	public ResponseEntity getLastPos(@RequestParam("TripId") int tripid,HttpServletRequest ht){
+		Optional<Trip> ot = triprep.findById(tripid);
+		if(!ot.isPresent()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		Trip t = triprep.findById(tripid).get();
 		TripUpdateBody tub = new TripUpdateBody();
 		List<List<Float>> llf = t.getHistory();
@@ -62,8 +62,7 @@ public class TripFollowerAPI{
 		tub.setTripId(new BigDecimal(tripid));
 		tub.setCoords(llf.get(llf.size()-1));
 	
-		//Response: 201,400
-		return tub;
+		return new ResponseEntity<TripUpdateBody>(tub,HttpStatus.OK);
 	}
 
 	@RequestMapping(value="/end_trip",method=RequestMethod.POST)
@@ -74,7 +73,6 @@ public class TripFollowerAPI{
 		t.setFinished();			
 		triprep.save(t);
 
-		//Response: 200,400
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }

@@ -16,10 +16,10 @@ import javax.validation.constraints.*;
 @Validated
 
 public class TripUpdateBody   {
-  @JsonProperty("TripId")
+  @JsonProperty(required=true,value="TripId")
   private BigDecimal tripId = null;
 
-  @JsonProperty("Coords")
+  @JsonProperty(required=true,value="Coords")
   @Valid
   private List<Float> coords = new ArrayList<Float>();
 

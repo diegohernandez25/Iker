@@ -62,7 +62,7 @@ public class ItineraryPlannerAPI{
 		return ret;
 	}
 
-	public static ProbeResponse getTripDetails(List<Waypoint> lw, ProbeRequest pr){
+	public static ProbeResponse getTripDetails(List<Waypoint> lw, ProbeRequest pr) throws Exception{
 		//https://secure-apir.viamichelin.com/apir/1/route.json/{lg}[/{data}]?steps={dep};[{steps};]{arr}&veht={veht}&itit={itit}&favMotorways={favMotorways}&avoidBorders={avoidBorders}&avoidTolls={avoidTolls}&avoidCCZ={avoidCCZ}&avoidORC={avoidORC}&multipleIti={multipleIti}&itiIdx={itiIdx}&distUnit={distUnit}&fuelConsump={fuelConsump}&fuelCost={fuelCost}&date={date}&cy={currency}&authkey={authkey}&charset={charset}&ie={ie}&callback={callback}&signature={signature}
 		//Response: ProbeResponse,400
 		String example="https://secure-apir.viamichelin.com/apir/1/route.json/fra?steps=1:e:2.0:48.0;1:e:3.0:49.0&fuelConsump=7.9:6.9:7.0";
@@ -90,13 +90,7 @@ public class ItineraryPlannerAPI{
 	
 		JSONObject get=null;
 
-		try{
-			get=michelinGet(sb.toString()).getJSONObject("iti");
-		}
-		catch(Exception e){
-			System.out.println(e);
-			return null;
-		}
+		get=michelinGet(sb.toString()).getJSONObject("iti");
 
 		ProbeResponse resp=new ProbeResponse();
 
@@ -123,13 +117,7 @@ public class ItineraryPlannerAPI{
 
 		//Get fuelCosts
 		Map<String,Float> fuelCosts=null;
-		try{
-			fuelCosts=getFuelCosts();
-		}
-		catch(Exception e){
-			System.out.println(e);
-			return null;
-		}
+		fuelCosts=getFuelCosts();
 
 		float fuelCost;
 		switch(pr.getFuelType()){
@@ -163,13 +151,18 @@ public class ItineraryPlannerAPI{
 	}
 	
 	@RequestMapping(value="/probe_trip",method=RequestMethod.POST)
-	public ProbeResponse probeTrip(@RequestBody ProbeRequest pr,HttpServletRequest ht){
-		return getTripDetails(null,pr);
+	public ResponseEntity probeTrip(@RequestBody ProbeRequest pr,HttpServletRequest ht){
+		//ProbeResponse
+		try{
+			return new ResponseEntity<ProbeResponse>(getTripDetails(null,pr),HttpStatus.OK);
+		}catch(Exception e){
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 	}
 	
 	@RequestMapping(value="/register_trip",method=RequestMethod.POST)
-	public Integer registerTrip(@RequestBody ProbeRequest pr,HttpServletRequest ht){
-		ProbeResponse prr = probeTrip(pr,null);
+	public ResponseEntity registerTrip(@RequestBody ProbeRequest pr,HttpServletRequest ht){
+		ProbeResponse prr = (ProbeResponse) probeTrip(pr,null).getBody();
 
 		Date start,end;
 		if(pr.getStartTime()!=null){
@@ -196,11 +189,11 @@ public class ItineraryPlannerAPI{
 							prr.getDist());
 		
 		//Response: 201,400,409
-		return triprep.save(t).getId();
+		return new ResponseEntity<Integer>(triprep.save(t).getId(),HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/get_trips",method=RequestMethod.POST)
-	public List<Integer> getTrips(@RequestBody GetTripsRequest gtr,HttpServletRequest ht){
+	public ResponseEntity getTrips(@RequestBody GetTripsRequest gtr,HttpServletRequest ht){
 		Date startday,endday;
 
 		Calendar cal = Calendar.getInstance();
@@ -234,11 +227,15 @@ public class ItineraryPlannerAPI{
 			llf.add(1,gtr.getStartCoords());
 			llf.add(llf.size()-1,gtr.getEndCoords());
 
-			if(getTripDetails(Waypoint.toListWaypoints(llf),pr).getDist()<t.getMaxDetour()+t.getDist())
-				ls.add(t.getId());
+			try{
+				if(getTripDetails(Waypoint.toListWaypoints(llf),pr).getDist()<t.getMaxDetour()+t.getDist())
+					ls.add(t.getId());
+			}catch(Exception e){
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	
+			}
 		}
 		//Response: 200 (array),400
-		return ls; 
+		return new ResponseEntity<List<Integer>>(ls,HttpStatus.OK); 
 	}
 
 	@RequestMapping(value="/add_subtrip",method=RequestMethod.POST)
@@ -260,7 +257,12 @@ public class ItineraryPlannerAPI{
 		llf.add(1,asr.getStartCoords());
 		llf.add(llf.size()-1,asr.getEndCoords());
 
-		ProbeResponse prr = getTripDetails(Waypoint.toListWaypoints(llf),pr);
+		ProbeResponse prr;
+		try{
+			prr = getTripDetails(Waypoint.toListWaypoints(llf),pr);
+		}catch(Exception e){
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	
+		}	
 
 		if(prr.getDist()>t.getMaxDetour()+t.getDist())
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -276,22 +278,26 @@ public class ItineraryPlannerAPI{
 	}
 	
 	@RequestMapping(value="/get_trip",method=RequestMethod.GET)
-	public TripResponse getTrip(@RequestParam("TripId") int tripid, HttpServletRequest ht){
+	public ResponseEntity getTrip(@RequestParam("TripId") int tripid, HttpServletRequest ht){
 		
-		Trip t = triprep.findById(tripid).get();
+		Optional<Trip> ot = triprep.findById(tripid);	
+		if(!ot.isPresent())
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		Trip t = ot.get();
 		TripResponse tr=new TripResponse();
 		tr.setCoords(t.getCoords());
 		tr.setStartTime(t.getStartTime().getTime()/1000);
 		tr.setEndTime(t.getEndTime().getTime()/1000);
 		tr.setMaxDetour(new BigDecimal(t.getMaxDetour()));
 		//Response: TripResponse,400
-		return tr;
+		return new ResponseEntity<TripResponse>(tr,HttpStatus.OK);
 	}
 	
 	@RequestMapping(value="/del_trip",method=RequestMethod.DELETE)
-	public void delTrip(@RequestParam("TripId") int tripid, HttpServletRequest ht){
+	public ResponseEntity delTrip(@RequestParam("TripId") int tripid, HttpServletRequest ht){
 		//Response: 200 (array),400
 		//We dont erase trips for history
 		//triprep.deleteById(tripid);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
