@@ -8,7 +8,7 @@ var express = require('express'),
   bodyParser = require('body-parser');
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/reviewDB', { 
+mongoose.connect('mongodb://mongo:27017/reviewDB', { 
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true }); 
