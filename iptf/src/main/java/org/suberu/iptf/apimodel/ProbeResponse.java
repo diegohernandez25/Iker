@@ -16,17 +16,17 @@ import javax.validation.constraints.*;
 @Validated
 
 public class ProbeResponse   {
-  @JsonProperty("waypoints")
+  @JsonProperty(required=true,value="waypoints")
   @Valid
   private List<List<Float>> waypoints = new ArrayList<List<Float>>();
 
-  @JsonProperty("cost")
+  @JsonProperty(required=true,value="cost")
   private Float cost = null;
 
-  @JsonProperty("time")
+  @JsonProperty(required=true,value="time")
   private BigDecimal time = null;
 
-  @JsonProperty("dist")
+  @JsonProperty(required=true,value="dist")
   private Float dist = null;
 
   public ProbeResponse waypoints(List<List<Float>> waypoints) {

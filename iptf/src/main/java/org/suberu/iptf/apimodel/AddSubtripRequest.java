@@ -16,14 +16,14 @@ import javax.validation.constraints.*;
 @Validated
 
 public class AddSubtripRequest   {
-  @JsonProperty("TripId")
+  @JsonProperty(required=true,value="TripId")
   private BigDecimal tripId = null;
 
-  @JsonProperty("StartCoords")
+  @JsonProperty(required=true,value="StartCoords")
   @Valid
   private List<Float> startCoords = new ArrayList<Float>();
 
-  @JsonProperty("EndCoords")
+  @JsonProperty(required=true,value="EndCoords")
   @Valid
   private List<Float> endCoords = new ArrayList<Float>();
 

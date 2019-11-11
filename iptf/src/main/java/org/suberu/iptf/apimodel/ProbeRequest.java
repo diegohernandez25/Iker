@@ -16,31 +16,31 @@ import javax.validation.constraints.*;
 @Validated
 
 public class ProbeRequest   {
-  @JsonProperty("StartCoords")
+  @JsonProperty(required=true,value="StartCoords")
   @Valid
   private List<Float> startCoords = new ArrayList<Float>();
 
-  @JsonProperty("EndCoords")
+  @JsonProperty(required=true,value="EndCoords")
   @Valid
   private List<Float> endCoords = new ArrayList<Float>();
 
-  @JsonProperty("Consumption")
+  @JsonProperty(required=true,value="Consumption")
   @Valid
   private List<Float> consumption = new ArrayList<Float>();
 
-  @JsonProperty("AvoidTolls")
+  @JsonProperty(required=true,value="AvoidTolls")
   private Boolean avoidTolls = null;
 
-  @JsonProperty("StartTime")
+  @JsonProperty(required=true,value="StartTime")
   private BigDecimal startTime = null;
 
-  @JsonProperty("EndTime")
+  @JsonProperty(required=true,value="EndTime")
   private BigDecimal endTime = null;
 
-  @JsonProperty("MaxDetour")
+  @JsonProperty(required=true,value="MaxDetour")
   private BigDecimal maxDetour = null;
 
-  @JsonProperty("FuelType")
+  @JsonProperty(required=true,value="FuelType")
   private String fuelType = null;
 
   public ProbeRequest startCoords(List<Float> startCoords) {

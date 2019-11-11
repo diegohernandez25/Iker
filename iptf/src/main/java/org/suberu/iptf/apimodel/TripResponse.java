@@ -16,17 +16,17 @@ import javax.validation.constraints.*;
 @Validated
 
 public class TripResponse{
-  @JsonProperty("Coords")
+  @JsonProperty(required=true,value="Coords")
   @Valid
   private List<List<Float>> coords = new ArrayList<>();
 
-  @JsonProperty("StartTime")
+  @JsonProperty(required=true,value="StartTime")
   private Long startTime = null;
 
-  @JsonProperty("EndTime")
+  @JsonProperty(required=true,value="EndTime")
   private Long endTime = null;
 
-  @JsonProperty("MaxDetour")
+  @JsonProperty(required=true,value="MaxDetour")
   private BigDecimal maxDetour = null;
 
   public TripResponse coords(List<List<Float>> coords) {
