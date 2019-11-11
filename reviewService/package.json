@@ -1,0 +1,32 @@
+{
+  "name": "reviewservice",
+  "version": "1.0.0",
+  "description": "review service to serve carpolling app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/r.rodinhas/reviewservice.git"
+  },
+  "keywords": [
+    "review"
+  ],
+  "author": "Rodrigo Pereira",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/r.rodinhas/reviewservice/issues"
+  },
+  "homepage": "https://gitlab.com/r.rodinhas/reviewservice#readme",
+  "devDependencies": {
+    "eslint": "^6.5.1",
+    "eslint-config-google": "^0.14.0",
+    "nodemon": "^1.19.3"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.7.4"
+  }
+}
