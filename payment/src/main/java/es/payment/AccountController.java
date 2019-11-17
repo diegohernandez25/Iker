@@ -20,7 +20,7 @@ class AccountController {
   }
 
   // Aggregate root
-  
+
   @GetMapping("/accounts")
   List<Account> all() {
     return repository.findAll();
@@ -34,14 +34,14 @@ class AccountController {
   // Single item
 
   @GetMapping("/accounts/{id}")
-  Account one(@PathVariable int globalID) {
+  Account one(@PathVariable long globalID) {
 
     return repository.findById(globalID)
       .orElseThrow(() -> new AccountNotFoundException(globalID));
   }
 
   @PutMapping("/accounts/{id}")
-  Account replaceAccount(@RequestBody Account newAccount, @PathVariable int globalID) {
+  Account replaceAccount(@RequestBody Account newAccount, @PathVariable long globalID) {
 
     return repository.findById(globalID)
       .map(account -> {
@@ -52,13 +52,13 @@ class AccountController {
         return repository.save(account);
       })
       .orElseGet(() -> {
-        newAccount.setId(id);
+        newAccount.setId(globalID);
         return repository.save(newAccount);
       });
   }
 
   @DeleteMapping("/account/{id}")
-  void deleteAccount(@PathVariable int globalID) {
+  void deleteAccount(@PathVariable long globalID) {
     repository.deleteById(globalID);
   }
 }
