@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "328064800570",
+    "firebase_url": "https://iker-f47a2.firebaseio.com",
+    "project_id": "iker-f47a2",
+    "storage_bucket": "iker-f47a2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:328064800570:android:eead81ecc9eb793e272203",
+        "android_client_info": {
+          "package_name": "com.es2019.iKer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "328064800570-qot241dq88m4htivciqkd0b1d2ncku8f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.es2019.iKer",
+            "certificate_hash": "b004618fbbea3fede1783083ee0184c0caf284c4"
+          }
+        },
+        {
+          "client_id": "328064800570-7g6j4ndiu1ij6qg6dv9lvcn6jog737e9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVJ0ZBrZwkbU_MZ-9BMrybJPLDRAfcPlw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "328064800570-7g6j4ndiu1ij6qg6dv9lvcn6jog737e9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
