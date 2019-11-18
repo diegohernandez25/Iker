@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:suberui/shared/components/EventTile.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:suberui/services/auth.dart';
 
 
 
 
 class Home extends StatelessWidget {
+
+  final AuthService _auth = AuthService();
 
   final List<EventTile> evtList=[
     EventTile(
@@ -57,6 +60,14 @@ class Home extends StatelessWidget {
         appBar: AppBar(
           title: Text("Main Page"),
           backgroundColor: Colors.teal[500],
+          actions: <Widget>[
+            FlatButton.icon(
+                onPressed: () async{
+                  await _auth.signOutGoogle();
+                },
+                icon: Icon(Icons.person),
+                label: Text('logout'))
+          ],
         ),
         body:Column(
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -5,10 +5,13 @@ import 'package:english_words/english_words.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:suberui/services/auth.dart';
 
 import 'package:suberui/shared/components/EventTile.dart';
 
 import 'package:suberui/screens/wrapper.dart';
+import 'package:provider/provider.dart';
+import 'package:suberui/models/user.dart';
 
 
 void main() => runApp(MyApp());
@@ -16,12 +19,15 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Suberu App',
-      theme: ThemeData(
-          primarySwatch: Colors.teal
+    return StreamProvider<User>.value(
+      value: AuthService().user,
+      child: MaterialApp(
+        title: 'Suberu App',
+        theme: ThemeData(
+            primarySwatch: Colors.teal
+        ),
+        home: Wrapper(),
       ),
-      home: Wrapper(),
     );
   }
 }
