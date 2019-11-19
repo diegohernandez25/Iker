@@ -164,6 +164,28 @@ def get_element_api(id, id_owner, id_domain, id_element)->str:
 
     return "ERROR"
 
+
+@app.route('/<id>/element/<id_element>', methods=['GET'])
+def get_element_byid_api(id, id_element)->str:
+    service = get_service(session, id)
+    element = get_element(session, id_element)
+
+    if(service is not None) and (element is not None):
+        return json.dumps(element.get_dict())
+
+    return "ERROR"
+
+@app.route('<id>/domain/<id_domain>', methods=['GET'])
+def get_domain_byid_api(id, id_domain)->str:
+    service = get_service(session, id)
+    domain = get_domain(session, id_domain)
+
+    if(service is not None) and (domain is not None):
+        return json.dumps(domain.get_dict())
+
+    return "ERROR"
+
+
 @app.route('/<id>/client', methods=['POST'])
 def create_client_api(id)->str:
 
@@ -204,7 +226,7 @@ def create_reservation_api(id, id_owner, id_domain, id_element)->str:
 
     if (element is not None) and (element.reserved == True):
         return "RESERVED"
-    
+
     if (service is not None) and (owner is not None) and (domain is not None)\
         and (owner in service.owner) and (domain in owner.domain)\
          and (client is not None) and (element in domain.element)\
@@ -238,7 +260,6 @@ def get_reservation_api(id, id_client, id_reservation)->str:
             return json.dumps(reservation.get_dict())
 
     return "ERROR"
-
 
 if __name__ == '__main__':
     Base.metadata.create_all(engine)
