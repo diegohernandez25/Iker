@@ -1,0 +1,54 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:suberui/models/user.dart';
+
+
+class AuthService{
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = new GoogleSignIn();
+
+
+  User _userFromGoogle(FirebaseUser user){
+    return user != null ? new User(uid: user.uid) : null;
+  }
+
+  //aut change user stream
+  Stream<User> get user{
+    return _auth.onAuthStateChanged.map(_userFromGoogle);
+  }
+
+
+  //Future<FirebaseUser> signInGoogle() async{
+  Future<User> signInGoogle() async{
+    try {
+      GoogleSignInAccount googleSignInAccount = await _googleSignIn.signIn();
+      GoogleSignInAuthentication gSA = await googleSignInAccount.authentication;
+
+      final AuthCredential credential = GoogleAuthProvider.getCredential(
+        accessToken: gSA.accessToken,
+        idToken: gSA.idToken,
+      );
+
+      final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
+      //return user;
+      return _userFromGoogle(user);
+    }
+    catch(e){
+      return null;
+    }
+  }
+
+  Future signOutGoogle() async{
+
+    try{
+
+      await _googleSignIn.signOut();
+
+      return await _auth.signOut();
+    }
+    catch(e){
+      print(e.toString());
+      return null;
+    }
+  }
+}
