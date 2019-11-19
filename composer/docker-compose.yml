@@ -12,6 +12,5 @@ services:
       - "33201:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
-    network_mode: "host"
     volumes:
       - ./db:/var/lib/mysql
