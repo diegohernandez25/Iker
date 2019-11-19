@@ -175,7 +175,7 @@ def get_element_byid_api(id, id_element)->str:
 
     return "ERROR"
 
-@app.route('<id>/domain/<id_domain>', methods=['GET'])
+@app.route('/<id>/domain/<id_domain>', methods=['GET'])
 def get_domain_byid_api(id, id_domain)->str:
     service = get_service(session, id)
     domain = get_domain(session, id_domain)

@@ -14,7 +14,6 @@ from sqlalchemy.orm import relationship, sessionmaker
 
 from database.operations import *
 from database.base import Base, engine, Session
-from json_op import *
 
 dictConfig({
     'version': 1,
