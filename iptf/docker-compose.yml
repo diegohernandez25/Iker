@@ -10,7 +10,6 @@ services:
 
   iptf_db:
     image: mariadb
-    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: topsecretpassword
       MYSQL_PASSWORD: 123qwe

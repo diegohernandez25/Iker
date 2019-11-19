@@ -22,7 +22,8 @@ import org.jsoup.select.*;
 @RestController
 public class ItineraryPlannerAPI{
 
-	private static String RESTKEY = "RESTGP20190930110108209441913192";
+	//private static String RESTKEY = "RESTGP20190930110108209441913192";
+	private static String RESTKEY = "RESTGP20191120000304894795243111";
 
 	@Autowired
 	TripRepository triprep;
@@ -156,6 +157,7 @@ public class ItineraryPlannerAPI{
 		try{
 			return new ResponseEntity<ProbeResponse>(getTripDetails(null,pr),HttpStatus.OK);
 		}catch(Exception e){
+			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -231,6 +233,7 @@ public class ItineraryPlannerAPI{
 				if(getTripDetails(Waypoint.toListWaypoints(llf),pr).getDist()<t.getMaxDetour()+t.getDist())
 					ls.add(t.getId());
 			}catch(Exception e){
+				e.printStackTrace();
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	
 			}
 		}
@@ -261,6 +264,7 @@ public class ItineraryPlannerAPI{
 		try{
 			prr = getTripDetails(Waypoint.toListWaypoints(llf),pr);
 		}catch(Exception e){
+			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	
 		}	
 
