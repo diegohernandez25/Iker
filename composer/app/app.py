@@ -2,6 +2,7 @@ from typing import List, Dict
 from flask import Flask, redirect, url_for, request, jsonify
 import mysql.connector
 import json
+import requests
 import datetime
 import json
 
@@ -46,3 +47,14 @@ def create_user():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
+
+
+@app.route("/test_trip", methods=['POST'])
+def test_trip():
+	print(requests.post("localhost:8081/probe_trip",data=request.json))
+
+@@app.route("/put_trip", methods=['POST'])
+def put_trip():
+	requests.post("localhost:8081/register_trip",data=request.json)
+
+
