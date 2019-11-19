@@ -1,0 +1,116 @@
+{
+	"info": {
+		"_postman_id": "e145f64e-8b5d-4267-b638-392b4552a8a2",
+		"name": "Trip Follower",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Start Trip",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:8081/start_trip?TripId=1",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"start_trip"
+					],
+					"query": [
+						{
+							"key": "TripId",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Trip Update",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"TripId\":1,\n\t\"Coords\":[\n\t\t40.642438, \n\t\t-8.655375\n\t\t]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8081/trip_update",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"trip_update"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Last Pos",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8081/get_last_pos?TripId=1",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"get_last_pos"
+					],
+					"query": [
+						{
+							"key": "TripId",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "End Trip",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:8081/end_trip?TripId=1",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"end_trip"
+					],
+					"query": [
+						{
+							"key": "TripId",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
