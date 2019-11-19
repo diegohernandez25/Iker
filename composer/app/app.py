@@ -52,7 +52,7 @@ if __name__ == '__main__':
 def test_trip():
 	print(requests.post("localhost:8081/probe_trip",data=request.json))
 
-@@app.route("/put_trip", methods=['POST'])
+@app.route("/put_trip", methods=['POST'])
 def put_trip():
 	requests.post("localhost:8081/register_trip",data=request.json)
 
