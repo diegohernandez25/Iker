@@ -1,6 +1,8 @@
 version: '2'
 services:
   spring:
+    depends_on:
+      - iptf_db
     build: .
     container_name: spring
     network_mode: "host"
