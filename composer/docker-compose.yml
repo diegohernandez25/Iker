@@ -4,9 +4,9 @@ services:
     depends_on:
       - db
     build: ./app
-    network_mode: "host"
+#    network_mode: "host"
     ports:
-      - "5000:5002"
+      - "5002:5000"
 
   db:
     image: mysql:5.7
