@@ -16,4 +16,4 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: booking
     volumes:
-      - ./db:/var/lib/mysql
+      - /dev/shm/db_res:/var/lib/mysql
