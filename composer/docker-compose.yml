@@ -17,4 +17,4 @@ services:
       MYSQL_DATABASE: composer
 
     volumes:
-      - ./db:/var/lib/mysql
+      - /dev/shm/db_composer:/var/lib/mysql
