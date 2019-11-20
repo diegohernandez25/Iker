@@ -1,6 +1,8 @@
 version: "2"
 services:
   app:
+    depends_on:
+      - db
     build: ./app
     network_mode: "host"
     ports:
@@ -12,5 +14,6 @@ services:
       - "32000:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: booking
     volumes:
       - ./db:/var/lib/mysql
