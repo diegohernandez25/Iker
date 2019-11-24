@@ -41,7 +41,7 @@ class Client(Base):
     information    = Column(String(1000))
     url            = Column(String(100))
     date           = Column(Date)
-    reservation     = relationship("Reservation", backref="client")
+    reservation     = relationship("Reservation", backref="client", cascade="all, delete-orphan")
 
     def __str__(self):
         return "         id: %s\n" % (str(self.id)) +\
@@ -68,12 +68,14 @@ class Element(Base):
     information = Column(String(1000))
     url         = Column(String(100))
     date        = Column(Date)
-    init_time   = Column(Date)
-    end_time    = Column(Date)
+    #init_time   = Column(Date)
+    #end_time    = Column(Date)
+    init_time   = Column(Integer)
+    end_time    = Column(Integer)
     price       = Column(Float)
     reserved    = Column(Boolean)
 
-    reservation = relationship("Reservation", backref="element")
+    reservation = relationship("Reservation", backref="element", cascade="all, delete-orphan")
 
     def __str__(self):
         return "         id: %s\n" % (str(self.id)) +\
@@ -108,7 +110,7 @@ class Domain(Base):
     information = Column(String(1000))
     url         = Column(String(100))
     date        = Column(Date)
-    element     = relationship("Element", backref="domain")
+    element     = relationship("Element", backref="domain", cascade="all, delete-orphan")
 
     def __str__(self):
         return "         id: %s\n" % (str(self.id)) +\
@@ -136,7 +138,7 @@ class Owner(Base):
     url         = Column(String(100))
     date        = Column(Date)
 
-    domain      = relationship("Domain", backref="owner")
+    domain      = relationship("Domain", backref="owner", cascade="all, delete-orphan")
 
     def __str__(self):
         return "         id: %s\n" % (str(self.id)) +\
@@ -164,8 +166,8 @@ class Service(Base):
     url            = Column(String(100))
     date           = Column(Date)
 
-    owner          = relationship("Owner", backref="service")
-    client         = relationship("Client", backref="service")
+    owner          = relationship("Owner", backref="service", cascade="all, delete-orphan")
+    client         = relationship("Client", backref="service", cascade="all, delete-orphan")
 
     def __str__(self):
         return "         id: %s\n" % (str(self.id)) +\

@@ -39,6 +39,7 @@ session = Session()
 def index() -> str:
     return "Booking"
 
+
 @app.route('/service', methods=['POST'])
 def create_service_api()->str:
 
@@ -50,7 +51,7 @@ def create_service_api()->str:
     return json.dumps(service.get_dict())
 
 
-@app.route('/service/<id>', methods=['GET'])
+@app.route('/<id>', methods=['GET'])
 def get_service_api(id)->str():
 
     service = get_service(session, id)
@@ -181,7 +182,7 @@ def get_domain_byid_api(id, id_domain)->str:
     domain = get_domain(session, id_domain)
 
     if(service is not None) and (domain is not None):
-        return json.dumps(domain.get_dict())
+        return get_json_domain(domain)
 
     return "ERROR"
 
@@ -263,4 +264,4 @@ def get_reservation_api(id, id_client, id_reservation)->str:
 
 if __name__ == '__main__':
     Base.metadata.create_all(engine)
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', port=5002)
