@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, Integer, Date, Float, ForeignKey, create_engine, and_
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.orm import relationship, sessionmaker, load_only
 from sqlalchemy.sql import exists
 
 from datetime import date
@@ -54,7 +54,32 @@ def trip_exists(session,id_iptf)->Boolean:
 
     return session.query(exists().where(Trip.id_iptf==id_iptf)).scalar()
 
+def owner_exists(session, id_owner)->Boolean:
 
+    return session.query(exists().where(User.id_owner_booking==id_owner)).scalar()
+
+def client_exists(session, id_client)->Boolean:
+
+    return session.query(exists().where(User.id_client_booking==id_client)).scalar()
+
+
+def get_trip_from_iptf(session, id_iptf)->Trip:
+    if trip_exists:
+        return session.query(Trip).\
+                filter(Trip.id_iptf==id_iptf).\
+                options(load_only("id")).\
+                one()
+
+    return None
+
+def get_usr_from_ownerid(session, id_iptf)->Trip:
+    if trip_exists:
+        return session.query(Trip).\
+                filter(Trip.id_iptf==id_iptf).\
+                options(load_only("id")).\
+                one()
+
+    return None
 
 if __name__ == '__main__':
 
@@ -71,4 +96,8 @@ if __name__ == '__main__':
     #print(valid_usr(session, 5, "J94M132H9VN91IW"))
 
     #Create Trip
-    #create_trip(session,-1,-1,1)
+    #create_trip(session,-2,-4,1)
+
+    #Get trip by iptf_id
+    #trip = get_trip_from_iptf(session,178)
+    #print(trip)

@@ -10,6 +10,7 @@ import string
 import random
 import logging
 import sys
+import time
 
 from logging.config import dictConfig
 from sqlalchemy import create_engine
@@ -21,8 +22,11 @@ from database.operations import *
 from database.base import Base, engine, Session
 from database.entities import *
 
+BOOKING_SERVICE_NAME = 'carpooling-es-19'
+BOOKING_SERVICE_ID = 1
 
-URL_RESERVATION = "http://localhost:5002/1/"
+
+URL_RESERVATION = "http://localhost:5002/"
 URL_TRIP_FOLLOWER = "http://localhost:8081/"
 
 logging.basicConfig(level=logging.DEBUG)
@@ -62,9 +66,10 @@ def put_trip():
 """
 Account Setup Flow
 """
-#TODO: Check if it is not registered. DONE
+
 @app.route("/create_usr", methods=['POST'])
 def createUser():
+    global BOOKING_SERVICE_ID
     #Get Authentication Id from query parameter
     authentication_id = request.args.get('usr_id')
 
@@ -74,13 +79,12 @@ def createUser():
         not usr_exists(session, authentication_id):
         #Get new owner id
         b_json  = {"name":body["name"],"information":body["information"]}
-        r       = requests.post(URL_RESERVATION + "owner", json=b_json)
-
+        r       = requests.post(URL_RESERVATION + str(BOOKING_SERVICE_ID) +"/owner", json=b_json)
         owner_id = r.json()['id']
 
         #Get new client id
         b_json  = {"name":body["name"],"information":body["information"]}
-        r       = requests.post(URL_RESERVATION + "client", json=b_json)
+        r       = requests.post(URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/client", json=b_json)
         client_id = r.json()['id']
 
         #generate random access_token
@@ -106,18 +110,39 @@ def book_trip()->str:
     body            = request.json
 
     if set(["StartCoords", "EndCoords","Consumption","AvoidTolls","StartTime",
-            "EndTime","MaxDetour","FuelType"]).issubset(set(body.keys())) and\
-            valid_usr(session, user_id, access_token):
+            "EndTime","MaxDetour","FuelType", "name", "information", "Price",
+            "NumSeats"]).issubset(set(body.keys())) and valid_usr(session, user_id, access_token):
 
         r       = requests.post(URL_TRIP_FOLLOWER + "register_trip", json=body)
         id_iptf = r.json()
 
-        user    = get_usr(session, user_id)
+        user        = get_usr(session, user_id)
         owner_id    = user.id_owner_booking
-        url     = URL_RESERVATION+"owner/"+str(owner_id)+"/domain"
-        d_json  = {"name": body["name"], "information": body["information"]}
-        r       = requests.post(url, json=d_json)
+        url         = URL_RESERVATION + str(BOOKING_SERVICE_ID) +"/owner/"+str(owner_id)+"/domain"
+        d_json      = {"name": body["name"], "information": body["information"]}
+        r           = requests.post(url, json=d_json)
         id_domain_booking   = r.json()['id']
+
+        #Create Elements
+        url = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/owner/" +\
+                str(owner_id) +"/domain/" + str(id_domain_booking) + "/element"
+        elem_bdy = {
+            "name"          : body["name"] + "_elem",
+            "information"   : body["information"],
+            "init_time"     : body["StartTime"],
+            "end_time"      : body["EndTime"],
+            "price"         : body["Price"]
+        }
+
+        if 'NumSeats' in set(body.keys()):
+            for i in range(0,body['NumSeats']):
+
+                elem_bdy["name"] = body["name"] + "_elem" + str(i)
+
+                r = requests.post(url, json=elem_bdy)
+
+        else:
+            r = requests.post(url, json=elem_bdy)
 
         #Save trip mapping
         trip = create_trip(session, id_domain_booking, id_iptf, user_id)
@@ -126,8 +151,85 @@ def book_trip()->str:
     else:
         return "ERROR"
 
+@app.route("/search_trip", methods=['GET'])
+def search_trip()->str:
+    global BOOKING_SERVICE_ID
+
+    user_id         = request.args.get('usr_id')
+    access_token    = request.args.get('access_token')
+    body            = request.json
+
+    if set(["StartCoords", "EndCoords", "StartTime"]).issubset(set(body.keys())) and\
+        valid_usr(session, user_id, access_token):
+        iptf_bdy = {
+            "StartCoords"   : body["StartCoords"],
+            "EndCoords"     : body["EndCoords"],
+            "StartTime"     : body["StartTime"]
+        }
+        r = requests.post(URL_TRIP_FOLLOWER + "get_trips", json=iptf_bdy)
+        trips = r.json()
+
+        url = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/"
+        res = list()
+
+        for t in trips:
+            #GET BOOKING
+            if trip_exists(session,t):
+                trip = get_trip_from_iptf(session, t)
+                r = requests.get(url + str(trip.id_domain_booking))
+                r = r.json()
+                count_aval = 0
+
+                for e in r["elements"]:
+                    count_aval += 1 if not e['reserved'] else 0
+
+                res.append({
+                    "id"        : trip.id,
+                    "init_time" : epoch_to_date(int(r["elements"][0]["init_time"])),
+                    "end_time"  : epoch_to_date(int(r["elements"][0]["end_time"])),
+                    "price"     : r["elements"][0]["price"],
+                    "aval"      : count_aval
+                })
+            else:
+                app.logger.info("Trip does not exist")
+
+        return json.dumps(res)
+
+    else:
+        return "ERROR"
+
+def epoch_to_date(epoch)->str:
+    return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(epoch))
+
+def create_service():
+    global BOOKING_SERVICE_ID
+
+    body = {    'name': 'carpooling-es-19',
+                'information':{
+                    'authors':['Diego','Andre','Rodrigo','Dinis']
+                }
+            }
+    r = requests.post(URL_RESERVATION + "service", json=body)
+    BOOKING_SERVICE_ID = r.json()['id']
+
+def check_service()->Boolean:
+    global BOOKING_SERVICE_ID
+
+    r   = requests.get(URL_RESERVATION + str(BOOKING_SERVICE_ID))
+
+    if (r.text=="ERROR"):
+        return False
+
+    return True if (r.json()['name'] == BOOKING_SERVICE_NAME) else False
+
+
 
 
 if __name__ == '__main__':
+    if not check_service():
+        create_service()
+    else:
+        print("Service was already created")
+
     Base.metadata.create_all(engine)
     app.run(host='0.0.0.0')

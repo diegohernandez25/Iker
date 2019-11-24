@@ -9,6 +9,7 @@ except:
 
 import time
 
+#FIXME : Might not need this.
 class Reservation(Base):
 
     __tablename__ = 'reservation'
@@ -67,8 +68,8 @@ class User(Base):
     id_client_booking       = Column(Integer, unique=True, nullable=False)
     access_token            = Column(String(15), nullable=False)
 
-    trip        = relationship("Trip", backref="user")
-    reservation = relationship("Reservation", backref="user")
+    trip        = relationship("Trip", backref="user", cascade="all, delete-orphan")
+    reservation = relationship("Reservation", backref="user", cascade="all, delete-orphan")
 
 
     def __str__(self):
