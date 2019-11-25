@@ -1,0 +1,20 @@
+version: "2"
+services:
+  app:
+    depends_on:
+      - db
+    build: ./app
+#    network_mode: "host"
+    ports:
+      - "5000:5000"
+
+  db:
+    image: mysql:5.7
+    ports:
+      - "33201:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: composer
+
+    volumes:
+      - /dev/shm/db_composer:/var/lib/mysql

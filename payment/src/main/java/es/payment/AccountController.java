@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,6 +50,8 @@ class AccountController {
         account.setName(newAccount.getName());
         account.setName(newAccount.getName());
         account.setBalance(newAccount.getBalance());
+        account.setPassword(newAccount.getPassword());
+        account.setEmail(newAccount.getEmail());
         return repository.save(account);
       })
       .orElseGet(() -> {
@@ -60,5 +63,19 @@ class AccountController {
   @DeleteMapping("/account/{id}")
   void deleteAccount(@PathVariable long globalID) {
     repository.deleteById(globalID);
+  }
+
+  // Single item
+
+  @GetMapping("/account_search")
+  Account emailSearch(@RequestParam String email){
+
+    List<Account> all_accounts = repository.findAll();
+    for (int i = 0; i < all_accounts.size(); i++) {
+         if(email.equals(all_accounts.get(i).getEmail())){
+           return all_accounts.get(i);
+         }
+    }
+    return null;
   }
 }

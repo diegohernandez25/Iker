@@ -1,0 +1,194 @@
+{
+	"info": {
+		"_postman_id": "880c068a-225f-4c81-8543-a735140d563b",
+		"name": "Itinerary Planner",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Probe Trip",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"StartCoords\": [\n        40.632933,\n        -8.659798\n    ],\n    \"EndCoords\": [\n        40.209366,\n        -8.444125\n    ],\n    \"Consumption\": [\n        5,\n        7.4,\n        9\n    ],\n    \"AvoidTolls\": true,\n    \"StartTime\": 1569885623,\n    \"EndTime\": 1569885623,\n    \"MaxDetour\": 100,\n    \"FuelType\": \"petrol\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8081/probe_trip",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"probe_trip"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Register Trip",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"StartCoords\": [\n        40.632933,\n        -8.659798\n    ],\n    \"EndCoords\": [\n        40.209366,\n        -8.444125\n    ],\n    \"Consumption\": [\n        5,\n        7.4,\n        9\n    ],\n    \"AvoidTolls\": true,\n    \"StartTime\": 1569885623,\n    \"EndTime\": 1569885623,\n    \"MaxDetour\": 100,\n    \"FuelType\": \"petrol\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8081/register_trip",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"register_trip"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Trips",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"StartCoords\": [\n        40.632933,\n        -8.659798\n    ],\n    \"EndCoords\": [\n        40.209366,\n        -8.444125\n    ],\n  \"StartTime\": 1569885023\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8081/get_trips",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"get_trips"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Subtrip",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"StartCoords\": [\n        40.632933,\n        -8.659798\n    ],\n    \"EndCoords\": [\n        40.209366,\n        -8.444125\n    ],\n  \"TripId\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8081/add_subtrip",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"add_subtrip"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Trip",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8081/get_trip?TripId=1",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"get_trip"
+					],
+					"query": [
+						{
+							"key": "TripId",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Trip",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8081/del_trip?TripId=1",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"del_trip"
+					],
+					"query": [
+						{
+							"key": "TripId",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

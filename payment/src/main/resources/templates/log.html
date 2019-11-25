@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+      <title>AyPal, we swear it's not a copy</title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <link rel="stylesheet"
+      href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+      <script
+      src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+      <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+      <link th:href="@{signin.css}" rel="stylesheet">
+  </head>
+  <body class="text-center" bgcolor="#E6E6FA">
+    <form class="form-signin" action="#" th:action="@{/sign_in}" th:object="${login}" method="post">
+      <img class="mb-4" th:src="@{aypal.png}" alt="" width="172" height="60" style="margin-bottom: 30px;">
+      <h6 style="margin-bottom: 20px; color: red;" th:text="${error}" />
+      <input type="hidden" id="transaction" th:name="ttoken" th:value="${token_value}">
+      <label for="inputUser" class="sr-only">Email</label>
+      <input type="email" id="userName" th:field="*{id}" class="form-control" placeholder="Email" required autofocus>
+      <label for="inputPassword" class="sr-only">Password</label>
+      <input type="password" id="inputPassword" class="form-control" placeholder="Password" required th:field="*{pass}">
+      <button class="btn btn-lg btn-primary btn-block" type="submit" style="margin-bottom: 10px;">Sign in</button>
+      <a th:href="${token_value2}">Don't have an account? Sign up here!</a>
+    </form>
+  </body>
+</html>

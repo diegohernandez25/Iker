@@ -92,13 +92,14 @@ def delete_domain(session, id=None, domain=None):
     session.delete(domain)
     session.commit()
 
-def create_element(session, domain, name, information, url, date, init_time,end_time, price)->Element:
+def create_element(session, domain, name, information, url, date, init_time,
+                    end_time, price)->Element:
 
-    if isinstance(init_time,str):
-        init_time   = datetime.datetime.strptime(init_time,"%Y-%m-%d %H:%M:%S")
+    #if isinstance(init_time,str):
+    #    init_time   = datetime.datetime.strptime(init_time,"%Y-%m-%d %H:%M:%S")
 
-    if isinstance(end_time, str):
-        end_time    = datetime.datetime.strptime(end_time,"%Y-%m-%d %H:%M:%S")
+    #if isinstance(end_time, str):
+    #    end_time    = datetime.datetime.strptime(end_time,"%Y-%m-%d %H:%M:%S")
 
     element = Element(name=name, information=information, url=url, date=date,
                       init_time=init_time, end_time=end_time, price=price,

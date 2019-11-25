@@ -6,8 +6,6 @@ WORKDIR /app
 
 COPY requirements.txt /app
 COPY database /app/database
-COPY json_op.py /app
-
 
 RUN pip install -r requirements.txt
 

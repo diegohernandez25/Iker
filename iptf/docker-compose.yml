@@ -1,19 +1,24 @@
 version: '2'
 services:
   spring:
+    depends_on:
+      - iptf_db
     build: .
     container_name: spring
+    ports:
+      - "8081:8081"
     network_mode: "host"
     command: 'java -jar /Iptf.jar'
 
   iptf_db:
     image: mariadb
-    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: topsecretpassword
       MYSQL_PASSWORD: 123qwe
       MYSQL_USER: esuser
       MYSQL_DATABASE: suberu_iptf
-    network_mode: "host"
+    ports:
+      - "3306:3306"
+#    network_mode: "host"
     volumes:
       - /dev/shm/db_data:/var/lib/mysql
