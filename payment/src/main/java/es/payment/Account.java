@@ -13,13 +13,17 @@ class Account {
   private @Id @GeneratedValue Long id;
   private int globalID;
   private String name;
+  private String email;
+  private String password;
   private String address;
   private double balance;
 
   Account() {}
 
-  Account(int globalID, String name, String address, double balance) {
+  Account(String name, String email, String password, String address, double balance) {
     this.name = name;
+    this.password = password;
+    this.email = email;
     this.address = address;
     this.balance = balance;
   }

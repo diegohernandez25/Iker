@@ -1,0 +1,22 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+      <title>AyPal, seriously, don't sue us please</title>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <link rel="stylesheet"
+      href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+      <script
+      src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+      <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+      <link th:href="@{signin.css}" rel="stylesheet">
+  </head>
+  <body class="text-center" bgcolor="#E6E6FA">
+    <form class="form-signin" action="#" th:action="@{/confirm}" method="post">
+      <img class="mb-4" th:src="@{aypal.png}" alt="" width="172" height="60" style="margin-bottom: 30px;">
+      <h1> All done!</h1>
+      <h3> You may close this page.</h3>
+    </form>
+  </body>
+</html>
