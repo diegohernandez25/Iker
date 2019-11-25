@@ -22,9 +22,16 @@ class MyApp extends StatelessWidget {
     return StreamProvider<User>.value(
       value: AuthService().user,
       child: MaterialApp(
+        initialRoute: '/',
         title: 'Suberu App',
         theme: ThemeData(
-            primarySwatch: Colors.teal
+            primaryColor: Colors.green[900],
+            textTheme: TextTheme(
+              title: TextStyle(fontSize: 36.0),
+              subhead: TextStyle(fontSize: 25.0),
+              body2: TextStyle(fontSize: 14.0, color: Colors.grey[700]),
+
+      ),
         ),
         home: Wrapper(),
       ),

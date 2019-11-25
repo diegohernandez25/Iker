@@ -70,7 +70,7 @@ class _SignInState extends State<SignIn> {
               OutlineButton(
                 splashColor: Colors.grey,
                 onPressed: () => _auth.signInGoogle()
-                    .then((User user)=> print(user.uid))
+                    .then((User user)=> print(user.imageUrl))
                     .catchError((e)=>print(e)),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
                 highlightElevation: 0,

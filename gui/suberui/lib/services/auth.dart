@@ -9,7 +9,7 @@ class AuthService{
 
 
   User _userFromGoogle(FirebaseUser user){
-    return user != null ? new User(uid: user.uid) : null;
+    return user != null ? new User(uid: user.uid,name: user.displayName, email:user.email, imageUrl: user.photoUrl) : null;
   }
 
   //aut change user stream
