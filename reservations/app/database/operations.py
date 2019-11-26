@@ -98,12 +98,6 @@ def delete_domain(session, id=None, domain=None):
 def create_element(session, domain, name, information, url, date, init_time,
                     end_time, price)->Element:
 
-    #if isinstance(init_time,str):
-    #    init_time   = datetime.datetime.strptime(init_time,"%Y-%m-%d %H:%M:%S")
-
-    #if isinstance(end_time, str):
-    #    end_time    = datetime.datetime.strptime(end_time,"%Y-%m-%d %H:%M:%S")
-
     element = Element(name=name, information=information, url=url, date=date,
                       init_time=init_time, end_time=end_time, price=price,
                       reserved=False)
@@ -156,13 +150,14 @@ def delete_client(session, id=None, client=None):
         session.delete(client)
         session.commit()
 
-def create_reservation(session, client, element, name, information, url,
+def create_reservation(session, service, client, element, name, information, url,
                        date)->Reservation:
 
     reservation = Reservation(name=name, information=information, url=url, date=date)
     client.reservation.append(reservation)
     element.reservation.append(reservation)
     element.reserved = True
+
     session.add(reservation)
     session.commit()
 
@@ -180,6 +175,44 @@ def delete_reservation(session, id=None, reservation=None):
     if reservation is not None:
         session.delete(reservation)
         session.commit()
+
+def get_domain_elements(session, id=None, domain=None)->list:
+
+    res = list()
+
+    if id is not None:
+        domain = get_domain(session, id)
+
+    if domain is not None:
+        for e in domain.element:
+            res.append(e.id)
+
+    return res
+
+def get_domain_aval_elements(session, id=None, domain=None)->list:
+
+    res = list()
+    if id is not None:
+        domain = get_domain(session, id)
+
+    if domain is not None:
+        for e in domain.element:
+            if not e.reserved: res.append(e.id)
+
+    return res
+
+def get_domain_total_aval_elements(session, id=None, domain=None)->int:
+    res = list()
+    if id is not None:
+        domain = get_domain(session, id)
+
+    if domain is not None:
+        count = 0
+        for e in domain.element:
+            if not e.reserved: count += 1
+        return count
+
+    return -1
 
 
 if __name__ == "__main__":

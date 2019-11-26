@@ -180,32 +180,66 @@ def get_element_api(id, id_owner, id_domain, id_element)->str:
 
 
 
-@app.route('/<id>/element/<id_element>', methods=['GET', 'DELETE'])
+@app.route('/<id>/element/<id_element>', methods=['GET', 'DELETE', 'POST'])
 def get_element_byid_api(id, id_element)->str:
     service = get_service(session, id)
     element = get_element(session, id_element)
-    if request.method == 'GET':
-        if(service is not None) and (element is not None):
-            return json.dumps(element.get_dict())
-        return "ERROR"
 
-    delete_element(session, element=element)
-    return "DELETED"
+    client_id   = request.args.get('client_id')
+
+
+    client = get_client(session, client_id)
+
+    if (service is not None) and (element is not None) and (client is not None):
+        #Get Reservation
+        if request.method == 'GET':
+            return json.dumps(element.get_dict())
+
+        #Make Reservation
+        elif request.method == 'POST':
+            body        = request.json
+            reservation = create_reservation(session, service, client, element,
+                                             body["name"], body["information"],
+                                             None, datetime.datetime.now())
+
+            reservation.url = "/service/%d/client/%d/reservation/%d" % (service.id, client.id, reservation.id)
+            session.commit()
+
+            return json.dumps(reservation.get_dict())
+
+        #Delete element
+        delete_element(session, element=element)
+        return "DELETED"
+
+    return "ERROR"
+
 
 @app.route('/<id>/domain/<id_domain>', methods=['GET', 'DELETE'])
 def get_domain_byid_api(id, id_domain)->str:
-    app.logger.info('aaaaaaa')
     service = get_service(session, id)
     domain = get_domain(session, id_domain)
 
-    if request.method == 'GET':
-        if(service is not None) and (domain is not None):
+    if(service is not None) and (domain is not None):
+        if request.method == 'GET':
             return get_json_domain(domain)
 
-        return "ERROR"
+        #delete domain
+        delete_domain(session, domain=domain)
+        return "DELETED"
 
-    delete_domain(session, domain=domain)
-    return "DELETED"
+    return "ERROR"
+
+@app.route('/<id>/domain/<id_domain>/get_aval_elems', methods=['GET'])
+def get_aval_elems(id, id_domain)->str:
+    service = get_service(session, id)
+    domain = get_domain(session, id_domain)
+
+    if(service is not None) and (domain is not None):
+
+        elements = get_domain_aval_elements(session, domain=domain)
+        return repr(elements)
+
+    return "ERROR"
 
 
 @app.route('/<id>/client', methods=['POST'])
@@ -257,17 +291,14 @@ def create_reservation_api(id, id_owner, id_domain, id_element)->str:
          and (client is not None) and (element in domain.element)\
             and (client in service.client) and (element.reserved ==False):
 
-         element.reserved = True
-         reservation = create_reservation(session, client, element,
+         reservation = create_reservation(session, service, client, element,
                                           body["name"], body["information"],
                                           None, datetime.datetime.now())
 
          reservation.url = "/service/%d/client/%d/reservation/%d" % (service.id, client.id, reservation.id)
-         client.reservation.append(reservation)
-         element.reservation.append(reservation)
          session.commit()
-         return json.dumps(reservation.get_dict())
 
+         return json.dumps(reservation.get_dict())
 
     return "ERROR"
 
