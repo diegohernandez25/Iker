@@ -1,0 +1,127 @@
+{
+	"info": {
+		"_postman_id": "93444c5b-425a-44a6-a4c0-a149a4c001d9",
+		"name": "ES19",
+		"description": "No documentation for you.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Delayed Payment",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"targetID\": 1\n\t\"ttoken\": 12345L\n\t\"amount\": 1.24\n\t\"briefDescription\": \"Ola\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/delayedPayment",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"delayedPayment"
+					]
+				},
+				"description": "Defines a pending payment waiting for an account to pay it."
+			},
+			"response": []
+		},
+		{
+			"name": "Create Payment",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"targetID\": 1\n\t\"sourceID\": 2,\n\t\"ttoken\": 70,\n\t\"amount\": 1.24\n\t\"briefDescription\": \"Ola\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/completePayment",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"completePayment"
+					]
+				},
+				"description": "Create a full \"Completed\" payment."
+			},
+			"response": []
+		},
+		{
+			"name": "Get transactions",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": ""
+				},
+				"description": "Get a list of all the transactions"
+			},
+			"response": []
+		},
+		{
+			"name": "Get specific account",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": ""
+				},
+				"description": "Get a specific account using it's e-mail as a search tool."
+			},
+			"response": []
+		},
+		{
+			"name": "Get accounts",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/accounts",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"accounts"
+					]
+				},
+				"description": "Get all the accounts"
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
