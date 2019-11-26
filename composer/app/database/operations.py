@@ -40,10 +40,11 @@ def get_usr(session, id)->User:
     return session.query(User).get(id)
 
 
-def create_trip(session, id_domain_booking, id_iptf, id_user)->Trip:
+def create_trip(session, id_domain_booking, id_iptf, id_user, user)->Trip:
 
-    trip = Trip(id_domain_booking=id_domain_booking, id_iptf=id_iptf,
-                    id_user=id_user)
+    trip = Trip(id_domain_booking=id_domain_booking, id_iptf=id_iptf)
+
+    user.trip.append(trip)
 
     session.add(trip)
     session.commit()
@@ -81,6 +82,12 @@ def get_usr_from_ownerid(session, id_iptf)->Trip:
 
     return None
 
+
+def trip_belongs_usr(session, usr_id, trip_id)->Boolean:
+
+    return session.query(exists().where(and_(Trip.id==trip_id,
+                    Trip.id_user==usr_id))).scalar()
+
 if __name__ == '__main__':
 
     from base import Base, engine, Session
@@ -88,6 +95,10 @@ if __name__ == '__main__':
 
     Base.metadata.create_all(engine)
     session = Session()
+
+    #usr = session.query(User).get(1)
+    #trip = session.query(Trip).get(1)
+    #trip_belongs_usr(session, usr, trip)
 
     #Check if user exist
     #usr_exists(session, 12347)

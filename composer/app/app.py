@@ -145,7 +145,8 @@ def book_trip()->str:
             r = requests.post(url, json=elem_bdy)
 
         #Save trip mapping
-        trip = create_trip(session, id_domain_booking, id_iptf, user_id)
+        trip = create_trip(session, id_domain_booking, id_iptf, user_id, user)
+
         return json.dumps(trip.get_dict())
 
     else:
@@ -190,13 +191,40 @@ def search_trip()->str:
                     "price"     : r["elements"][0]["price"],
                     "aval"      : count_aval
                 })
-            else:
-                app.logger.info("Trip does not exist")
 
         return json.dumps(res)
 
     else:
         return "ERROR"
+
+@app.route("/remove_trip", methods=['DELETE'])
+def remove_trip()->str:
+
+    user_id         = request.args.get('usr_id')
+    access_token    = request.args.get('access_token')
+    trip_id         = request.args.get('trip_id')
+    body            = request.json
+
+    if valid_usr(session, user_id, access_token) and\
+        trip_belongs_usr(session, user_id, trip_id):
+
+        trip = session.query(Trip).get(trip_id)
+
+        #DELETE trip @booking
+        r = requests.delete(URL_TRIP_FOLLOWER + "del_trip",
+                data={"TripId":trip.id_iptf})
+
+        #Delete trip @reservation
+        url = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" + str(trip.id_domain_booking)
+        r = requests.delete(url)
+
+        #Delete Trip @composer
+        session.delete(trip)
+        session.commit()
+
+        return "DELETED"
+
+    return "ERROR"
 
 def epoch_to_date(epoch)->str:
     return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(epoch))
@@ -221,9 +249,6 @@ def check_service()->Boolean:
         return False
 
     return True if (r.json()['name'] == BOOKING_SERVICE_NAME) else False
-
-
-
 
 if __name__ == '__main__':
     if not check_service():

@@ -41,6 +41,7 @@ class Trip(Base):
     id                  = Column(Integer, primary_key=True)
     id_domain_booking   = Column(Integer, unique=True)
     id_iptf             = Column(Integer, unique=True)
+
     id_user             = Column(Integer, ForeignKey('user.id'))
 
     def __str__(self):
@@ -66,10 +67,11 @@ class User(Base):
     id_authentication       = Column(Integer, unique=True, nullable=False)
     id_owner_booking        = Column(Integer, unique=True, nullable=False)
     id_client_booking       = Column(Integer, unique=True, nullable=False)
+    id_payment              = Column(Integer, unique=True)
     access_token            = Column(String(15), nullable=False)
 
-    trip        = relationship("Trip", backref="user", cascade="all, delete-orphan")
-    reservation = relationship("Reservation", backref="user", cascade="all, delete-orphan")
+    trip        = relationship("Trip", backref="user", cascade="all, delete-orphan", lazy='dynamic')
+    reservation = relationship("Reservation", backref="user", cascade="all, delete-orphan", lazy='dynamic')
 
 
     def __str__(self):
