@@ -26,17 +26,18 @@ def delete_service(session, id=None, service=None):
     if id is not None:
         service = get_service(session, id)
 
-    for o in service.owner:
-        for d in o.domain:
-            for e in d.element:
-                for r in e.reservation:
-                    delete_reservation(session, reservation=r)
-                delete_element(session,element=e)
-            delete_domain(session,domain=d)
-        delete_owner(session,owner=o)
+    if service is not None:
+        for o in service.owner:
+            for d in o.domain:
+                for e in d.element:
+                    for r in e.reservation:
+                        delete_reservation(session, reservation=r)
+                    delete_element(session,element=e)
+                delete_domain(session,domain=d)
+            delete_owner(session,owner=o)
 
-    session.delete(service)
-    session.commit()
+        session.delete(service)
+        session.commit()
 
 def create_owner(session, service, name, information, url, date)->Owner:
 
@@ -56,15 +57,16 @@ def delete_owner(session, id=None, owner=None):
     if id is not None:
         owner = get_owner(session, id)
 
-    for d in owner.domain:
-        for e in d.element:
-            for r in e.reservation:
-                delete_reservation(session, reservation=r)
-            delete_element(session, element=e)
-        delete_domain(session, domain=d)
+    if owner is not None:
+        for d in owner.domain:
+            for e in d.element:
+                for r in e.reservation:
+                    delete_reservation(session, reservation=r)
+                delete_element(session, element=e)
+            delete_domain(session, domain=d)
 
-    session.delete(owner)
-    session.commit()
+        session.delete(owner)
+        session.commit()
 
 def create_domain(session, owner, name, information, url, date)->Domain:
 
@@ -84,13 +86,14 @@ def delete_domain(session, id=None, domain=None):
     if id is not None:
         domain = get_domain(session, id)
 
-    for e in domain.element:
-        for r in e.reservation:
-            delete_reservation(session, reservation=r)
-        delete_element(e)
+    if domain is not None:
+        for e in domain.element:
+            for r in e.reservation:
+                delete_reservation(session, reservation=r)
+            delete_element(e)
 
-    session.delete(domain)
-    session.commit()
+        session.delete(domain)
+        session.commit()
 
 def create_element(session, domain, name, information, url, date, init_time,
                     end_time, price)->Element:
@@ -120,11 +123,12 @@ def delete_element(session, id=None, element=None):
     if id is not None:
         element = get_element(session, id)
 
-    for r in element.reservation:
-        delete_reservation(session, reservation=r)
+    if element is not None:
+        for r in element.reservation:
+            delete_reservation(session, reservation=r)
 
-    session.delete(element)
-    session.commit()
+        session.delete(element)
+        session.commit()
 
 
 def create_client(session, service, name, information, url, date)->Client:
@@ -145,11 +149,12 @@ def delete_client(session, id=None, client=None):
     if id is not None:
         client = get_client(session, id)
 
-    for r in client.reservation:
-        delete_reservation(session, reservation=r)
+    if client is not None:
+        for r in client.reservation:
+            delete_reservation(session, reservation=r)
 
-    session.delete(client)
-    session.commit()
+        session.delete(client)
+        session.commit()
 
 def create_reservation(session, client, element, name, information, url,
                        date)->Reservation:
@@ -172,8 +177,9 @@ def delete_reservation(session, id=None, reservation=None):
     if id is not None:
         reservation = get_reservation(session, id)
 
-    session.delete(reservation)
-    session.commit()
+    if reservation is not None:
+        session.delete(reservation)
+        session.commit()
 
 
 if __name__ == "__main__":
