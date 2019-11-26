@@ -29,6 +29,7 @@ BOOKING_SERVICE_ID = 1
 URL_RESERVATION = "http://localhost:5002/"
 URL_TRIP_FOLLOWER = "http://localhost:8081/"
 
+
 logging.basicConfig(level=logging.DEBUG)
 
 dictConfig({
@@ -63,9 +64,6 @@ def test_trip():
 def put_trip():
 	requests.post("localhost:8081/register_trip",data=request.json)
 
-"""
-Account Setup Flow
-"""
 
 @app.route("/create_usr", methods=['POST'])
 def createUser():
@@ -109,9 +107,14 @@ def book_trip()->str:
     access_token    = request.args.get('access_token')
     body            = request.json
 
-    if set(["StartCoords", "EndCoords","Consumption","AvoidTolls","StartTime",
+    if set(["EventID", "City", "EndCoords","Consumption","AvoidTolls","StartTime",
             "EndTime","MaxDetour","FuelType", "name", "information", "Price",
-            "NumSeats"]).issubset(set(body.keys())) and valid_usr(session, user_id, access_token):
+            "NumSeats"]).issubset(set(body.keys())) and\
+            valid_usr(session, user_id, access_token) and\
+            event_exist(session, body["EventID"]):
+
+        event = get_event(session, body["EventID"])
+        body["StartCoords"] = [event.lat, event.lon]
 
         r       = requests.post(URL_TRIP_FOLLOWER + "register_trip", json=body)
         id_iptf = r.json()
@@ -145,7 +148,7 @@ def book_trip()->str:
             r = requests.post(url, json=elem_bdy)
 
         #Save trip mapping
-        trip = create_trip(session, id_domain_booking, id_iptf, user_id, user)
+        trip = create_trip(session, id_domain_booking, id_iptf, body["City"], user, event)
 
         return json.dumps(trip.get_dict())
 
@@ -225,6 +228,57 @@ def remove_trip()->str:
         return "DELETED"
 
     return "ERROR"
+
+@app.route("/create_event", methods=['POST'])
+def make_event()->str:
+    body = request.json
+
+    if set(["Name", "Description", "Category", "ImageUrl", "City", "SubCity",
+                "Lat", "Lon", "Date"]).issubset(set(body.keys())):
+
+        event = create_event(session, body["Name"], body["Description"], body["Category"],
+                body["ImageUrl"], body["City"], body["Lat"],body["Lon"],
+                epoch_to_date(body["Date"]), sub_city=body["SubCity"])
+
+        return json.dumps(event.get_dict())
+
+    return "ERROR"
+
+@app.route("/remove_event", methods=['DELETE'])
+def remove_event()->str:
+
+    event_id = request.args.get('event_id')
+
+    if event_exist(session, event_id):
+        delete_event(session, id=event_id)
+        return "DELETED"
+
+    return "ERROR"
+
+@app.route("/get_event", methods=['GET'])
+def find_event()->str:
+
+    event_id = request.args.get('event_id')
+    if event_exist(session, event_id):
+        event = get_event(session, event_id)
+        return json.dumps(event.get_dict())
+
+    return "ERROR"
+
+@app.route("/get_trips_event", methods=['GET'])
+def find_event_trip()->str:
+
+    user_id         = request.args.get('usr_id')
+    access_token    = request.args.get('access_token')
+    event_id        = request.args.get('event_id')
+    src_addr        = request.args.get('src_addr')
+
+    if valid_usr(session, user_id, access_token):
+        trips = find_event_trips(session, event_id, src_addr)
+        return repr(trips)
+
+    return "ERROR"
+
 
 def epoch_to_date(epoch)->str:
     return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(epoch))

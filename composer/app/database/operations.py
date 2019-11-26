@@ -12,8 +12,6 @@ try:
 except:
     from entities import *
 
-#TODO. Think about the erros and try exceptions placements
-
 def create_user(session, id_authentication, id_owner_booking, id_client_booking, access_token)->User:
 
     user = User(id_authentication=id_authentication,
@@ -40,16 +38,55 @@ def get_usr(session, id)->User:
     return session.query(User).get(id)
 
 
-def create_trip(session, id_domain_booking, id_iptf, id_user, user)->Trip:
+def create_trip(session, id_domain_booking, id_iptf, city, user, event)->Trip:
 
-    trip = Trip(id_domain_booking=id_domain_booking, id_iptf=id_iptf)
+    trip = Trip(id_domain_booking=id_domain_booking, id_iptf=id_iptf, city=city)
 
     user.trip.append(trip)
+    event.trip.append(trip)
 
     session.add(trip)
     session.commit()
 
     return trip
+
+def create_event(session, name, description, category, image_url, city, lat,
+                    lon, date, sub_city=None)->Event:
+
+    event = Event(name=name, description=description, category=category,
+                    image_url=image_url, city=city, sub_city=sub_city,
+                    lat=lat, lon=lon, date=date)
+
+    session.add(event)
+    session.commit()
+
+    return event
+
+def event_exist(session, id_event)->Boolean:
+
+    return session.query(exists().where(Event.id==id_event)).scalar()
+
+def get_event(session, id)->Event:
+
+    return session.query(Event).get(id)
+
+def get_event_by_name(session, event_name)->lst:
+    res = list()
+
+    events = session.query(Event).filter(Event.name.like('%' + event_name + '%')).all()
+    for e in events:
+        res.append(e.id)
+
+    return res
+
+def delete_event(session, id=None, event=None):
+    if id is not None:
+        event = get_event(session, id)
+
+    if event is not None:
+        session.delete(event)
+        session.commit()
+
 
 def trip_exists(session,id_iptf)->Boolean:
 
@@ -88,6 +125,17 @@ def trip_belongs_usr(session, usr_id, trip_id)->Boolean:
     return session.query(exists().where(and_(Trip.id==trip_id,
                     Trip.id_user==usr_id))).scalar()
 
+def find_event_trips(session, event_id, src_addr)->list:
+
+    res = list()
+    if event_exist(session, event_id):
+        trips = session.query(Trip).filter(and_(Trip.id_event==event_id,
+                    Trip.city.like('%' + src_addr + '%') )).all()
+        for t in trips:
+            res.append(t.id)
+
+    return res
+
 if __name__ == '__main__':
 
     from base import Base, engine, Session
@@ -95,20 +143,3 @@ if __name__ == '__main__':
 
     Base.metadata.create_all(engine)
     session = Session()
-
-    #usr = session.query(User).get(1)
-    #trip = session.query(Trip).get(1)
-    #trip_belongs_usr(session, usr, trip)
-
-    #Check if user exist
-    #usr_exists(session, 12347)
-
-    #Valid usr:
-    #print(valid_usr(session, 5, "J94M132H9VN91IW"))
-
-    #Create Trip
-    #create_trip(session,-2,-4,1)
-
-    #Get trip by iptf_id
-    #trip = get_trip_from_iptf(session,178)
-    #print(trip)
