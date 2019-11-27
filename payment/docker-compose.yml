@@ -1,0 +1,9 @@
+version: '2'
+services:
+  paymment:
+    image: springio/payment:latest
+    ports:
+      - "8080:8080"
+#    network_mode: "host"
+
+#docker run -p 8080:8080 --name payment -t springio/payment:latest -d
