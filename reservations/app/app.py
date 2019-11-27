@@ -181,12 +181,11 @@ def get_element_api(id, id_owner, id_domain, id_element)->str:
 
 
 @app.route('/<id>/element/<id_element>', methods=['GET', 'DELETE', 'POST'])
-def get_element_byid_api(id, id_element)->str:
+def get_element_byid_api(id, id_element):
     service = get_service(session, id)
     element = get_element(session, id_element)
 
     client_id   = request.args.get('client_id')
-
 
     client = get_client(session, client_id)
 
@@ -198,14 +197,19 @@ def get_element_byid_api(id, id_element)->str:
         #Make Reservation
         elif request.method == 'POST':
             body        = request.json
+
             reservation = create_reservation(session, service, client, element,
                                              body["name"], body["information"],
                                              None, datetime.datetime.now())
 
-            reservation.url = "/service/%d/client/%d/reservation/%d" % (service.id, client.id, reservation.id)
-            session.commit()
+            if reservation is not None:
+                reservation.url = "/service/%d/client/%d/reservation/%d" % (service.id, client.id, reservation.id)
+                session.commit()
 
-            return json.dumps(reservation.get_dict())
+                return jsonify(reservation.get_dict())
+
+            else:
+                return "RESERVED"
 
         #Delete element
         delete_element(session, element=element)
@@ -230,14 +234,14 @@ def get_domain_byid_api(id, id_domain)->str:
     return "ERROR"
 
 @app.route('/<id>/domain/<id_domain>/get_aval_elems', methods=['GET'])
-def get_aval_elems(id, id_domain)->str:
+def get_aval_elems(id, id_domain):
     service = get_service(session, id)
     domain = get_domain(session, id_domain)
 
     if(service is not None) and (domain is not None):
 
-        elements = get_domain_aval_elements(session, domain=domain)
-        return repr(elements)
+        elements = get_domain_aval_elements_w_info(session, domain=domain)
+        return jsonify(elements)
 
     return "ERROR"
 

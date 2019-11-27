@@ -153,13 +153,16 @@ def delete_client(session, id=None, client=None):
 def create_reservation(session, service, client, element, name, information, url,
                        date)->Reservation:
 
-    reservation = Reservation(name=name, information=information, url=url, date=date)
-    client.reservation.append(reservation)
-    element.reservation.append(reservation)
-    element.reserved = True
+    reservation = None
+    
+    if not element.reserved:
+        reservation = Reservation(name=name, information=information, url=url, date=date)
+        client.reservation.append(reservation)
+        element.reservation.append(reservation)
+        element.reserved = True
 
-    session.add(reservation)
-    session.commit()
+        session.add(reservation)
+        session.commit()
 
     return reservation
 
@@ -198,6 +201,23 @@ def get_domain_aval_elements(session, id=None, domain=None)->list:
     if domain is not None:
         for e in domain.element:
             if not e.reserved: res.append(e.id)
+
+    return res
+
+def get_domain_aval_elements_w_info(session, id=None, domain=None)->list:
+
+    res = list()
+    if id is not None:
+        domain = get_domain(session, id)
+
+    if domain is not None:
+        for e in domain.element:
+            if not e.reserved:
+                res.append({
+                    "id": e.id,
+                    "information": e.information,
+                    "price": e.price
+                })
 
     return res
 
