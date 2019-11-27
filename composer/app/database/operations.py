@@ -12,12 +12,14 @@ try:
 except:
     from entities import *
 
-def create_user(session, id_authentication, id_owner_booking, id_client_booking, access_token)->User:
+def create_user(session, id_authentication, id_owner_booking, id_client_booking,
+                id_aypal, access_token, name, img_url, mail)->User:
 
     user = User(id_authentication=id_authentication,
                     id_owner_booking=id_owner_booking,
-                    id_client_booking=id_client_booking,
-                    access_token=access_token)
+                    id_client_booking=id_client_booking, id_aypal=id_aypal,
+                    access_token=access_token, name=name, img_url=img_url,
+                    mail=mail)
 
     session.add(user)
     session.commit()
@@ -37,10 +39,16 @@ def get_usr(session, id)->User:
 
     return session.query(User).get(id)
 
+def get_trip(session, id)->Trip:
 
-def create_trip(session, id_domain_booking, id_iptf, city, user, event)->Trip:
+    return session.query(Trip).get(id)
 
-    trip = Trip(id_domain_booking=id_domain_booking, id_iptf=id_iptf, city=city)
+
+def create_trip(session, id_domain_booking, id_iptf, city, available, user,
+                event)->Trip:
+
+    trip = Trip(id_domain_booking=id_domain_booking, id_iptf=id_iptf, city=city,
+                available=available)
 
     user.trip.append(trip)
     event.trip.append(trip)
@@ -109,6 +117,10 @@ def delete_event(session, id=None, event=None):
 def trip_exists(session,id_iptf)->Boolean:
 
     return session.query(exists().where(Trip.id_iptf==id_iptf)).scalar()
+
+def trip_exists_id(session, id)->Boolean:
+
+    return session.query(exists().where(Trip.id==id)).scalar()
 
 def owner_exists(session, id_owner)->Boolean:
 

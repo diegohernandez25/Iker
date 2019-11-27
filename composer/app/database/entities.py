@@ -9,29 +9,6 @@ except:
 
 import time
 
-#FIXME : Might not need this.
-class Reservation(Base):
-
-    __tablename__ = 'reservation'
-
-    id                  = Column(Integer, primary_key=True)
-    id_element_booking  = Column(Integer, unique=True)
-    id_iptf             = Column(Integer, unique=True)
-    id_user             = Column(Integer, ForeignKey('user.id'))
-
-    def __str__(self):
-        return "         id: %s\n" % (str(self.id)) +\
-            "id_element_booking:%s\n" % (self.id_domain_booking) +\
-            "          id_iptf: %s\n" % (self.id_iptf) +\
-            "          id_user: %s\n" % (self.id_user)
-
-    def get_dict(self):
-        return {
-            "id"                : self.id,
-            "id_domain_booking" : self.id_domain_booking ,
-            "id_iptf"  : self.id_iptf,
-            "id_user" : self.id_user
-        }
 
 class Event(Base):
     __tablename__ = 'event'
@@ -85,6 +62,8 @@ class Trip(Base):
 
     city                = Column(String(200), nullable=True)
 
+    available           = Column(Boolean)
+
     id_user             = Column(Integer, ForeignKey('user.id'), nullable=False)
     id_event            = Column(Integer, ForeignKey('event.id'), nullable=False)
 
@@ -94,7 +73,8 @@ class Trip(Base):
             "          id_iptf: %s\n" % (self.id_iptf) +\
             "          id_user: %s\n" % (self.id_user) +\
             "         id_event: %s\n" % (self.id_event) +\
-            "             city: %s\n" % (self.city)
+            "             city: %s\n" % (self.city) +\
+            "        available: %s\n" % (self.available)
 
     def get_dict(self):
         return {
@@ -103,7 +83,8 @@ class Trip(Base):
             "id_iptf"           : self.id_iptf,
             "id_user"           : self.id_user,
             "id_event"          : self.id_event,
-            "city"              : self.city
+            "city"              : self.city,
+            "available"         : self.available
         }
 
 
@@ -115,19 +96,25 @@ class User(Base):
     id_authentication       = Column(Integer, unique=True, nullable=False)
     id_owner_booking        = Column(Integer, unique=True, nullable=False)
     id_client_booking       = Column(Integer, unique=True, nullable=False)
-    id_payment              = Column(Integer, unique=True)
+    id_aypal                = Column(Integer, unique=True, nullable=False)
     access_token            = Column(String(15), nullable=False)
 
-    trip        = relationship("Trip", backref="user", cascade="all, delete-orphan", lazy='dynamic')
-    reservation = relationship("Reservation", backref="user", cascade="all, delete-orphan", lazy='dynamic')
+    name    = Column(String(50), nullable=False)
+    img_url = Column(String(200), nullable=False)
+    mail    = Column(String(50), nullable=False)
 
+    trip        = relationship("Trip", backref="user", cascade="all, delete-orphan", lazy='dynamic')
 
     def __str__(self):
         return "         id: %s\n" % (str(self.id)) +\
             "id_authentication: %s\n" % (self.id_authentication) +\
             " id_owner_booking: %s\n" % (self.id_owner_booking) +\
             "id_client_booking: %s\n" % (self.id_client_booking) +\
-            "     access_token: %s\n" % (self.access_token)
+            "         id_aypal: %s\n" % (self.id_aypal) +\
+            "     access_token: %s\n" % (self.access_token)+\
+            "         usr_name: %s\n" % (self.usr_name) +\
+            "          img_url: %s\n" % (self.img_url) +\
+            "         usr_mail: %s\n" % (self.usr_mail)
 
     def get_dict(self):
         return {
@@ -135,5 +122,9 @@ class User(Base):
             "id_authentication" : self.id_authentication,
             "id_owner_booking"  : self.id_owner_booking,
             "id_client_booking" : self.id_client_booking,
-            "access_token"      : self.access_token
+            "id_aypal"          : self.id_aypal,
+            "access_token"      : self.access_token,
+            "usr_name"          : self.usr_name,
+            "img_url"           : self.img_url,
+            "usr_mail"          : self.usr_mail
         }
