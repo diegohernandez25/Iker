@@ -24,7 +24,7 @@ echo "Starting Reservation Service"
 (cd reservations && docker-compose up -d)
 
 echo "Starting Payment Service"
-(cd payment && make mount_detach)
+(cd payment && docker-compose up -d)
 
 echo "Starting IPTF Service"
 (cd iptf && mvn -Dmaven.test.skip=true package && docker-compose up -d)
