@@ -28,9 +28,10 @@ class AuthService{
         accessToken: gSA.accessToken,
         idToken: gSA.idToken,
       );
-
-      final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
+      final AuthResult t_auth= (await _auth.signInWithCredential(credential));
+      final FirebaseUser user = t_auth.user;
       //return user;
+      print(t_auth.additionalUserInfo.isNewUser);
       return _userFromGoogle(user);
     }
     catch(e){

@@ -4,6 +4,7 @@ import 'package:suberui/models/event.dart';
 import 'tripSearch.dart';
 import 'package:provider/provider.dart';
 import 'package:suberui/models/user.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 
 class EventPage extends StatelessWidget {
@@ -96,7 +97,45 @@ class EventPage extends StatelessWidget {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: SpeedDial(
+
+        marginRight: 18,
+        marginBottom: 20,
+        animatedIcon: AnimatedIcons.menu_close,
+        animatedIconTheme: IconThemeData(size: 22.0),
+        visible: true,
+        closeManually: false,
+        curve: Curves.bounceIn,
+        overlayColor: Colors.black,
+        overlayOpacity: 0.5,
+        backgroundColor: Colors.green[900],
+        foregroundColor: Colors.white,
+        elevation: 8.0,
+        shape: CircleBorder(),
+        children: [
+          SpeedDialChild(
+              child: Icon(Icons.bookmark),
+              backgroundColor: Colors.green[700],
+              label: 'Book Trip',
+              labelStyle: TextStyle(fontSize: 18.0),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => TripSearch()),
+                );
+              }
+          ),
+          SpeedDialChild(
+            child: Icon(Icons.add),
+            backgroundColor: Colors.green[400],
+            label: 'Create Trip',
+            labelStyle: TextStyle(fontSize: 18.0),
+            onTap: () => print('Create Trip'),
+          ),
+
+        ],
+      ),
+      /*floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.push(
             context,
@@ -106,7 +145,7 @@ class EventPage extends StatelessWidget {
         label: Text('Book Trip'),
         icon: Icon(Icons.bookmark),
         backgroundColor: Colors.green[900],
-      ),
+      ),*/
     );
 
   }

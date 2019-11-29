@@ -8,8 +8,6 @@ import 'package:suberui/services/auth.dart';
 import 'profileScreen.dart';
 
 
-
-
 class Home extends StatelessWidget {
 
   final AuthService _auth = AuthService();
@@ -44,106 +42,149 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user= Provider.of<User>(context);
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("Main Page"),
-          //backgroundColor: Colors.teal[500],
-          actions: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ProfileScreen()),
-                  );
-                },
-                child: CircleAvatar(
-                  backgroundImage: NetworkImage(user.imageUrl),
-                  radius: 20.0,
+    return  DefaultTabController(
+          length: 2,
+          child: new Scaffold(
+          appBar: AppBar(
+            title: Text("Main Page"),
+            //backgroundColor: Colors.teal[500],
+            actions: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ProfileScreen()),
+                    );
+                  },
+                  child: CircleAvatar(
+                    backgroundImage: NetworkImage(user.imageUrl),
+                    radius: 20.0,
+                  ),
                 ),
               ),
-            ),
-            FlatButton.icon(
-                onPressed: () async{
-                  await _auth.signOutGoogle();
-                },
-                icon: Icon(Icons.power_settings_new ),
-                label: Text(''))
-          ],
-        ),
-        body:SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(height: 25.0),
-              Text(
-                'Events Near You',
-                style: TextStyle(
-                    color: Colors.teal,
-                    fontSize: 30.0,
-                    letterSpacing: 1.0,
-                    fontWeight: FontWeight.bold
-                ),
-              ),
-              CarouselSlider(
-                height: 200.0,
-                items: listOfEvents.map((i) {
-                  return Builder(
-                      builder: (BuildContext context){
-                        return EventTile(event: i);
-                      }
-                  );
-                }).toList(),
-              ),
+              FlatButton.icon(
+                  onPressed: () async{
+                    await _auth.signOutGoogle();
+                  },
+                  icon: Icon(Icons.power_settings_new ),
+                  label: Text(''))
+            ],
+          ),
+          body:TabBarView(
+            children: [
+              SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    SizedBox(height: 25.0),
+                    Text(
+                      'Events Near You',
+                      style: TextStyle(
+                          color: Colors.teal,
+                          fontSize: 30.0,
+                          letterSpacing: 1.0,
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    CarouselSlider(
+                      height: 200.0,
+                      items: listOfEvents.map((i) {
+                        return Builder(
+                            builder: (BuildContext context){
+                              return EventTile(event: i);
+                            }
+                        );
+                      }).toList(),
+                    ),
 
 
-              SizedBox(height: 25.0),
-              Text(
-                'Soccer Games',
-                textAlign: TextAlign.left,
-                style: TextStyle(
-                    color: Colors.teal,
-                    fontSize: 30.0,
-                    letterSpacing: 1.0,
-                    fontWeight: FontWeight.bold
+                    SizedBox(height: 25.0),
+                    Text(
+                      'Soccer Games',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          color: Colors.teal,
+                          fontSize: 30.0,
+                          letterSpacing: 1.0,
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    CarouselSlider(
+                      height: 200.0,
+                      items: listOfEvents.map((i) {
+                        return Builder(
+                            builder: (BuildContext context){
+                              return EventTile(event: i,);
+                            }
+                        );
+                      }).toList(),
+                    ),
+                    SizedBox(height: 25.0),
+                    Text(
+                      'Soccer Games',
+                      textAlign: TextAlign.left,
+                      style: TextStyle(
+                          color: Colors.teal,
+                          fontSize: 30.0,
+                          letterSpacing: 1.0,
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    CarouselSlider(
+                      height: 200.0,
+                      items: listOfEvents.map((i) {
+                        return Builder(
+                            builder: (BuildContext context){
+                              return EventTile(event: i,);
+                            }
+                        );
+                      }).toList(),
+                    ),
+
+                  ],
                 ),
               ),
-              CarouselSlider(
-                height: 200.0,
-                items: listOfEvents.map((i) {
-                  return Builder(
-                      builder: (BuildContext context){
-                        return EventTile(event: i,);
-                      }
-                  );
-                }).toList(),
-              ),
-              SizedBox(height: 25.0),
-              Text(
-                'Soccer Games',
-                textAlign: TextAlign.left,
-                style: TextStyle(
-                    color: Colors.teal,
-                    fontSize: 30.0,
-                    letterSpacing: 1.0,
-                    fontWeight: FontWeight.bold
+              GridView.builder(
+                  shrinkWrap: true,
+                  gridDelegate:
+                  new SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2),
+                  itemCount: listOfEvents.length  ,
+
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: EventTile(
+                        event:  listOfEvents[index]
+                      )
+                    );
+                  }
+
                 ),
+
+            ]
+          ),
+          bottomNavigationBar: new TabBar(
+
+            tabs: [
+              Tab(
+                icon: new Icon(Icons.home),
               ),
-              CarouselSlider(
-                height: 200.0,
-                items: listOfEvents.map((i) {
-                  return Builder(
-                      builder: (BuildContext context){
-                        return EventTile(event: i,);
-                      }
-                  );
-                }).toList(),
+              Tab(
+                icon: new Icon(Icons.search),
               ),
 
             ],
-          ),
-        )
+              labelColor: Colors.green[900],
+              unselectedLabelColor: Colors.grey,
+              indicatorSize: TabBarIndicatorSize.tab,
+              indicatorPadding: EdgeInsets.all(5.0),
+              indicatorColor: Colors.green,
+              ),
+      ),
+
     );
   }
 }
