@@ -29,6 +29,7 @@ BOOKING_SERVICE_ID = 1
 URL_RESERVATION = "http://localhost:5002/"
 URL_TRIP_FOLLOWER = "http://localhost:8081/"
 
+
 logging.basicConfig(level=logging.DEBUG)
 
 dictConfig({
@@ -63,39 +64,32 @@ def test_trip():
 def put_trip():
 	requests.post("localhost:8081/register_trip",data=request.json)
 
-"""
-Account Setup Flow
-"""
 
 @app.route("/create_usr", methods=['POST'])
 def createUser():
     global BOOKING_SERVICE_ID
-    #Get Authentication Id from query parameter
+
     authentication_id = request.args.get('usr_id')
 
-    #Create Owner in booking service
     body        = request.json
     if set(["name", "information"]).issubset(set(body.keys())) and\
         not usr_exists(session, authentication_id):
-        #Get new owner id
+
         b_json  = {"name":body["name"],"information":body["information"]}
         r       = requests.post(URL_RESERVATION + str(BOOKING_SERVICE_ID) +"/owner", json=b_json)
         owner_id = r.json()['id']
 
-        #Get new client id
         b_json  = {"name":body["name"],"information":body["information"]}
         r       = requests.post(URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/client", json=b_json)
         client_id = r.json()['id']
 
-        #generate random access_token
         access_token = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(15))
 
-        #create line register to the composer database
         usr = create_user(session, authentication_id, owner_id, client_id,
-                            access_token)
+                            body["id_aypal"], access_token, body["name"],
+                            body["img_url"], body["mail"])
 
-        response = {"id": usr.id, "access_token":usr.access_token}
-        return json.dumps(response)
+        return json.dumps({"id": usr.id, "access_token":usr.access_token})
 
     else:
         app.logger.error('Invalid JSON body. "name" or "information" fields may\
@@ -104,14 +98,20 @@ def createUser():
 
 @app.route("/register_trip", methods=['POST'])
 def book_trip()->str:
+    global BOOKING_SERVICE_ID
 
     user_id         = request.args.get('usr_id')
     access_token    = request.args.get('access_token')
     body            = request.json
 
-    if set(["StartCoords", "EndCoords","Consumption","AvoidTolls","StartTime",
+    if set(["EventID", "City", "StartCoords","Consumption","AvoidTolls","StartTime",
             "EndTime","MaxDetour","FuelType", "name", "information", "Price",
-            "NumSeats"]).issubset(set(body.keys())) and valid_usr(session, user_id, access_token):
+            "NumSeats"]).issubset(set(body.keys())) and\
+            valid_usr(session, user_id, access_token) and\
+            event_exist(session, body["EventID"]):
+
+        event = get_event(session, body["EventID"])
+        body["EndCoords"] = [event.lat, event.lon]
 
         r       = requests.post(URL_TRIP_FOLLOWER + "register_trip", json=body)
         id_iptf = r.json()
@@ -145,7 +145,8 @@ def book_trip()->str:
             r = requests.post(url, json=elem_bdy)
 
         #Save trip mapping
-        trip = create_trip(session, id_domain_booking, id_iptf, user_id)
+        trip = create_trip(session, id_domain_booking, id_iptf, body["City"], True, user, event)
+
         return json.dumps(trip.get_dict())
 
     else:
@@ -172,7 +173,7 @@ def search_trip()->str:
         url = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/"
         res = list()
 
-        for t in trips:
+        for t in trips: #t_iptf
             #GET BOOKING
             if trip_exists(session,t):
                 trip = get_trip_from_iptf(session, t)
@@ -190,13 +191,183 @@ def search_trip()->str:
                     "price"     : r["elements"][0]["price"],
                     "aval"      : count_aval
                 })
-            else:
-                app.logger.info("Trip does not exist")
 
         return json.dumps(res)
 
     else:
         return "ERROR"
+
+@app.route("/remove_trip", methods=['DELETE'])
+def remove_trip()->str:
+    global BOOKING_SERVICE_ID
+
+    user_id         = request.args.get('usr_id')
+    access_token    = request.args.get('access_token')
+    trip_id         = request.args.get('trip_id')
+    body            = request.json
+
+    if valid_usr(session, user_id, access_token) and\
+        trip_belongs_usr(session, user_id, trip_id):
+
+        trip = session.query(Trip).get(trip_id)
+
+        #DELETE trip @booking
+        r = requests.delete(URL_TRIP_FOLLOWER + "del_trip",
+                data={"TripId":trip.id_iptf})
+
+        #Delete trip @reservation
+        url = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" + str(trip.id_domain_booking)
+        r = requests.delete(url)
+
+        #Delete Trip @composer
+        session.delete(trip)
+        session.commit()
+
+        return "DELETED"
+
+    return "ERROR"
+
+
+@app.route("/create_event", methods=['POST'])
+def make_event()->str:
+    body = request.json
+
+    if set(["Name", "Description", "Category", "ImageUrl", "City", "SubCity",
+                "Lat", "Lon", "Date"]).issubset(set(body.keys())):
+
+        event = create_event(session, body["Name"], body["Description"], body["Category"],
+                body["ImageUrl"], body["City"], body["Lat"],body["Lon"],
+                epoch_to_date(body["Date"]), sub_city=body["SubCity"])
+
+        return json.dumps(event.get_dict())
+
+    return "ERROR"
+
+@app.route("/remove_event", methods=['DELETE'])
+def remove_event()->str:
+
+    event_id = request.args.get('event_id')
+
+    if event_exist(session, event_id):
+        delete_event(session, id=event_id)
+        return "DELETED"
+
+    return "ERROR"
+
+@app.route("/get_event", methods=['GET'])
+def find_event()->str:
+
+    event_id = request.args.get('event_id')
+    if event_exist(session, event_id):
+        event = get_event(session, event_id)
+        return json.dumps(event.get_dict())
+
+    return "ERROR"
+
+@app.route("/get_trips_event", methods=['GET'])
+def find_event_trip()->str:
+
+    user_id         = request.args.get('usr_id')
+    access_token    = request.args.get('access_token')
+    event_id        = request.args.get('event_id')
+    src_addr        = request.args.get('src_addr')
+
+    if valid_usr(session, user_id, access_token):
+        trips = find_event_trips(session, event_id, src_addr)
+        return repr(trips)
+
+    return "ERROR"
+
+@app.route("/get_events", methods=['GET'])
+def get_events()->str:
+
+    user_id         = request.args.get('usr_id')
+    access_token    = request.args.get('access_token')
+
+    event_name      = request.args.get('event_name')
+    event_city      = request.args.get('event_city')
+    event_category  = request.args.get('event_category')
+
+    events = None
+    if valid_usr(session, user_id, access_token):
+        if event_name is not None:
+            events = get_event_by_name(session, event_name)
+
+        if event_city is not None:
+            e = get_event_by_city(session, event_city)
+            events = e if events is None else list(set(e) & set(events))
+
+        if event_category is not None:
+            e = get_event_by_category(session, event_category)
+            events = e if events is None else list(set(e) & set(events))
+
+        return repr(events) if events is not None else repr(lst())
+
+    return "ERROR"
+
+@app.route("/get_aval_seats", methods=['GET'])
+def get_aval_seats():
+    global BOOKING_SERVICE_ID
+
+    user_id         = request.args.get('usr_id')
+    access_token    = request.args.get('access_token')
+    trip_id         = request.args.get('trip_id')
+
+    if valid_usr(session, user_id, access_token) and\
+        trip_exists_id(session, trip_id):
+
+        trip = get_trip(session, trip_id)
+        if trip.available:
+            r = requests.get(URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" +\
+                    str(trip.id_domain_booking) + "/get_aval_elems")
+
+            r = r.json()
+            return jsonify(r)
+
+        return jsonify(list())
+
+    return "ERROR"
+
+@app.route("/reserve_seat", methods=['POST'])
+def reserve_seat():
+    global BOOKING_SERVICE_ID
+
+    user_id         = request.args.get('usr_id')
+    access_token    = request.args.get('access_token')
+
+    trip_id         = request.args.get('trip_id')
+    element_id      = request.args.get('elem_id')
+
+    body = request.json
+
+    if valid_usr(session, user_id, access_token) and\
+        trip_exists_id(session, trip_id) and\
+        set(["name", "information"]).issubset(set(body.keys())):
+
+        user = get_usr(session, user_id)
+        trip = get_trip(session, trip_id)
+
+        if trip.available:
+
+            url     = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/element/" + str(element_id)
+            data    = { 'client_id':user.id_client_booking }
+            r       = requests.post(url, json=body, params=data)
+
+            if r.text == "RESERVED":
+                return "RESERVED"
+
+            if r.text == "ERROR":
+                return "ERROR"
+
+            res     = r.json()
+            r       = requests.get(URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" +\
+                        str(trip.id_domain_booking) + "/get_aval_elems")
+
+            if len(r.json()) == 0:
+                trip.available = False
+                session.commit()
+
+            return jsonify(res)
 
 def epoch_to_date(epoch)->str:
     return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(epoch))
@@ -221,9 +392,6 @@ def check_service()->Boolean:
         return False
 
     return True if (r.json()['name'] == BOOKING_SERVICE_NAME) else False
-
-
-
 
 if __name__ == '__main__':
     if not check_service():

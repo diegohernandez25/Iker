@@ -16,5 +16,3 @@ services:
     network_mode: "host"
     ports:
       - "5002:5002"
-
-

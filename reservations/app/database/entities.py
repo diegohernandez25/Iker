@@ -105,7 +105,9 @@ class Domain(Base):
     __tablename__ = 'domain'
 
     id          = Column(Integer, primary_key=True)
+
     id_owner    = Column(Integer, ForeignKey('owner.id'))
+
     name        = Column(String(100), index = True, nullable=False)
     information = Column(String(1000))
     url         = Column(String(100))
