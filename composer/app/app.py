@@ -335,7 +335,7 @@ def find_available_event_trips_api():
         lat = request.args.get('lat')
         lon = request.args.get('lon')
         body = {
-            "StartCoords": [lat, lon],
+            "StartCoords": [float(lat), float(lon)],
             "EndCoords": [event.lat, event.lon],
             "StartTime": event.date
         }
