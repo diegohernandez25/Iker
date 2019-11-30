@@ -22,12 +22,16 @@ from database.operations import *
 from database.base import Base, engine, Session
 from database.entities import *
 
+
 BOOKING_SERVICE_NAME = 'carpooling-es-19'
 BOOKING_SERVICE_ID = 1
 
 
-URL_RESERVATION = "http://localhost:5002/"
-URL_TRIP_FOLLOWER = "http://localhost:8081/"
+URL_RESERVATION     = "http://localhost:5002/"
+URL_TRIP_FOLLOWER   = "http://localhost:8081/"
+URL_PAYMENT         = "http://localhost:8080/"
+
+IKER_MAIL = "iker@mail.com"
 
 
 logging.basicConfig(level=logging.DEBUG)
@@ -197,8 +201,20 @@ def search_trip()->str:
     else:
         return "ERROR"
 
+#TODO: Mapeamento de operação para verificar se pagou
+#Get specific transaction
+
+
+
 @app.route("/remove_trip", methods=['DELETE'])
 def remove_trip()->str:
+
+
+    #TODO: No pagamento:
+    #Utilizar CreatePayment
+    #TargetID => email COndutor
+    #SourceID 0> nosso email
+
     global BOOKING_SERVICE_ID
 
     user_id         = request.args.get('usr_id')
@@ -209,7 +225,7 @@ def remove_trip()->str:
     if valid_usr(session, user_id, access_token) and\
         trip_belongs_usr(session, user_id, trip_id):
 
-        trip = session.query(Trip).get(trip_id)
+        trip = get_trip(session, trip_id)
 
         #DELETE trip @booking
         r = requests.delete(URL_TRIP_FOLLOWER + "del_trip",
@@ -224,6 +240,29 @@ def remove_trip()->str:
         session.commit()
 
         return "DELETED"
+
+    return "ERROR"
+
+#TODO:
+@app.route("/end_trip", methods=['POST'])
+def end_trip():
+    global BOOKING_SERVICE_ID
+    user_id         = request.args.get('usr_id')
+    access_token    = request.args.get('access_token')
+    trip_id         = request.args.get('trip_id')
+
+    #Get domain elements
+    if valid_usr(session, user_id, access_token) and\
+        trip_belongs_usr(session, user_id, trip_id):
+
+        trip = get_trip(session, trip_id)
+
+        url = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" +\
+                str(trip.id_domain_booking) + "/get_dom_reservations"
+
+        r = requests.get(url)
+        #TODO Continue
+        return jsonify(r.json())
 
     return "ERROR"
 
@@ -328,47 +367,6 @@ def get_aval_seats():
 
     return "ERROR"
 
-@app.route("/reserve_seat", methods=['POST'])
-def reserve_seat():
-    global BOOKING_SERVICE_ID
-
-    user_id         = request.args.get('usr_id')
-    access_token    = request.args.get('access_token')
-
-    trip_id         = request.args.get('trip_id')
-    element_id      = request.args.get('elem_id')
-
-    body = request.json
-
-    if valid_usr(session, user_id, access_token) and\
-        trip_exists_id(session, trip_id) and\
-        set(["name", "information"]).issubset(set(body.keys())):
-
-        user = get_usr(session, user_id)
-        trip = get_trip(session, trip_id)
-
-        if trip.available:
-
-            url     = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/element/" + str(element_id)
-            data    = { 'client_id':user.id_client_booking }
-            r       = requests.post(url, json=body, params=data)
-
-            if r.text == "RESERVED":
-                return "RESERVED"
-
-            if r.text == "ERROR":
-                return "ERROR"
-
-            res     = r.json()
-            r       = requests.get(URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" +\
-                        str(trip.id_domain_booking) + "/get_aval_elems")
-
-            if len(r.json()) == 0:
-                trip.available = False
-                session.commit()
-
-            return jsonify(res)
-
 def epoch_to_date(epoch)->str:
     return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(epoch))
 
@@ -392,6 +390,60 @@ def check_service()->Boolean:
         return False
 
     return True if (r.json()['name'] == BOOKING_SERVICE_NAME) else False
+
+@app.route("/reserve_seat", methods=['POST'])
+def reserve_seat():
+    global BOOKING_SERVICE_ID
+
+    user_id         = request.args.get('usr_id')
+    access_token    = request.args.get('access_token')
+    trip_id         = request.args.get('trip_id')
+    element_id      = request.args.get('elem_id')
+
+    body = request.json
+
+    if valid_usr(session, user_id, access_token) and\
+        trip_exists_id(session, trip_id) and\
+        set(["name", "information"]).issubset(set(body.keys())):
+
+        user = get_usr(session, user_id)
+        trip = get_trip(session, trip_id)
+
+        if trip.available:
+
+            #Get element information
+            url     = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/element/" + str(element_id)
+            r       = requests.get(url)
+            r       = r.json()
+
+            if r['reserved']:
+                return "RESERVED"
+
+            #Create Delayed Payment
+            pay_url = URL_PAYMENT + "/delayedPayment"
+            pay_bdy     = {
+                "targetID"          : IKER_MAIL,
+                "amount"            : r['price'],
+                "briefDescription"  : "None"
+            }
+            r   = requests.post(pay_url, json=body)
+
+            body['information'] = r.json()
+            data    = { 'client_id':user.id_client_booking }
+            r       = requests.post(url, json=body, params=data)
+
+            if r.text == "RESERVED" or r.text == "ERROR":
+                return r.text
+
+            res     = r.json()
+            r       = requests.get(URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" +\
+                        str(trip.id_domain_booking) + "/get_aval_elems")
+
+            if len(r.json()) == 0:
+                trip.available = False
+                session.commit()
+
+            return jsonify(res)
 
 if __name__ == '__main__':
     if not check_service():

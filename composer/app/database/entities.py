@@ -101,7 +101,7 @@ class User(Base):
 
     name    = Column(String(50), nullable=False)
     img_url = Column(String(200), nullable=False)
-    mail    = Column(String(50), nullable=False)
+    mail    = Column(String(50), nullable=False) 
 
     trip        = relationship("Trip", backref="user", cascade="all, delete-orphan", lazy='dynamic')
 
