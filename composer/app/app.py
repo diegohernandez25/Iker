@@ -318,29 +318,25 @@ def find_event_trip()->str:
 @app.route("/get_events", methods=['GET'])
 def get_events()->str:
 
-    user_id         = request.args.get('usr_id')
-    access_token    = request.args.get('access_token')
-
-    event_name      = request.args.get('event_name')
-    event_city      = request.args.get('event_city')
-    event_category  = request.args.get('event_category')
+    event_name      = request.args.get('name')
+    event_city      = request.args.get('city')
+    event_category  = request.args.get('category')
 
     events = None
-    if valid_usr(session, user_id, access_token):
-        if event_name is not None:
-            events = get_event_by_name(session, event_name)
 
-        if event_city is not None:
-            e = get_event_by_city(session, event_city)
-            events = e if events is None else list(set(e) & set(events))
+    if event_name is not None:
+        events = get_event_by_name(session, event_name)
 
-        if event_category is not None:
-            e = get_event_by_category(session, event_category)
-            events = e if events is None else list(set(e) & set(events))
+    if event_city is not None:
+        e = get_event_by_city(session, event_city)
+        events = e if events is None else list(set(e) & set(events))
 
-        return repr(events) if events is not None else repr(lst())
+    if event_category is not None:
+        e = get_event_by_category(session, event_category)
+        events = e if events is None else list(set(e) & set(events))
 
-    return "ERROR"
+    return repr(events) if events is not None else repr(lst())
+
 
 @app.route("/get_aval_seats", methods=['GET'])
 def get_aval_seats():
