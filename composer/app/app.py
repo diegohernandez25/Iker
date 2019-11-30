@@ -358,7 +358,7 @@ def find_available_event_trips_api():
                 "usr_name"  : user.name,
                 "user_img"  : user.img_url,
                 "mail"      : user.mail,
-                "review"    : r["avgRating"]
+                "review"    : (r["avgRating"] if len(r)!=0 else 0)
                 })
 
         app.logger.info("TRIPS:\t"+repr(response))
