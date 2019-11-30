@@ -22,7 +22,7 @@ class Event(Base):
     sub_city    = Column(String(200), nullable=True)
     lat         = Column(Float, nullable=False)
     lon         = Column(Float, nullable=False)
-    date        = Column(Date, nullable=False)
+    date        = Column(Integer, nullable=False)
 
     trip = relationship("Trip", backref="event", cascade="all, delete-orphan", lazy='dynamic')
 
@@ -36,7 +36,7 @@ class Event(Base):
             "   sub_city: %s\n" % (self.sub_city) +\
             "        lat: %s\n" % (str(self.lat)) +\
             "        lon: %s\n" % (str(self.lon)) +\
-            "       date: %s\n" % (str(self.date))
+            "       date: %s\n" % (epoch_to_date(self.date))
 
     def get_dict(self):
         return {
@@ -49,7 +49,7 @@ class Event(Base):
             "sub_city"      : self.sub_city,
             "lat"           : self.lat,
             "lon"           : self.lon,
-            "date"          : str(self.date)
+            "date"          : epoch_to_date(self.date)
         }
 
 class Trip(Base):
@@ -128,3 +128,6 @@ class User(Base):
             "img_url"           : self.img_url,
             "usr_mail"          : self.mail
         }
+
+def epoch_to_date(epoch)->str:
+    return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(epoch))

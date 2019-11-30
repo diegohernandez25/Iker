@@ -173,12 +173,29 @@ def find_event_trips(session, event_id, src_addr)->list:
     res = list()
     if event_exist(session, event_id):
         trips = session.query(Trip).filter(and_(Trip.id_event==event_id,
-                    Trip.city.like('%' + src_addr + '%') )).all()
+                    Trip.city.like('%' + src_addr + '%'))).all()
         for t in trips:
             res.append(t.id)
-
     return res
 
+def find_available_event_trips(session, event_id, src_addr)->list:
+
+    res = list()
+    if event_exist(session, event_id):
+        trips = session.query(Trip).filter(and_(Trip.id_event==event_id,
+                    Trip.city.like('%' + src_addr + '%'),
+                    Trip.available==True)).all()
+        for t in trips:
+            user = get_usr(session, t.id_user)
+            res.append({
+                "id"        : t.id,
+                "city"      : t.city,
+                "usr_name"  : user.name,
+                "user_img"  : user.img_url,
+                "mail"      : user.mail
+            })
+
+    return res
 
 if __name__ == '__main__':
 
@@ -188,5 +205,5 @@ if __name__ == '__main__':
     Base.metadata.create_all(engine)
     session = Session()
 
-    usr = get_usr_by_idclient(session, 6)
-    print(usr)
+    res = find_available_event_trips(session, 1, "Aveiro")
+    print(repr(res))

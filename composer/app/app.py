@@ -30,6 +30,7 @@ BOOKING_SERVICE_ID = 1
 URL_RESERVATION     = "http://localhost:5002/"
 URL_TRIP_FOLLOWER   = "http://localhost:8081/"
 URL_PAYMENT         = "http://localhost:8080/"
+URL_REVIEW          = "http://168.63.30.192:3000/"
 
 IKER_MAIL = "iker@mail.com"
 
@@ -283,8 +284,6 @@ def end_trip():
 
             requests.post(URL_PAYMENT + "completePayment", json=payment_bdy)
 
-
-
     return "ERROR"
 
 
@@ -297,7 +296,7 @@ def make_event()->str:
 
         event = create_event(session, body["Name"], body["Description"], body["Category"],
                 body["ImageUrl"], body["City"], body["Lat"],body["Lon"],
-                epoch_to_date(body["Date"]), sub_city=body["SubCity"])
+                body["Date"], sub_city=body["SubCity"])
 
         return json.dumps(event.get_dict())
 
@@ -324,19 +323,48 @@ def find_event()->str:
 
     return "ERROR"
 
-@app.route("/get_trips_event", methods=['GET'])
-def find_event_trip():
+@app.route("/get_av_trips_event", methods=['GET'])
+def find_available_event_trips_api():
 
-    #user_id         = request.args.get('usr_id')
-    #access_token    = request.args.get('access_token')
-    event_id        = request.args.get('event_id')
-    src_addr        = request.args.get('src_addr')
+    event_id    = request.args.get('event_id')
+    event       = get_event(session,event_id)
 
-    #if valid_usr(session, user_id, access_token):
-    trips = find_event_trips(session, event_id, src_addr)
-    return jsonify(trips)
+    if event is not None:
+        response = list()
 
-    #return "ERROR"
+        lat = request.args.get('lat')
+        lon = request.args.get('lon')
+        body = {
+            "StartCoords": [lat, lon],
+            "EndCoords": [event.lat, event.lon],
+            "StartTime": event.date
+        }
+
+        r       = requests.post(URL_TRIP_FOLLOWER + "/get_trips", json=body)
+        trips   = r.json()
+        url_review = URL_REVIEW + "avgRating/"
+
+        for t in trips:
+            app.logger.info('t:\t'+str(t))
+            trip    = get_trip_from_iptf(session, t)
+            user    = get_usr(session, trip.id_user)
+            r       = requests.get(url_review + user.mail)
+            r       = r.json()
+            app.logger.info('url:\t'+url_review + user.mail)
+            app.logger.info("r:\t"+repr(r))
+            response.append({
+                "id"        : trip.id,
+                "city"      : trip.city,
+                "usr_name"  : user.name,
+                "user_img"  : user.img_url,
+                "mail"      : user.mail,
+                "review"    : r["avgRating"]
+                })
+
+        app.logger.info("TRIPS:\t"+repr(response))
+        return jsonify(response)
+
+    return "ERROR"
 
 @app.route("/get_events", methods=['GET'])
 def get_events()->str:
@@ -386,6 +414,7 @@ def get_aval_seats():
 
 def epoch_to_date(epoch)->str:
     return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(epoch))
+
 
 def create_service():
     global BOOKING_SERVICE_ID
