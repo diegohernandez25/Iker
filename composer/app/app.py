@@ -259,8 +259,31 @@ def end_trip():
                 str(trip.id_domain_booking) + "/get_dom_reservations"
 
         r = requests.get(url)
-        #TODO Continue
-        return jsonify(r.json())
+        reservations = r.json()
+
+        driver = get_usr(session, user_id)
+
+        token_list = list()
+
+        for res in reservations:
+            usr = get_usr_by_idclient(session, res["client_id"])
+            payment_info = json.loads(res["information"])
+            payment_bdy = {
+                "targetID"  : driver.mail,
+                "sourceID"  : IKER_MAIL,
+                "amount"    : res["price"],
+                "briefDescription": "None"
+            }
+
+            token_list.append({
+                "usr_id"        : usr.id,
+                "payment_token" : payment_info["ttoken"],
+                "amount"        : res["price"]
+                })
+
+            requests.post(URL_PAYMENT + "completePayment", json=payment_bdy)
+
+
 
     return "ERROR"
 
@@ -302,18 +325,18 @@ def find_event()->str:
     return "ERROR"
 
 @app.route("/get_trips_event", methods=['GET'])
-def find_event_trip()->str:
+def find_event_trip():
 
-    user_id         = request.args.get('usr_id')
-    access_token    = request.args.get('access_token')
+    #user_id         = request.args.get('usr_id')
+    #access_token    = request.args.get('access_token')
     event_id        = request.args.get('event_id')
     src_addr        = request.args.get('src_addr')
 
-    if valid_usr(session, user_id, access_token):
-        trips = find_event_trips(session, event_id, src_addr)
-        return repr(trips)
+    #if valid_usr(session, user_id, access_token):
+    trips = find_event_trips(session, event_id, src_addr)
+    return jsonify(trips)
 
-    return "ERROR"
+    #return "ERROR"
 
 @app.route("/get_events", methods=['GET'])
 def get_events()->str:

@@ -101,7 +101,7 @@ class User(Base):
 
     name    = Column(String(50), nullable=False)
     img_url = Column(String(200), nullable=False)
-    mail    = Column(String(50), nullable=False) 
+    mail    = Column(String(50), nullable=False)
 
     trip        = relationship("Trip", backref="user", cascade="all, delete-orphan", lazy='dynamic')
 
@@ -112,9 +112,9 @@ class User(Base):
             "id_client_booking: %s\n" % (self.id_client_booking) +\
             "         id_aypal: %s\n" % (self.id_aypal) +\
             "     access_token: %s\n" % (self.access_token)+\
-            "         usr_name: %s\n" % (self.usr_name) +\
+            "         usr_name: %s\n" % (self.name) +\
             "          img_url: %s\n" % (self.img_url) +\
-            "         usr_mail: %s\n" % (self.usr_mail)
+            "         usr_mail: %s\n" % (self.mail)
 
     def get_dict(self):
         return {
@@ -124,7 +124,7 @@ class User(Base):
             "id_client_booking" : self.id_client_booking,
             "id_aypal"          : self.id_aypal,
             "access_token"      : self.access_token,
-            "usr_name"          : self.usr_name,
+            "usr_name"          : self.name,
             "img_url"           : self.img_url,
-            "usr_mail"          : self.usr_mail
+            "usr_mail"          : self.mail
         }

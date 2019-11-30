@@ -140,13 +140,18 @@ def client_exists(session, id_client)->Boolean:
 
 
 def get_trip_from_iptf(session, id_iptf)->Trip:
-    if trip_exists:
-        return session.query(Trip).\
+
+    return session.query(Trip).\
                 filter(Trip.id_iptf==id_iptf).\
                 options(load_only("id")).\
                 one()
 
-    return None
+
+def get_usr_by_idclient(session, id_client_booking):
+    return session.query(User).\
+                filter(User.id_client_booking==id_client_booking).\
+                options(load_only("id")).\
+                one()
 
 def get_usr_from_ownerid(session, id_iptf)->Trip:
     if trip_exists:
@@ -183,5 +188,5 @@ if __name__ == '__main__':
     Base.metadata.create_all(engine)
     session = Session()
 
-    res = get_all_events(session)
-    print(res)
+    usr = get_usr_by_idclient(session, 6)
+    print(usr)
