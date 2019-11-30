@@ -78,12 +78,20 @@ def get_event(session, id)->Event:
 
     return session.query(Event).get(id)
 
+def get_all_events(session)->list:
+    res = list()
+    events = session.query(Event)
+    for e in events:
+        res.append(e.get_dict())
+
+    return res
+
 def get_event_by_name(session, event_name)->list:
     res = list()
 
     events = session.query(Event).filter(Event.name.like('%' + event_name + '%')).all()
     for e in events:
-        res.append(e.id)
+        res.append(e.get_dict())
 
     return res
 
@@ -92,7 +100,7 @@ def get_event_by_category(session, category)->list:
 
     events = session.query(Event).filter(Event.category.like('%' + category + '%')).all()
     for e in events:
-        res.append(e.id)
+        res.append(e.get_dict())
 
     return res
 
@@ -101,7 +109,7 @@ def get_event_by_city(session, city)->list:
 
     events = session.query(Event).filter(Event.city.like('%' + city + '%')).all()
     for e in events:
-        res.append(e.id)
+        res.append(e.get_dict())
 
     return res
 
@@ -174,3 +182,6 @@ if __name__ == '__main__':
 
     Base.metadata.create_all(engine)
     session = Session()
+
+    res = get_all_events(session)
+    print(res)

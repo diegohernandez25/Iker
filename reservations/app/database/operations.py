@@ -6,8 +6,10 @@ from datetime import date
 import datetime
 import time
 
-from database.entities import *
-
+try:
+    from database.entities import *
+except:
+    from entities import *
 
 def create_service(session, name, information, url, date)->Service:
 
@@ -154,7 +156,7 @@ def create_reservation(session, service, client, element, name, information, url
                        date)->Reservation:
 
     reservation = None
-    
+
     if not element.reserved:
         reservation = Reservation(name=name, information=information, url=url, date=date)
         client.reservation.append(reservation)
@@ -168,7 +170,7 @@ def create_reservation(session, service, client, element, name, information, url
 
 def get_reservation(session, id)->Reservation:
 
-    return session,query(Reservation).get(id)
+    return session.query(Reservation).get(id)
 
 def delete_reservation(session, id=None, reservation=None):
 
@@ -222,7 +224,7 @@ def get_domain_aval_elements_w_info(session, id=None, domain=None)->list:
     return res
 
 def get_domain_total_aval_elements(session, id=None, domain=None)->int:
-    res = list()
+
     if id is not None:
         domain = get_domain(session, id)
 
@@ -234,6 +236,19 @@ def get_domain_total_aval_elements(session, id=None, domain=None)->int:
 
     return -1
 
+def get_domain_reservations(session, id=None, domain=None)->list:
+
+    res = list()
+    if id is not None:
+        domain = get_domain(session, id)
+
+    if domain is not None:
+        for e in domain.element:
+            for r in e.reservation:
+                res.append(r.get_dict())
+
+    return res
+
 
 if __name__ == "__main__":
     from base import Base, engine, Session
@@ -242,21 +257,7 @@ if __name__ == "__main__":
     Base.metadata.create_all(engine)
     session = Session()
 
-    ex_serv = create_service(session, "service1","service1","service1", date(1996,3,25))
-    id = ex_serv.id
-
-    ex_own  = create_owner(session, ex_serv,"owner1","owner1","owner1", date(1996,3,25))
-    owner = ex_serv.owner
-
-    ex_domain  = create_domain(session, ex_own,"d1","d1","d1", date(1996,3,25))
-    ex_element = create_element(session, ex_domain,"e1","e1","e1", date(1996,3,25), init_time=int(time.time()), end_time=int(time.time()+5), price=10.35)
-    ex_client  = create_client(session, ex_serv,"c1","c1","c1", date(1996,3,25))
-
-    ex_reserv = create_reservation(session, ex_client, ex_element,"r1", "r1", "r1",datetime.datetime.now())
-
-
-    for r in ex_client.reservation:
-        print(r)
-
+    res = get_domain_reservations(session, id=1)
+    print(repr(res))
 
     session.close()

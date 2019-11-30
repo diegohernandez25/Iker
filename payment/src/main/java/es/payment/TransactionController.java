@@ -72,7 +72,7 @@ class TransactionController {
 
   @PostMapping("/delayedPayment")
   Transaction newFromPay(@RequestBody Transaction newTransaction) {
-    newTransaction.setSourceID(-1);
+    newTransaction.setSourceID("null");
     newTransaction.setStatus("Pending");
     newTransaction.setDate(LocalDate.now());
     return repository.save(newTransaction);
@@ -82,13 +82,13 @@ class TransactionController {
   Transaction newGetPay(@RequestBody Transaction newTransaction) {
     newTransaction.setStatus("Complete");
     newTransaction.setDate(LocalDate.now());
+
     boolean found = false;
-    // TODO: Adicionar/Retirar do amount das contas
     List<Account> all_accounts = accounts.findAll();
     Account account_info = all_accounts.get(0);
     // Taking money out
     for (int i = 0; i < all_accounts.size(); i++) {
-         if(newTransaction.getSourceID() == all_accounts.get(i).getId()){
+         if(newTransaction.getSourceID().equals(all_accounts.get(i).getEmail())){
            found = true;
            account_info = all_accounts.get(i);
            break;
@@ -100,7 +100,7 @@ class TransactionController {
     found = false;
     // Receiving money in
     for (int i = 0; i < all_accounts.size(); i++) {
-         if(newTransaction.getTargetID() == all_accounts.get(i).getId()){
+         if(newTransaction.getTargetID().equals(all_accounts.get(i).getEmail())){
            found = true;
            account_info = all_accounts.get(i);
            break;

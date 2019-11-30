@@ -101,8 +101,9 @@ class ShopController {
     public String done(@RequestParam(name="token", required=true, defaultValue="Invalid") String name, @RequestParam(name="account", required=true, defaultValue="Invalid") String id, Model model) {
         Optional<Transaction> o_transaction_info = transaction_repo.findById(Long.parseLong(name));
         Transaction transaction_info = o_transaction_info.get();
+        Account account_i = account_repo.findById(Long.parseLong(id)).get();
         transaction_info.setStatus("Completed");
-        transaction_info.setSourceID(Integer.parseInt(id));
+        transaction_info.setSourceID(account_i.getEmail());
         transaction_repo.save(transaction_info);
 
         // TODO: Adicionar/Retirar do amount das contas
@@ -111,7 +112,7 @@ class ShopController {
         Account account_info = all_accounts.get(0);
         // Taking money out
         for (int i = 0; i < all_accounts.size(); i++) {
-             if(transaction_info.getSourceID() == all_accounts.get(i).getId()){
+             if(transaction_info.getSourceID().equals(all_accounts.get(i).getEmail())){
                found = true;
                account_info = all_accounts.get(i);
                break;
@@ -123,7 +124,7 @@ class ShopController {
         found = false;
         // Receiving money in
         for (int i = 0; i < all_accounts.size(); i++) {
-             if(transaction_info.getTargetID() == all_accounts.get(i).getId()){
+             if(transaction_info.getTargetID().equals(all_accounts.get(i).getEmail())){
                found = true;
                account_info = all_accounts.get(i);
                break;

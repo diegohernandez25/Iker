@@ -12,10 +12,10 @@ import java.time.LocalDate;
 @Entity
 class Transaction {
 
-  //private @Id @GeneratedValue Long id;
-  private @Id Long ttoken;
-  private int sourceID;
-  private int targetID;
+  private @Id @GeneratedValue Long ttoken;
+  //private @Id Long ttoken;
+  private String sourceID;
+  private String targetID;
   private String briefDescription;
   private double amount;
   private String status;
@@ -24,8 +24,8 @@ class Transaction {
 
   Transaction() {}
 
-  Transaction(Long ttoken, int sourceID, int targetID, String briefDescription, double amount, String status, LocalDate date) {
-    this.ttoken = ttoken;
+  Transaction(String sourceID, String targetID, String briefDescription, double amount, String status, LocalDate date) {
+    //this.ttoken = ttoken;
     this.sourceID = sourceID;
     this.targetID = targetID;
     this.briefDescription = briefDescription;

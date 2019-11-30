@@ -189,13 +189,13 @@ def get_element_byid_api(id, id_element):
 
     client = get_client(session, client_id)
 
-    if (service is not None) and (element is not None) and (client is not None):
+    if (service is not None) and (element is not None):
         #Get Reservation
         if request.method == 'GET':
             return json.dumps(element.get_dict())
 
         #Make Reservation
-        elif request.method == 'POST':
+        elif request.method == 'POST' and (client is not None):
             body        = request.json
 
             reservation = create_reservation(session, service, client, element,
@@ -242,6 +242,18 @@ def get_aval_elems(id, id_domain):
 
         elements = get_domain_aval_elements_w_info(session, domain=domain)
         return jsonify(elements)
+
+    return "ERROR"
+
+@app.route('/<id>/domain/<id_domain>/get_dom_reservations', methods=['GET'])
+def get_domain_reservations_api(id, id_domain):
+    service = get_service(session, id)
+    domain = get_domain(session, id_domain)
+
+    if (service is not None) and (domain is not None):
+
+        reservations = get_domain_reservations(session, domain=domain)
+        return jsonify(reservations)
 
     return "ERROR"
 
@@ -315,7 +327,7 @@ def get_reservation_api(id, id_client, id_reservation)->str:
 
     if request.method == 'GET':
         if (service is not None) and (client is not None)\
-            and (reservation is not None) and (client in service.owner)\
+            and (reservation is not None) and (client in service.client)\
                 and (reservation in client.reservation):
 
                 return json.dumps(reservation.get_dict())
@@ -323,6 +335,7 @@ def get_reservation_api(id, id_client, id_reservation)->str:
         return "ERROR"
     delete_reservation(session, reservation=reservation)
     return "DELETED"
+
 
 if __name__ == '__main__':
     Base.metadata.create_all(engine)
