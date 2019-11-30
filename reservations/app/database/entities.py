@@ -1,9 +1,13 @@
 from sqlalchemy import Column, String, Integer, Date, Float, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
-from database.base import Base, engine, Session
 from datetime import date
 import time
 
+try:
+    from database.base import Base, engine, Session
+except:
+    from base import Base, engine, Session
+    
 class Reservation(Base):
     __tablename__ = 'reservation'
 
@@ -68,8 +72,6 @@ class Element(Base):
     information = Column(String(1000))
     url         = Column(String(100))
     date        = Column(Date)
-    #init_time   = Column(Date)
-    #end_time    = Column(Date)
     init_time   = Column(Integer)
     end_time    = Column(Integer)
     price       = Column(Float)
