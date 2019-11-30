@@ -6,7 +6,7 @@ var Schema = mongoose.Schema;
 
 var Comment_Schema = new Schema({
   authorID: {
-   type: Number,
+   type: String,
    required: true
   },
   Text: {
@@ -22,11 +22,11 @@ var Comment_Schema = new Schema({
 module.exports = mongoose.model('Comment', Comment_Schema);
 var Review_Schema = new Schema({
   reviewdObjectID: {
-    type: Number,
+    type: String,
     required: true
   },
   authorID: {
-    type: Number,
+    type: String,
     required: true
   },
   rating: {

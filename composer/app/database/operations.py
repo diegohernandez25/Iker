@@ -140,13 +140,18 @@ def client_exists(session, id_client)->Boolean:
 
 
 def get_trip_from_iptf(session, id_iptf)->Trip:
-    if trip_exists:
-        return session.query(Trip).\
+
+    return session.query(Trip).\
                 filter(Trip.id_iptf==id_iptf).\
                 options(load_only("id")).\
                 one()
 
-    return None
+
+def get_usr_by_idclient(session, id_client_booking):
+    return session.query(User).\
+                filter(User.id_client_booking==id_client_booking).\
+                options(load_only("id")).\
+                one()
 
 def get_usr_from_ownerid(session, id_iptf)->Trip:
     if trip_exists:
@@ -168,12 +173,29 @@ def find_event_trips(session, event_id, src_addr)->list:
     res = list()
     if event_exist(session, event_id):
         trips = session.query(Trip).filter(and_(Trip.id_event==event_id,
-                    Trip.city.like('%' + src_addr + '%') )).all()
+                    Trip.city.like('%' + src_addr + '%'))).all()
         for t in trips:
             res.append(t.id)
-
     return res
 
+def find_available_event_trips(session, event_id, src_addr)->list:
+
+    res = list()
+    if event_exist(session, event_id):
+        trips = session.query(Trip).filter(and_(Trip.id_event==event_id,
+                    Trip.city.like('%' + src_addr + '%'),
+                    Trip.available==True)).all()
+        for t in trips:
+            user = get_usr(session, t.id_user)
+            res.append({
+                "id"        : t.id,
+                "city"      : t.city,
+                "usr_name"  : user.name,
+                "user_img"  : user.img_url,
+                "mail"      : user.mail
+            })
+
+    return res
 
 if __name__ == '__main__':
 
@@ -183,5 +205,5 @@ if __name__ == '__main__':
     Base.metadata.create_all(engine)
     session = Session()
 
-    res = get_all_events(session)
-    print(res)
+    res = find_available_event_trips(session, 1, "Aveiro")
+    print(repr(res))

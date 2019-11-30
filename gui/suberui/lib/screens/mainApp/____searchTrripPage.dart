@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:suberui/shared/components/customTripTile.dart';
-import 'tripDetailPage.dart';
+import '____tripDetailPage.dart';
 
 class SearchTripPage extends StatefulWidget {
   @override
