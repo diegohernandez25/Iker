@@ -204,8 +204,6 @@ def search_trip()->str:
 #TODO: Mapeamento de operação para verificar se pagou
 #Get specific transaction
 
-
-
 @app.route("/remove_trip", methods=['DELETE'])
 def remove_trip()->str:
 
@@ -444,6 +442,11 @@ def reserve_seat():
                 session.commit()
 
             return jsonify(res)
+
+@app.route("/get_all_events", methods=['GET'])
+def get_all_events_api():
+    return jsonify(get_all_events(session))
+
 
 if __name__ == '__main__':
     if not check_service():
