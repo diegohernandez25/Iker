@@ -1,0 +1,443 @@
+{
+	"info": {
+		"_postman_id": "6608f211-59fb-42f5-97d1-7b1664b3080d",
+		"name": "Composer",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "create_usr",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\":\"Diego\",\n\t\"information\":{\n\t\t\"lastname\": \"Hernandez\",\n\t\t\"age\": 25,\n\t\t\"address\": \"Aveiro\"\n\t},\n\t\"img_url\": \"google.com\",\n\t\"mail\": \"mail@mail.pt\",\n\t\"id_aypal\": 12345\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/create_usr?usr_id=12358",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"create_usr"
+					],
+					"query": [
+						{
+							"key": "usr_id",
+							"value": "12358",
+							"description": "authentication identification"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RegisterTrip",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"StartCoords\": [\n        40.632933,\n        -8.659798\n    ],\n    \"EventID\":1,\n    \"EndCoords\": [\n        40.209366,\n        -8.444125\n    ],\n    \"Consumption\": [\n        5,\n        7.4,\n        9\n    ],\n    \"City\": \"Aveiro\",\n    \"AvoidTolls\": true,\n    \"StartTime\": 1569885623,\n    \"EndTime\": 1569885623,\n    \"MaxDetour\": 100,\n    \"FuelType\": \"petrol\",\n    \n    \n    \"name\":\"Lisbon_Aveiro\",\n    \"information\": \"None\",\n    \"Price\":25.5,\n    \"NumSeats\":3\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/register_trip?usr_id=1&access_token=B96P35WO8GG2TG1",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"register_trip"
+					],
+					"query": [
+						{
+							"key": "usr_id",
+							"value": "1"
+						},
+						{
+							"key": "access_token",
+							"value": "B96P35WO8GG2TG1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getTrips",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"StartCoords\": [\n        40.632933,\n        -8.659798\n    ],\n    \"EndCoords\": [\n        40.209366,\n        -8.444125\n    ],\n  \"StartTime\": 1569885023\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/search_trip?usr_id=1&access_token=4OCI2B5NWNYCOT5",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"search_trip"
+					],
+					"query": [
+						{
+							"key": "usr_id",
+							"value": "1"
+						},
+						{
+							"key": "access_token",
+							"value": "4OCI2B5NWNYCOT5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteTrip",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:5000/remove_trip?usr_id=1&access_token=4OCI2B5NWNYCOT5&trip_id=1",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"remove_trip"
+					],
+					"query": [
+						{
+							"key": "usr_id",
+							"value": "1"
+						},
+						{
+							"key": "access_token",
+							"value": "4OCI2B5NWNYCOT5"
+						},
+						{
+							"key": "trip_id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createEvent",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Name\": \"Super Bock Super Rock\",\n\t\"Description\": \"Super Bock Super Rock\",\n\t\"Category\": \"Music Festival\",\n\t\"ImageUrl\": \"None\",\n\t\"City\": \"Aveiro\",\n\t\"SubCity\": \"Aveiro Centro\",\n\t\"Lat\": 40.209366,\n\t\"Lon\": -8.44412,\n\t\"Date\": 1569885623\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/create_event",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"create_event"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteEvent",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:5000/remove_event?event_id=6",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"remove_event"
+					],
+					"query": [
+						{
+							"key": "event_id",
+							"value": "6"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "findEventTrip",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:5000/get_trips_event?usr_id=1&access_token=4OCI2B5NWNYCOT5&event_id=1&src_addr=Aveiro",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"get_trips_event"
+					],
+					"query": [
+						{
+							"key": "usr_id",
+							"value": "1"
+						},
+						{
+							"key": "access_token",
+							"value": "4OCI2B5NWNYCOT5"
+						},
+						{
+							"key": "event_id",
+							"value": "1"
+						},
+						{
+							"key": "src_addr",
+							"value": "Aveiro"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getEventsBy",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:5000/get_events?usr_id=1&access_token=4OCI2B5NWNYCOT5&event_name=Bock",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"get_events"
+					],
+					"query": [
+						{
+							"key": "usr_id",
+							"value": "1"
+						},
+						{
+							"key": "event_category",
+							"value": "",
+							"disabled": true
+						},
+						{
+							"key": "access_token",
+							"value": "4OCI2B5NWNYCOT5"
+						},
+						{
+							"key": "event_name",
+							"value": "Bock"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAvalSeats",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:5000/get_aval_seats?usr_id=1&access_token=B96P35WO8GG2TG1&trip_id=1",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"get_aval_seats"
+					],
+					"query": [
+						{
+							"key": "usr_id",
+							"value": "1"
+						},
+						{
+							"key": "access_token",
+							"value": "B96P35WO8GG2TG1"
+						},
+						{
+							"key": "trip_id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "reserveSeat",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"a new reservation\",\n\t\"information\": \"None\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/reserve_seat?usr_id=1&access_token=B96P35WO8GG2TG1&trip_id=1&elem_id=3",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"reserve_seat"
+					],
+					"query": [
+						{
+							"key": "usr_id",
+							"value": "1"
+						},
+						{
+							"key": "access_token",
+							"value": "B96P35WO8GG2TG1"
+						},
+						{
+							"key": "trip_id",
+							"value": "1"
+						},
+						{
+							"key": "elem_id",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "endTrip",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:5000/end_trip?usr_id=1&access_token=B96P35WO8GG2TG1&trip_id=1",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"end_trip"
+					],
+					"query": [
+						{
+							"key": "usr_id",
+							"value": "1"
+						},
+						{
+							"key": "access_token",
+							"value": "B96P35WO8GG2TG1"
+						},
+						{
+							"key": "trip_id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "7bccc114-a770-4a93-a6cb-9942fdb74d8e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "1fb6eb47-e0fd-47cf-a70f-ff6e8abc85d4",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
