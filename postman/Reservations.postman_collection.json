@@ -1,0 +1,333 @@
+{
+	"info": {
+		"_postman_id": "091ee471-3500-4b0d-bd2a-3ac1825b9996",
+		"name": "Reservations",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Service",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"iker\",\n\t\"information\":\"ES \"\n\t\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5002/service",
+					"host": [
+						"localhost"
+					],
+					"port": "5002",
+					"path": [
+						"service"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createOwner",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"diego\",\n\t\"information\":{\n\t\t\"last_name\":\"hernandez\"\n\t}\n\t\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5002/1/owner",
+					"host": [
+						"localhost"
+					],
+					"port": "5002",
+					"path": [
+						"1",
+						"owner"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createDomain",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"lisbon_aveiro\",\n\t\"information\":{\n\t\t\"last_name\":\"hernandez\",\n\t\t\"max_elem\":10\n\t}\n\t\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5002/1/owner/1/domain",
+					"host": [
+						"localhost"
+					],
+					"port": "5002",
+					"path": [
+						"1",
+						"owner",
+						"1",
+						"domain"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createElement",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"lisbon_aveiro_e0\",\n\t\"information\":{\n\t\t\"last_name\":\"hernandez\",\n\t\t\"max_elem\":10\n\t},\n\t\"init_time\": 1574788897,\n\t\"end_time\": 1574788900,\n\t\"price\": 25\n\t\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5002/1/owner/1/domain/1/element",
+					"host": [
+						"localhost"
+					],
+					"port": "5002",
+					"path": [
+						"1",
+						"owner",
+						"1",
+						"domain",
+						"1",
+						"element"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createReservation",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"lisbon_aveiro_e0\",\n\t\"information\":{\n\t\t\"last_name\":\"hernandez\",\n\t\t\"max_elem\":10\n\t}\n\t\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5002/1/element/1?client_id=1",
+					"host": [
+						"localhost"
+					],
+					"port": "5002",
+					"path": [
+						"1",
+						"element",
+						"1"
+					],
+					"query": [
+						{
+							"key": "client_id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createClient",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"rodrigo\",\n\t\"information\":{\n\t\t\"last_name\":\"pereira\"\n\t}\n\t\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5002/1/client",
+					"host": [
+						"localhost"
+					],
+					"port": "5002",
+					"path": [
+						"1",
+						"client"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getService",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:5002/2",
+					"host": [
+						"localhost"
+					],
+					"port": "5002",
+					"path": [
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getDomainSimple",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:5002/1/domain/2",
+					"host": [
+						"localhost"
+					],
+					"port": "5002",
+					"path": [
+						"1",
+						"domain",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAvalElem",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:5002/1/domain/1/get_aval_elems",
+					"host": [
+						"localhost"
+					],
+					"port": "5002",
+					"path": [
+						"1",
+						"domain",
+						"1",
+						"get_aval_elems"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getElement",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:5002/1/element/1",
+					"host": [
+						"localhost"
+					],
+					"port": "5002",
+					"path": [
+						"1",
+						"element",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getReservation",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getDomainReservations",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
