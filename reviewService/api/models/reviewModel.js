@@ -6,7 +6,7 @@ var Schema = mongoose.Schema;
 
 var Comment_Schema = new Schema({
   authorID: {
-   type: Number,
+   type: String,
    required: true
   },
   Text: {

@@ -1,0 +1,157 @@
+{
+	"info": {
+		"_postman_id": "f2511141-9d31-49c8-8758-f14ff5713a67",
+		"name": "reviewService",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "getReviews",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://168.63.30.192:3000/review",
+					"protocol": "http",
+					"host": [
+						"168",
+						"63",
+						"30",
+						"192"
+					],
+					"port": "3000",
+					"path": [
+						"review"
+					],
+					"query": [
+						{
+							"key": "_id",
+							"value": "5de2d15c8159010019857586",
+							"description": "id da review",
+							"disabled": true
+						},
+						{
+							"key": "rating",
+							"value": "5",
+							"description": "devolve reviews com rating x",
+							"disabled": true
+						},
+						{
+							"key": "authorID",
+							"value": "rudirudellas@gmail.com",
+							"description": "devolve reviews com o autor x",
+							"disabled": true
+						},
+						{
+							"key": "reviewdObjectID",
+							"value": "r.rodinhas@gmail.com",
+							"description": "devolve reviews sobre objeto x ",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "newReview",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"reviewdObjectID\": \"r.rodinhas@gmail.com\", \n\t\"authorID\": \"rudirudellas@gmail.com\",\n\t\"rating\": 5,\n\t\"reviewText\": \"Gosto muito\" \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://168.63.30.192:3000/review",
+					"protocol": "http",
+					"host": [
+						"168",
+						"63",
+						"30",
+						"192"
+					],
+					"port": "3000",
+					"path": [
+						"review"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAvgRev",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://168.63.30.192:3000/avgRating/r.rodinhas@gmail.com",
+					"protocol": "http",
+					"host": [
+						"168",
+						"63",
+						"30",
+						"192"
+					],
+					"port": "3000",
+					"path": [
+						"avgRating",
+						"r.rodinhas@gmail.com"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "newComment",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/javascript",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"authorID\": \"rudirudellas@gmail.com\", \n\t\"Text\": \"new comment\", \n\t\"parents\": []\n\t\n}",
+					"options": {
+						"raw": {
+							"language": "javascript"
+						}
+					}
+				},
+				"url": {
+					"raw": "/review/:_id/comment",
+					"path": [
+						"review",
+						":_id",
+						"comment"
+					],
+					"variable": [
+						{
+							"key": "_id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
