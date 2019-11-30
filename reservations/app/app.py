@@ -198,6 +198,9 @@ def get_element_byid_api(id, id_element):
         elif request.method == 'POST' and (client is not None):
             body        = request.json
 
+            if isinstance(body["information"], dict):
+                body["information"]= json.dumps(body["information"])
+
             reservation = create_reservation(session, service, client, element,
                                              body["name"], body["information"],
                                              None, datetime.datetime.now())
