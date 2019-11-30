@@ -57,6 +57,7 @@ class EventTileState extends State<EventTile> {
               height: 200.0,
               margin: new EdgeInsets.all(10.0),
               decoration: new BoxDecoration(
+                color: Colors.white,
                 image: DecorationImage(
                   image: widget.event.eventImage,
                   fit: BoxFit.fill),
@@ -116,7 +117,7 @@ class EventTileState extends State<EventTile> {
           Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
-              Row(
+              /*Row(
                 children: <Widget>[
                   Expanded (child: Padding(
                       padding: const EdgeInsets.all(30.0),
@@ -132,7 +133,7 @@ class EventTileState extends State<EventTile> {
                     )
                     ),
 
-]           )
+]           )*/
             ],
           )
         ]

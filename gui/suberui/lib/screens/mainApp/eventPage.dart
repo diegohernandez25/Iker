@@ -5,6 +5,8 @@ import 'tripSearch.dart';
 import 'package:provider/provider.dart';
 import 'package:suberui/models/user.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:suberui/shared/components/customDrawer.dart';
+import 'package:intl/intl.dart';
 
 
 class EventPage extends StatelessWidget {
@@ -28,23 +30,15 @@ class EventPage extends StatelessWidget {
               floating: true,
               pinned: true,
               actions: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: CircleAvatar(
-                    backgroundImage: NetworkImage(user.imageUrl),
-                    radius: 20.0,
-                  ),
+                IconButton(
+                  icon: Icon(Icons.home),
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
+                  },
                 ),
-                FlatButton.icon(
-                    onPressed: () async{
-                      Navigator.of(context)
-                          .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
-                      await _auth.signOutGoogle();
-
-                    },
-                    icon: Icon(Icons.power_settings_new ),
-                    label: Text(''))
               ],
+
               flexibleSpace: FlexibleSpaceBar(
                   centerTitle: true,
                   title: Text(event.name,
@@ -66,7 +60,7 @@ class EventPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text("Super Bock Super Rock",
+                Text(event.name,
                   style: Theme.of(context).textTheme.title),
                 SizedBox(height: 30),
                 Text(event.description,
@@ -87,7 +81,7 @@ class EventPage extends StatelessWidget {
                   children: <Widget>[
                     Icon(Icons.calendar_today,size: 40),
                     SizedBox(width: 10),
-                    Text("10-2-2019",style: Theme.of(context).textTheme.subhead,)
+                    Text(DateFormat('yyyy-MM-dd ').format(event.date),style: Theme.of(context).textTheme.subhead,)
                   ],
                 ),
                 SizedBox(height: 60),
@@ -135,6 +129,8 @@ class EventPage extends StatelessWidget {
 
         ],
       ),
+
+      drawer: CustomDrawer()
       /*floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.push(

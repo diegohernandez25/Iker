@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:suberui/models/user.dart';
-import 'package:suberui/screens/mainApp/tripDetail.dart';
+import 'package:suberui/screens/mainApp/_____tripDetail.dart';
+import 'package:suberui/screens/mainApp/tripPurchase.dart';
 import 'package:suberui/services/auth.dart';
 import 'package:suberui/shared/components/purchaseDialog.dart';
 import 'package:suberui/shared/components/tripTile.dart';
 import 'package:suberui/models/trip.dart';
+import 'package:suberui/shared/components/customDrawer.dart';
 
 class TripSearch extends StatefulWidget {
   @override
@@ -21,27 +23,19 @@ class _TripSearchState extends State<TripSearch> {
   Widget build(BuildContext context) {
     final user= Provider.of<User>(context);
     return Scaffold(
+      drawer: CustomDrawer(),
       appBar: AppBar(
         title: Text("Trip Search"),
-        //backgroundColor: Colors.teal[500],
         actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: CircleAvatar(
-              backgroundImage: NetworkImage(user.imageUrl),
-              radius: 20.0,
-            ),
+          IconButton(
+            icon: Icon(Icons.home),
+            onPressed: () {
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
+            },
           ),
-          FlatButton.icon(
-              onPressed: () async{
-                Navigator.of(context)
-                    .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
-                await _auth.signOutGoogle();
-
-              },
-              icon: Icon(Icons.power_settings_new ),
-              label: Text(''))
         ],
+        //backgroundColor: Colors.teal[500],
       ),
       body: Padding(
             padding: EdgeInsets.all(0.0),
@@ -53,7 +47,11 @@ class _TripSearchState extends State<TripSearch> {
                       padding: const EdgeInsets.all(0.0),
                       child: GestureDetector(
                         onTap: (){
-                          showDialog(
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => TripPurchase()),
+                          );
+                          /*showDialog(
                             context: context,
                             builder: (BuildContext context) => PurchaseDialog(
                               trip: Trip(
@@ -65,7 +63,7 @@ class _TripSearchState extends State<TripSearch> {
                                   price: 150.90
                               ),
                             ),
-                          );
+                          );*/
                         },
                         child: TripTile(
                           trip: Trip(
@@ -84,6 +82,8 @@ class _TripSearchState extends State<TripSearch> {
             )
           
       ),
+
+
 
     );
   }

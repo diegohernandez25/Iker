@@ -8,4 +8,10 @@ class User {
   final String imageUrl;
 
   User ({this.uid, this.name, this.email,this.imageUrl});
+
+
+
+
 }
+
+
