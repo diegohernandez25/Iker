@@ -77,6 +77,8 @@ def createUser():
     authentication_id = request.args.get('usr_id')
 
     body = request.json
+
+    app.logger.info("BODY:\t"+repr(body))
     if usr_exists(session, authentication_id):
         return "LOGGED IN"
 
