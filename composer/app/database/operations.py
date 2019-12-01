@@ -13,11 +13,11 @@ except:
     from entities import *
 
 def create_user(session, id_authentication, id_owner_booking, id_client_booking,
-                id_aypal, access_token, name, img_url, mail)->User:
+                access_token, name, img_url, mail)->User:
 
     user = User(id_authentication=id_authentication,
                     id_owner_booking=id_owner_booking,
-                    id_client_booking=id_client_booking, id_aypal=id_aypal,
+                    id_client_booking=id_client_booking,
                     access_token=access_token, name=name, img_url=img_url,
                     mail=mail)
 
@@ -143,6 +143,12 @@ def get_trip_from_iptf(session, id_iptf)->Trip:
 
     return session.query(Trip).\
                 filter(Trip.id_iptf==id_iptf).\
+                options(load_only("id")).\
+                one()
+
+def get_usr_by_idauth(session, id_authentication):
+    return session.query(User).\
+                filter(User.id_authentication==id_authentication).\
                 options(load_only("id")).\
                 one()
 

@@ -261,7 +261,10 @@ def get_domain_byid_api(id, id_domain)->str:
                     reservation.url = "/service/%d/client/%d/reservation/%d" % (service.id, client.id, reservation.id)
                     session.commit()
 
-                    return jsonify(reservation.get_dict())
+                    response            = reservation.get_dict()
+                    response["price"]   = element.price
+
+                    return jsonify(response)
 
                 else:
                     return "ALREADY RESERVED"
@@ -388,7 +391,8 @@ def get_reservation_api(id, id_client, id_reservation)->str:
 
                     reservation.information = body["information"]
                     session.commit()
-                    return "UPDATED"
+                    
+                    return jsonify(reservation.get_dict())
 
             #Delete reservation
             delete_reservation(session, reservation=reservation)
