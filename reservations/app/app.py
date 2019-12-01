@@ -362,23 +362,39 @@ def create_reservation_api(id, id_owner, id_domain, id_element)->str:
 
     return "ERROR"
 
-@app.route('/<id>/client/<id_client>/reservation/<id_reservation>', methods=['GET', 'DELETE'])
+@app.route('/<id>/client/<id_client>/reservation/<id_reservation>', methods=['GET', 'DELETE', 'PUT'])
 def get_reservation_api(id, id_client, id_reservation)->str:
 
     service     = get_service(session, id)
     client      = get_client(session, id_client)
     reservation = get_reservation(session, id_reservation)
 
-    if request.method == 'GET':
-        if (service is not None) and (client is not None)\
-            and (reservation is not None) and (client in service.client)\
-                and (reservation in client.reservation):
+    if (service is not None) and (client is not None)\
+        and (reservation is not None) and (client in service.client)\
+            and (reservation in client.reservation):
 
+            #Get Reservation
+            if request.method == 'GET':
                 return json.dumps(reservation.get_dict())
 
-        return "ERROR"
-    delete_reservation(session, reservation=reservation)
-    return "DELETED"
+            #Update Information
+            elif request.method == 'PUT':
+                body = request.json
+
+                if "information" in body.keys():
+
+                    if isinstance(body["information"], dict):
+                        body["information"]= json.dumps(body["information"])
+
+                    reservation.information = body["information"]
+                    session.commit()
+                    return "UPDATED"
+
+            #Delete reservation
+            delete_reservation(session, reservation=reservation)
+            return "DELETED"
+
+    return "ERROR"
 
 
 if __name__ == '__main__':
