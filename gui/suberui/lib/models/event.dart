@@ -13,12 +13,13 @@ class Event {
 
 
   factory Event.fromJson(Map<String, dynamic> json) {
+
     return Event(
       eid: json['id'] as int,
       name: json['name'] as String,
       eventImage: NetworkImage(json['image_url']),
       description: json['description'] as String,
-      date: DateTime.parse(json['date']+' 00:00:00.000'),
+      date: DateTime.parse(json['date']),
       location: json['city'] as String,
     );
   }

@@ -18,7 +18,7 @@ class TripPurchase extends StatefulWidget {
 }
 
 class _TripPurchaseState extends State<TripPurchase> {
-  @override
+
   final TextEditingController _typeAheadController = TextEditingController();
 
   Location _selectedLocation= null;
@@ -40,7 +40,7 @@ class _TripPurchaseState extends State<TripPurchase> {
     locList.map((item) => print(item.name));
     return locList;
   }
-
+  @override
   Widget build(BuildContext context) {
 
     return Scaffold(

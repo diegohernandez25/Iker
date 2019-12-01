@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:suberui/models/event.dart';
+import 'package:suberui/models/location.dart';
 import 'package:suberui/models/user.dart';
 import 'package:suberui/screens/mainApp/_____tripDetail.dart';
 import 'package:suberui/screens/mainApp/tripPurchase.dart';
@@ -8,19 +12,73 @@ import 'package:suberui/shared/components/purchaseDialog.dart';
 import 'package:suberui/shared/components/tripTile.dart';
 import 'package:suberui/models/trip.dart';
 import 'package:suberui/shared/components/customDrawer.dart';
+import 'package:http/http.dart' as http;
 
 class TripSearch extends StatefulWidget {
+  final Event event;
+  final Location location;
+  TripSearch({this.event,this.location});
   @override
   _TripSearchState createState() => _TripSearchState();
 }
 
+
+
 class _TripSearchState extends State<TripSearch> {
   final AuthService _auth = AuthService();
 
+  List<Trip> _fetchedListOfTrips = [];
 
+  void _getTrips () async {
+
+    final _authority = "168.63.30.192:5000";
+    final _path = "/get_av_trips_event";
+    final _params = {
+      "event_id": widget.event.eid.toString(),
+      "lat": widget.location.lat.toString(),
+      "lon": widget.location.lon.toString()
+    };
+    final _uri =  Uri.http(_authority, _path,_params);
+    print(_uri.toString());
+
+
+    http.Response res = await http.get(_uri.toString());
+    if (res.statusCode == 200) {
+      List<dynamic> body = json.decode(res.body);
+
+      List<Trip> tripList = body.map((dynamic item) => Trip.fromJson(item),)
+          .toList();
+      //print(eventList.length);
+      for (int i = 0; i < tripList.length; i++) {
+        print(tripList[i].tid);
+        /* print(eventList[i].name);
+        print(eventList[i].eventImage);
+        print(eventList[i].description);
+        print(eventList[i].date);
+        print(eventList[i].location);
+        print('..............');*/
+      }
+
+      setState(() { _fetchedListOfTrips = tripList; });
+    }
+    else{
+      setState(() { _fetchedListOfTrips = []; });
+    }
+
+
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _getTrips();
+  }
 
   @override
   Widget build(BuildContext context) {
+    print(widget.event.name);
+
     final user= Provider.of<User>(context);
     return Scaffold(
       drawer: CustomDrawer(),
@@ -41,39 +99,26 @@ class _TripSearchState extends State<TripSearch> {
             padding: EdgeInsets.all(0.0),
             child: ListView.builder(
                 shrinkWrap: true,
-                itemCount: 7,
+                itemCount: _fetchedListOfTrips.length,
                 itemBuilder: (context, index) {
                   return  Padding(
                       padding: const EdgeInsets.all(0.0),
                       child: GestureDetector(
                         onTap: (){
-                          Navigator.push(
+                         /* Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => TripPurchase()),
-                          );
-                          /*showDialog(
+                          );*/
+                          showDialog(
                             context: context,
                             builder: (BuildContext context) => PurchaseDialog(
-                              trip: Trip(
-                                  tid: 1,
-                                  authorId: '1',
-                                  authorImage: AssetImage('Images/voa.jpg'),
-                                  authorName: 'Rodrigo Pereira',
-                                  authorRtng: 4.3,
-                                  price: 150.90
-                              ),
+                              trip: _fetchedListOfTrips[index],
+                              event: widget.event,
                             ),
-                          );*/
+                          );
                         },
                         child: TripTile(
-                          trip: Trip(
-                            tid: 1,
-                            authorId: '1',
-                            authorImage: AssetImage('Images/voa.jpg'),
-                            authorName: 'Rodrigo Pereira',
-                            authorRtng: 4.3,
-                            price: 150.90
-                          )
+                          trip: _fetchedListOfTrips[index]
                         ),
                       ),
 

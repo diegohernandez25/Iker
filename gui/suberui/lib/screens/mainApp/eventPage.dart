@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:suberui/screens/mainApp/locationPicker.dart';
 import 'package:suberui/services/auth.dart';
 import 'package:suberui/models/event.dart';
 import 'tripSearch.dart';
@@ -115,7 +116,7 @@ class EventPage extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => TripSearch()),
+                  MaterialPageRoute(builder: (context) => LocationPicker(event: event,)),
                 );
               }
           ),
@@ -124,7 +125,9 @@ class EventPage extends StatelessWidget {
             backgroundColor: Colors.green[400],
             label: 'Create Trip',
             labelStyle: TextStyle(fontSize: 18.0),
-            onTap: () => print('Create Trip'),
+            onTap: () {
+
+            },
           ),
 
         ],

@@ -6,9 +6,7 @@ import 'package:suberui/models/user.dart';
 import 'package:suberui/models/event.dart';
 import 'package:suberui/shared/components/EventTile.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:suberui/services/auth.dart';
-import 'profileScreen.dart';
-import 'package:geolocator/geolocator.dart';
+
 import 'package:suberui/shared/components/customDrawer.dart';
 import 'package:http/http.dart' as http;
 
@@ -24,55 +22,25 @@ class _HomeState extends State<Home> {
   final List<Event> listOfEvents=[
     Event(
         eid: 1,
-        name:'SuperRock',
+        name:'Dummy event',
         eventImage: AssetImage('Images/super.png'),
-        description:'O Super Bock Super Rock é um dos festivais de música mais famosos e aclamados de Portugal. Todos os verões, o festival convida atuações de renome internacional para um alinhamento que inclui também muitos talentos locais.',
+        description:'',
         date: DateTime.now(),
         location: 'Lisboa'
     ),
-    Event(
-        eid: 2,
-        name:'VOA',
-        eventImage: AssetImage('Images/voa.jpg'),
-        description:'Description',
-        date: DateTime.now(),
-        location: 'Lisboa'
-    ),
-    Event(
-        eid: 1,
-        name:'EDP CoolJazz',
-        eventImage: AssetImage('Images/edp.jpg'),
-        description:'Description',
-        date: DateTime.now(),
-        location: 'Lisboa'
-    )
+
   ];
 
   List<Event> _fetchedListOfEvents = [
     Event(
         eid: 1,
-        name:'SuperRock',
+        name:'DummyEvent',
         eventImage: AssetImage('Images/super.png'),
         description:'O Super Bock Super Rock é um dos festivais de música mais famosos e aclamados de Portugal. Todos os verões, o festival convida atuações de renome internacional para um alinhamento que inclui também muitos talentos locais.',
         date: DateTime.now(),
         location: 'Lisboa'
     ),
-    Event(
-        eid: 2,
-        name:'VOA',
-        eventImage: AssetImage('Images/voa.jpg'),
-        description:'Description',
-        date: DateTime.now(),
-        location: 'Lisboa'
-    ),
-    Event(
-        eid: 1,
-        name:'EDP CoolJazz',
-        eventImage: AssetImage('Images/edp.jpg'),
-        description:'Description',
-        date: DateTime.now(),
-        location: 'Lisboa'
-    )
+
   ];
 
   @override
@@ -102,8 +70,8 @@ class _HomeState extends State<Home> {
       for (int i = 0; i < eventList.length; i++) {
 
         //print(eventList[i].eid);
-       /* print(eventList[i].name);
         print(eventList[i].eventImage);
+        /*print(eventList[i].eventImage);
         print(eventList[i].description);
         print(eventList[i].date);
         print(eventList[i].location);
