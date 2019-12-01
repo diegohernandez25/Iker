@@ -339,30 +339,36 @@ def find_available_event_trips_api():
             "EndCoords": [event.lat, event.lon],
             "StartTime": event.date
         }
-        app.logger.info("BODY:\t"+repr(body))
+
         r       = requests.post(URL_TRIP_FOLLOWER + "/get_trips", json=body)
         trips   = r.json()
-        app.logger.info("IPTF RESPONSE:\t"+repr(trips))
         url_review = URL_REVIEW + "avgRating/"
 
         for t in trips:
-            app.logger.info('t:\t'+str(t))
-            trip    = get_trip_from_iptf(session, t)
-            user    = get_usr(session, trip.id_user)
-            r       = requests.get(url_review + user.mail)
-            r       = r.json()
-            app.logger.info('url:\t'+url_review + user.mail)
-            app.logger.info("r:\t"+repr(r))
-            response.append({
-                "id"        : trip.id,
-                "city"      : trip.city,
-                "usr_name"  : user.name,
-                "user_img"  : user.img_url,
-                "mail"      : user.mail,
-                "review"    : (r["avgRating"] if len(r)!=0 else 0)
-                })
 
-        app.logger.info("TRIPS:\t"+repr(response))
+            trip    = get_trip_from_iptf(session, t)
+            if trip.available:
+                url = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" + \
+                        str(trip.id_domain_booking) + "/get_aval_elems"
+
+                r = requests.get(url)
+                r = r.json()
+                price = r[0]["price"]
+                
+                user    = get_usr(session, trip.id_user)
+                r       = requests.get(url_review + user.mail)
+                r       = r.json()
+
+                response.append({
+                    "id"        : trip.id,
+                    "city"      : trip.city,
+                    "usr_name"  : user.name,
+                    "user_img"  : user.img_url,
+                    "mail"      : user.mail,
+                    "review"    : (r["avgRating"] if len(r)!=0 else 0),
+                    "price"     : price
+                    })
+
         return jsonify(response)
 
     return "ERROR"
