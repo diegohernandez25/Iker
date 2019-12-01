@@ -153,6 +153,7 @@ public class ItineraryPlannerAPI{
 	
 	@RequestMapping(value="/probe_trip",method=RequestMethod.POST)
 	public ResponseEntity probeTrip(@RequestBody ProbeRequest pr,HttpServletRequest ht){
+		System.out.printf("probeTrip: %s\n",pr.toString());
 		//ProbeResponse
 		try{
 			return new ResponseEntity<ProbeResponse>(getTripDetails(null,pr),HttpStatus.OK);
@@ -164,6 +165,7 @@ public class ItineraryPlannerAPI{
 	
 	@RequestMapping(value="/register_trip",method=RequestMethod.POST)
 	public ResponseEntity registerTrip(@RequestBody ProbeRequest pr,HttpServletRequest ht){
+		System.out.printf("registerTrip: %s\n",pr.toString());
 		ProbeResponse prr = (ProbeResponse) probeTrip(pr,null).getBody();
 
 		Date start,end;
@@ -184,7 +186,7 @@ public class ItineraryPlannerAPI{
 							prr.getWaypoints(),
 							start,
 							end,
-							pr.getMaxDetour().intValue(),
+							pr.getMaxDetour().intValue()*1000, //Meters to KM
 							pr.isAvoidTolls(),
 							pr.getFuelType(),
 							pr.getConsumption(),
@@ -196,6 +198,7 @@ public class ItineraryPlannerAPI{
 	
 	@RequestMapping(value="/get_trips",method=RequestMethod.POST)
 	public ResponseEntity getTrips(@RequestBody GetTripsRequest gtr,HttpServletRequest ht){
+		System.out.printf("getTrips: %s\n",gtr.toString());
 		Date startday,endday;
 
 		Calendar cal = Calendar.getInstance();
@@ -243,6 +246,7 @@ public class ItineraryPlannerAPI{
 
 	@RequestMapping(value="/add_subtrip",method=RequestMethod.POST)
 	public ResponseEntity addSubTrip(@RequestBody AddSubtripRequest asr, HttpServletRequest ht){
+		System.out.printf("addSubTrip: %s\n",asr.toString());
 		Trip t=triprep.findById(asr.getTripId().intValue()).get();
 
 		if(t.getMaxDetour()==0)
@@ -283,6 +287,7 @@ public class ItineraryPlannerAPI{
 	
 	@RequestMapping(value="/get_trip",method=RequestMethod.GET)
 	public ResponseEntity getTrip(@RequestParam("TripId") int tripid, HttpServletRequest ht){
+		System.out.printf("getTrip: %d\n",tripid);
 		
 		Optional<Trip> ot = triprep.findById(tripid);	
 		if(!ot.isPresent())
