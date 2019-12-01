@@ -492,9 +492,10 @@ def reserve_seat():
                     str(user.id_client_booking) + "/reservation/" + str(res_id)
 
             #Updates reservation and gets final reservation info.
+            tmp_pay_dict = json.loads(pay_response)
             r = requests.put(url,json={"information":pay_response})
             res     = r.json()
-
+            res["token"] = tmp_pay_dict["ttoken"]
 
             app.logger.info("res:\t"+repr(res))
             #Analyses available elements and updates number of elements avaiable
