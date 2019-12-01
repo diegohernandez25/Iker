@@ -507,6 +507,9 @@ def reserve_seat():
 
             return jsonify(res)
 
+        return "TRIP UNAVAILABLE"
+    return "ERROR"
+
 @app.route("/get_all_events", methods=['GET'])
 def get_all_events_api():
     return jsonify(get_all_events(session))
