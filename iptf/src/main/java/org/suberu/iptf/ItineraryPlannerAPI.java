@@ -275,7 +275,7 @@ public class ItineraryPlannerAPI{
 		if(prr.getDist()>t.getMaxDetour()+t.getDist())
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-		t.setMaxDetour(0); //Doesnt allow for more than one subtrip
+		//t.setMaxDetour(0); //Doesnt allow for more than one subtrip
 		t.setDist(prr.getDist());
 		t.setCoords(llf);
 	
