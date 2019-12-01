@@ -198,6 +198,10 @@ def get_element_byid_api(id, id_element):
         elif request.method == 'POST' and (client is not None):
             body        = request.json
 
+
+            if isinstance(body["information"], dict):
+                body["information"]= json.dumps(body["information"])
+
             reservation = create_reservation(session, service, client, element,
                                              body["name"], body["information"],
                                              None, datetime.datetime.now())
@@ -218,7 +222,7 @@ def get_element_byid_api(id, id_element):
     return "ERROR"
 
 
-@app.route('/<id>/domain/<id_domain>', methods=['GET', 'DELETE'])
+@app.route('/<id>/domain/<id_domain>', methods=['GET', 'DELETE', 'POST'])
 def get_domain_byid_api(id, id_domain)->str:
     service = get_service(session, id)
     domain = get_domain(session, id_domain)
@@ -227,9 +231,52 @@ def get_domain_byid_api(id, id_domain)->str:
         if request.method == 'GET':
             return get_json_domain(domain)
 
+        #Reserve one of the available elements from domain
+        elif request.method == 'POST':
+            body = request.json
+
+            elems = get_domain_aval_elements(session, domain=domain)
+            if len(elems)!= 0 and\
+                set(["name", "information", "client"]).issubset(set(body.keys())):
+
+                #Get Client
+                client = get_client(session, body["client"])
+                if client is None:
+                    return "ERROR CLIENT"
+
+                #Get Element
+                element = get_element(session, elems[0])
+                if element is None:
+                    return "ERROR ELEMENT"
+
+                if isinstance(body["information"], dict):
+                    body["information"]= json.dumps(body["information"])
+
+                #Create Reservation
+                reservation = create_reservation(session, service, client, element,
+                                                 body["name"], body["information"],
+                                                 None, datetime.datetime.now())
+
+                if reservation is not None:
+                    reservation.url = "/service/%d/client/%d/reservation/%d" % (service.id, client.id, reservation.id)
+                    session.commit()
+
+                    response            = reservation.get_dict()
+                    response["price"]   = element.price
+
+                    return jsonify(response)
+
+                else:
+                    return "ALREADY RESERVED"
+
+            else:
+                return "ERROR"
+
         #delete domain
         delete_domain(session, domain=domain)
         return "DELETED"
+
+
 
     return "ERROR"
 
@@ -318,23 +365,40 @@ def create_reservation_api(id, id_owner, id_domain, id_element)->str:
 
     return "ERROR"
 
-@app.route('/<id>/client/<id_client>/reservation/<id_reservation>', methods=['GET', 'DELETE'])
+@app.route('/<id>/client/<id_client>/reservation/<id_reservation>', methods=['GET', 'DELETE', 'PUT'])
 def get_reservation_api(id, id_client, id_reservation)->str:
 
     service     = get_service(session, id)
     client      = get_client(session, id_client)
     reservation = get_reservation(session, id_reservation)
 
-    if request.method == 'GET':
-        if (service is not None) and (client is not None)\
-            and (reservation is not None) and (client in service.client)\
-                and (reservation in client.reservation):
+    if (service is not None) and (client is not None)\
+        and (reservation is not None) and (client in service.client)\
+            and (reservation in client.reservation):
 
+            #Get Reservation
+            if request.method == 'GET':
                 return json.dumps(reservation.get_dict())
 
-        return "ERROR"
-    delete_reservation(session, reservation=reservation)
-    return "DELETED"
+            #Update Information
+            elif request.method == 'PUT':
+                body = request.json
+
+                if "information" in body.keys():
+
+                    if isinstance(body["information"], dict):
+                        body["information"]= json.dumps(body["information"])
+
+                    reservation.information = body["information"]
+                    session.commit()
+                    
+                    return jsonify(reservation.get_dict())
+
+            #Delete reservation
+            delete_reservation(session, reservation=reservation)
+            return "DELETED"
+
+    return "ERROR"
 
 
 if __name__ == '__main__':

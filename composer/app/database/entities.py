@@ -22,7 +22,7 @@ class Event(Base):
     sub_city    = Column(String(200), nullable=True)
     lat         = Column(Float, nullable=False)
     lon         = Column(Float, nullable=False)
-    date        = Column(Date, nullable=False)
+    date        = Column(Integer, nullable=False)
 
     trip = relationship("Trip", backref="event", cascade="all, delete-orphan", lazy='dynamic')
 
@@ -36,7 +36,7 @@ class Event(Base):
             "   sub_city: %s\n" % (self.sub_city) +\
             "        lat: %s\n" % (str(self.lat)) +\
             "        lon: %s\n" % (str(self.lon)) +\
-            "       date: %s\n" % (str(self.date))
+            "       date: %s\n" % (epoch_to_date(self.date))
 
     def get_dict(self):
         return {
@@ -49,7 +49,7 @@ class Event(Base):
             "sub_city"      : self.sub_city,
             "lat"           : self.lat,
             "lon"           : self.lon,
-            "date"          : str(self.date)
+            "date"          : epoch_to_date(self.date)
         }
 
 class Trip(Base):
@@ -93,15 +93,14 @@ class User(Base):
     __tablename__ = 'user'
 
     id                      = Column(Integer, primary_key=True)
-    id_authentication       = Column(Integer, unique=True, nullable=False)
+    id_authentication       = Column(String(50), unique=True, nullable=False)
     id_owner_booking        = Column(Integer, unique=True, nullable=False)
     id_client_booking       = Column(Integer, unique=True, nullable=False)
-    id_aypal                = Column(Integer, unique=True, nullable=False)
     access_token            = Column(String(15), nullable=False)
 
     name    = Column(String(50), nullable=False)
     img_url = Column(String(200), nullable=False)
-    mail    = Column(String(50), nullable=False) 
+    mail    = Column(String(50), unique=True, nullable=False)
 
     trip        = relationship("Trip", backref="user", cascade="all, delete-orphan", lazy='dynamic')
 
@@ -110,11 +109,10 @@ class User(Base):
             "id_authentication: %s\n" % (self.id_authentication) +\
             " id_owner_booking: %s\n" % (self.id_owner_booking) +\
             "id_client_booking: %s\n" % (self.id_client_booking) +\
-            "         id_aypal: %s\n" % (self.id_aypal) +\
             "     access_token: %s\n" % (self.access_token)+\
-            "         usr_name: %s\n" % (self.usr_name) +\
+            "         usr_name: %s\n" % (self.name) +\
             "          img_url: %s\n" % (self.img_url) +\
-            "         usr_mail: %s\n" % (self.usr_mail)
+            "         usr_mail: %s\n" % (self.mail)
 
     def get_dict(self):
         return {
@@ -122,9 +120,11 @@ class User(Base):
             "id_authentication" : self.id_authentication,
             "id_owner_booking"  : self.id_owner_booking,
             "id_client_booking" : self.id_client_booking,
-            "id_aypal"          : self.id_aypal,
             "access_token"      : self.access_token,
-            "usr_name"          : self.usr_name,
+            "usr_name"          : self.name,
             "img_url"           : self.img_url,
-            "usr_mail"          : self.usr_mail
+            "usr_mail"          : self.mail
         }
+
+def epoch_to_date(epoch)->str:
+    return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(epoch))

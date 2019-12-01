@@ -30,6 +30,7 @@ BOOKING_SERVICE_ID = 1
 URL_RESERVATION     = "http://localhost:5002/"
 URL_TRIP_FOLLOWER   = "http://localhost:8081/"
 URL_PAYMENT         = "http://localhost:8080/"
+URL_REVIEW          = "http://168.63.30.192:3000/"
 
 IKER_MAIL = "iker@mail.com"
 
@@ -75,9 +76,11 @@ def createUser():
 
     authentication_id = request.args.get('usr_id')
 
-    body        = request.json
-    if set(["name", "information"]).issubset(set(body.keys())) and\
-        not usr_exists(session, authentication_id):
+    body = request.json
+    if usr_exists(session, authentication_id):
+        return "LOGGED IN"
+
+    elif set(["name", "information"]).issubset(set(body.keys())):
 
         b_json  = {"name":body["name"],"information":body["information"]}
         r       = requests.post(URL_RESERVATION + str(BOOKING_SERVICE_ID) +"/owner", json=b_json)
@@ -90,8 +93,8 @@ def createUser():
         access_token = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(15))
 
         usr = create_user(session, authentication_id, owner_id, client_id,
-                            body["id_aypal"], access_token, body["name"],
-                            body["img_url"], body["mail"])
+                            access_token, body["name"],body["img_url"],
+                            body["mail"])
 
         return json.dumps({"id": usr.id, "access_token":usr.access_token})
 
@@ -99,6 +102,7 @@ def createUser():
         app.logger.error('Invalid JSON body. "name" or "information" fields may\
             not be explicit.')
         return "ERROR"
+
 
 @app.route("/register_trip", methods=['POST'])
 def book_trip()->str:
@@ -259,8 +263,29 @@ def end_trip():
                 str(trip.id_domain_booking) + "/get_dom_reservations"
 
         r = requests.get(url)
-        #TODO Continue
-        return jsonify(r.json())
+        reservations = r.json()
+
+        driver = get_usr(session, user_id)
+
+        token_list = list()
+
+        for res in reservations:
+            usr = get_usr_by_idclient(session, res["client_id"])
+            payment_info = json.loads(res["information"])
+            payment_bdy = {
+                "targetID"  : driver.mail,
+                "sourceID"  : IKER_MAIL,
+                "amount"    : res["price"],
+                "briefDescription": "None"
+            }
+
+            token_list.append({
+                "usr_id"        : usr.id,
+                "payment_token" : payment_info["ttoken"],
+                "amount"        : res["price"]
+                })
+
+            requests.post(URL_PAYMENT + "completePayment", json=payment_bdy)
 
     return "ERROR"
 
@@ -274,7 +299,7 @@ def make_event()->str:
 
         event = create_event(session, body["Name"], body["Description"], body["Category"],
                 body["ImageUrl"], body["City"], body["Lat"],body["Lon"],
-                epoch_to_date(body["Date"]), sub_city=body["SubCity"])
+                body["Date"], sub_city=body["SubCity"])
 
         return json.dumps(event.get_dict())
 
@@ -301,17 +326,53 @@ def find_event()->str:
 
     return "ERROR"
 
-@app.route("/get_trips_event", methods=['GET'])
-def find_event_trip()->str:
+@app.route("/get_av_trips_event", methods=['GET'])
+def find_available_event_trips_api():
 
-    user_id         = request.args.get('usr_id')
-    access_token    = request.args.get('access_token')
-    event_id        = request.args.get('event_id')
-    src_addr        = request.args.get('src_addr')
+    event_id    = request.args.get('event_id')
+    event       = get_event(session,event_id)
 
-    if valid_usr(session, user_id, access_token):
-        trips = find_event_trips(session, event_id, src_addr)
-        return repr(trips)
+    if event is not None:
+        response = list()
+
+        lat = request.args.get('lat')
+        lon = request.args.get('lon')
+        body = {
+            "StartCoords": [float(lat), float(lon)],
+            "EndCoords": [event.lat, event.lon],
+            "StartTime": event.date
+        }
+
+        r       = requests.post(URL_TRIP_FOLLOWER + "/get_trips", json=body)
+        trips   = r.json()
+        url_review = URL_REVIEW + "avgRating/"
+
+        for t in trips:
+
+            trip    = get_trip_from_iptf(session, t)
+            if trip.available:
+                url = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" + \
+                        str(trip.id_domain_booking) + "/get_aval_elems"
+
+                r = requests.get(url)
+                r = r.json()
+                price = r[0]["price"]
+
+                user    = get_usr(session, trip.id_user)
+                r       = requests.get(url_review + user.mail)
+                r       = r.json()
+
+                response.append({
+                    "id"        : trip.id,
+                    "city"      : trip.city,
+                    "usr_name"  : user.name,
+                    "user_img"  : user.img_url,
+                    "mail"      : user.mail,
+                    "review"    : (r["avgRating"] if len(r)!=0 else 0),
+                    "price"     : price
+                    })
+
+        return jsonify(response)
 
     return "ERROR"
 
@@ -364,6 +425,7 @@ def get_aval_seats():
 def epoch_to_date(epoch)->str:
     return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(epoch))
 
+
 def create_service():
     global BOOKING_SERVICE_ID
 
@@ -389,29 +451,30 @@ def check_service()->Boolean:
 def reserve_seat():
     global BOOKING_SERVICE_ID
 
-    user_id         = request.args.get('usr_id')
-    access_token    = request.args.get('access_token')
-    trip_id         = request.args.get('trip_id')
-    element_id      = request.args.get('elem_id')
+    user_id = request.args.get('usr_id') #Auth id
+    trip_id = request.args.get('trip_id')
+    body    = request.json
 
-    body = request.json
-
-    if valid_usr(session, user_id, access_token) and\
+    if usr_exists(session, user_id) and\
         trip_exists_id(session, trip_id) and\
         set(["name", "information"]).issubset(set(body.keys())):
 
-        user = get_usr(session, user_id)
+        user = get_usr_by_idauth(session, user_id)
         trip = get_trip(session, trip_id)
 
         if trip.available:
 
-            #Get element information
-            url     = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/element/" + str(element_id)
-            r       = requests.get(url)
-            r       = r.json()
-
-            if r['reserved']:
-                return "RESERVED"
+            #Make reservation.
+            url     = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" + str(trip.id_domain_booking)
+            res_body = {
+                "client":user.id_client_booking,
+                "name":"reservation_from_"+user.name,
+                "information": "none"
+            }
+            r = requests.post(url,json=res_body)
+            r = r.json()
+            #Saves reservation Id
+            res_id = r["id"]
 
             #Create Delayed Payment
             pay_url = URL_PAYMENT + "/delayedPayment"
@@ -420,16 +483,19 @@ def reserve_seat():
                 "amount"            : r['price'],
                 "briefDescription"  : "None"
             }
-            r   = requests.post(pay_url, json=body)
+            r   = requests.post(pay_url, json=pay_bdy)
+            pay_response = r.json()
 
-            body['information'] = r.json()
-            data    = { 'client_id':user.id_client_booking }
-            r       = requests.post(url, json=body, params=data)
+            url = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/client/" +\
+                    str(user.id_client_booking) + "/reservation/" + str(res_id)
 
-            if r.text == "RESERVED" or r.text == "ERROR":
-                return r.text
-
+            #Updates reservation and gets final reservation info.
+            r = requests.put(url,json={"information":pay_response})
             res     = r.json()
+
+
+            app.logger.info("res:\t"+repr(res))
+            #Analyses available elements and updates number of elements avaiable
             r       = requests.get(URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" +\
                         str(trip.id_domain_booking) + "/get_aval_elems")
 

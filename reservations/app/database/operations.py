@@ -245,7 +245,11 @@ def get_domain_reservations(session, id=None, domain=None)->list:
     if domain is not None:
         for e in domain.element:
             for r in e.reservation:
-                res.append(r.get_dict())
+                tmp_dict    = r.get_dict()
+                tmp_dict['client_id'] = r.id_client
+                tmp_dict['price'] = e.price
+                res.append(tmp_dict)
+                del tmp_dict
 
     return res
 
