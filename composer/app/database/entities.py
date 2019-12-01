@@ -93,15 +93,14 @@ class User(Base):
     __tablename__ = 'user'
 
     id                      = Column(Integer, primary_key=True)
-    id_authentication       = Column(Integer, unique=True, nullable=False)
+    id_authentication       = Column(String(50), unique=True, nullable=False)
     id_owner_booking        = Column(Integer, unique=True, nullable=False)
     id_client_booking       = Column(Integer, unique=True, nullable=False)
-    id_aypal                = Column(Integer, unique=True, nullable=False)
     access_token            = Column(String(15), nullable=False)
 
     name    = Column(String(50), nullable=False)
     img_url = Column(String(200), nullable=False)
-    mail    = Column(String(50), nullable=False)
+    mail    = Column(String(50), unique=True, nullable=False)
 
     trip        = relationship("Trip", backref="user", cascade="all, delete-orphan", lazy='dynamic')
 
@@ -110,7 +109,6 @@ class User(Base):
             "id_authentication: %s\n" % (self.id_authentication) +\
             " id_owner_booking: %s\n" % (self.id_owner_booking) +\
             "id_client_booking: %s\n" % (self.id_client_booking) +\
-            "         id_aypal: %s\n" % (self.id_aypal) +\
             "     access_token: %s\n" % (self.access_token)+\
             "         usr_name: %s\n" % (self.name) +\
             "          img_url: %s\n" % (self.img_url) +\
@@ -122,7 +120,6 @@ class User(Base):
             "id_authentication" : self.id_authentication,
             "id_owner_booking"  : self.id_owner_booking,
             "id_client_booking" : self.id_client_booking,
-            "id_aypal"          : self.id_aypal,
             "access_token"      : self.access_token,
             "usr_name"          : self.name,
             "img_url"           : self.img_url,

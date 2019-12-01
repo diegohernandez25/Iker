@@ -76,9 +76,13 @@ def createUser():
 
     authentication_id = request.args.get('usr_id')
 
-    body        = request.json
-    if set(["name", "information"]).issubset(set(body.keys())) and\
-        not usr_exists(session, authentication_id):
+    body = request.json
+
+    app.logger.info("BODY:\t"+repr(body))
+    if usr_exists(session, authentication_id):
+        return "LOGGED IN"
+
+    elif set(["name", "information"]).issubset(set(body.keys())):
 
         b_json  = {"name":body["name"],"information":body["information"]}
         r       = requests.post(URL_RESERVATION + str(BOOKING_SERVICE_ID) +"/owner", json=b_json)
@@ -91,8 +95,8 @@ def createUser():
         access_token = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(15))
 
         usr = create_user(session, authentication_id, owner_id, client_id,
-                            body["id_aypal"], access_token, body["name"],
-                            body["img_url"], body["mail"])
+                            access_token, body["name"],body["img_url"],
+                            body["mail"])
 
         return json.dumps({"id": usr.id, "access_token":usr.access_token})
 
@@ -100,6 +104,7 @@ def createUser():
         app.logger.error('Invalid JSON body. "name" or "information" fields may\
             not be explicit.')
         return "ERROR"
+
 
 @app.route("/register_trip", methods=['POST'])
 def book_trip()->str:
@@ -339,30 +344,36 @@ def find_available_event_trips_api():
             "EndCoords": [event.lat, event.lon],
             "StartTime": event.date
         }
-        app.logger.info("BODY:\t"+repr(body))
+
         r       = requests.post(URL_TRIP_FOLLOWER + "/get_trips", json=body)
         trips   = r.json()
-        app.logger.info("IPTF RESPONSE:\t"+repr(trips))
         url_review = URL_REVIEW + "avgRating/"
 
         for t in trips:
-            app.logger.info('t:\t'+str(t))
-            trip    = get_trip_from_iptf(session, t)
-            user    = get_usr(session, trip.id_user)
-            r       = requests.get(url_review + user.mail)
-            r       = r.json()
-            app.logger.info('url:\t'+url_review + user.mail)
-            app.logger.info("r:\t"+repr(r))
-            response.append({
-                "id"        : trip.id,
-                "city"      : trip.city,
-                "usr_name"  : user.name,
-                "user_img"  : user.img_url,
-                "mail"      : user.mail,
-                "review"    : (r["avgRating"] if len(r)!=0 else 0)
-                })
 
-        app.logger.info("TRIPS:\t"+repr(response))
+            trip    = get_trip_from_iptf(session, t)
+            if trip.available:
+                url = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" + \
+                        str(trip.id_domain_booking) + "/get_aval_elems"
+
+                r = requests.get(url)
+                r = r.json()
+                price = r[0]["price"]
+
+                user    = get_usr(session, trip.id_user)
+                r       = requests.get(url_review + user.mail)
+                r       = r.json()
+
+                response.append({
+                    "id"        : trip.id,
+                    "city"      : trip.city,
+                    "usr_name"  : user.name,
+                    "user_img"  : user.img_url,
+                    "mail"      : user.mail,
+                    "review"    : (r["avgRating"] if len(r)!=0 else 0),
+                    "price"     : price
+                    })
+
         return jsonify(response)
 
     return "ERROR"
@@ -442,29 +453,30 @@ def check_service()->Boolean:
 def reserve_seat():
     global BOOKING_SERVICE_ID
 
-    user_id         = request.args.get('usr_id')
-    access_token    = request.args.get('access_token')
-    trip_id         = request.args.get('trip_id')
-    element_id      = request.args.get('elem_id')
+    user_id = request.args.get('usr_id') #Auth id
+    trip_id = request.args.get('trip_id')
+    body    = request.json
 
-    body = request.json
-
-    if valid_usr(session, user_id, access_token) and\
+    if usr_exists(session, user_id) and\
         trip_exists_id(session, trip_id) and\
         set(["name", "information"]).issubset(set(body.keys())):
 
-        user = get_usr(session, user_id)
+        user = get_usr_by_idauth(session, user_id)
         trip = get_trip(session, trip_id)
 
         if trip.available:
 
-            #Get element information
-            url     = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/element/" + str(element_id)
-            r       = requests.get(url)
-            r       = r.json()
-
-            if r['reserved']:
-                return "RESERVED"
+            #Make reservation.
+            url     = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" + str(trip.id_domain_booking)
+            res_body = {
+                "client":user.id_client_booking,
+                "name":"reservation_from_"+user.name,
+                "information": "none"
+            }
+            r = requests.post(url,json=res_body)
+            r = r.json()
+            #Saves reservation Id
+            res_id = r["id"]
 
             #Create Delayed Payment
             pay_url = URL_PAYMENT + "/delayedPayment"
@@ -473,16 +485,19 @@ def reserve_seat():
                 "amount"            : r['price'],
                 "briefDescription"  : "None"
             }
-            r   = requests.post(pay_url, json=body)
+            r   = requests.post(pay_url, json=pay_bdy)
+            pay_response = r.json()
 
-            body['information'] = r.json()
-            data    = { 'client_id':user.id_client_booking }
-            r       = requests.post(url, json=body, params=data)
+            url = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/client/" +\
+                    str(user.id_client_booking) + "/reservation/" + str(res_id)
 
-            if r.text == "RESERVED" or r.text == "ERROR":
-                return r.text
-
+            #Updates reservation and gets final reservation info.
+            r = requests.put(url,json={"information":pay_response})
             res     = r.json()
+            res["token"] = pay_response["ttoken"]
+
+            app.logger.info("res:\t"+repr(res))
+            #Analyses available elements and updates number of elements avaiable
             r       = requests.get(URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" +\
                         str(trip.id_domain_booking) + "/get_aval_elems")
 
@@ -491,6 +506,9 @@ def reserve_seat():
                 session.commit()
 
             return jsonify(res)
+
+        return "TRIP UNAVAILABLE"
+    return "ERROR"
 
 @app.route("/get_all_events", methods=['GET'])
 def get_all_events_api():
