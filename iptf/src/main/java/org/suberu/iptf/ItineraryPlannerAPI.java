@@ -186,7 +186,7 @@ public class ItineraryPlannerAPI{
 							prr.getWaypoints(),
 							start,
 							end,
-							pr.getMaxDetour().intValue(),
+							pr.getMaxDetour().intValue()*1000, //Meters to KM
 							pr.isAvoidTolls(),
 							pr.getFuelType(),
 							pr.getConsumption(),
