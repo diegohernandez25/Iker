@@ -198,6 +198,7 @@ def get_element_byid_api(id, id_element):
         elif request.method == 'POST' and (client is not None):
             body        = request.json
 
+
             if isinstance(body["information"], dict):
                 body["information"]= json.dumps(body["information"])
 
@@ -221,7 +222,7 @@ def get_element_byid_api(id, id_element):
     return "ERROR"
 
 
-@app.route('/<id>/domain/<id_domain>', methods=['GET', 'DELETE'])
+@app.route('/<id>/domain/<id_domain>', methods=['GET', 'DELETE', 'POST'])
 def get_domain_byid_api(id, id_domain)->str:
     service = get_service(session, id)
     domain = get_domain(session, id_domain)
@@ -230,9 +231,49 @@ def get_domain_byid_api(id, id_domain)->str:
         if request.method == 'GET':
             return get_json_domain(domain)
 
+        #Reserve one of the available elements from domain
+        elif request.method == 'POST':
+            body = request.json
+
+            elems = get_domain_aval_elements(session, domain=domain)
+            if len(elems)!= 0 and\
+                set(["name", "information", "client"]).issubset(set(body.keys())):
+
+                #Get Client
+                client = get_client(session, body["client"])
+                if client is None:
+                    return "ERROR CLIENT"
+
+                #Get Element
+                element = get_element(session, elems[0])
+                if element is None:
+                    return "ERROR ELEMENT"
+
+                if isinstance(body["information"], dict):
+                    body["information"]= json.dumps(body["information"])
+
+                #Create Reservation
+                reservation = create_reservation(session, service, client, element,
+                                                 body["name"], body["information"],
+                                                 None, datetime.datetime.now())
+
+                if reservation is not None:
+                    reservation.url = "/service/%d/client/%d/reservation/%d" % (service.id, client.id, reservation.id)
+                    session.commit()
+
+                    return jsonify(reservation.get_dict())
+
+                else:
+                    return "ALREADY RESERVED"
+
+            else:
+                return "ERROR"
+
         #delete domain
         delete_domain(session, domain=domain)
         return "DELETED"
+
+
 
     return "ERROR"
 
