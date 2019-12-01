@@ -335,13 +335,14 @@ def find_available_event_trips_api():
         lat = request.args.get('lat')
         lon = request.args.get('lon')
         body = {
-            "StartCoords": [lat, lon],
+            "StartCoords": [float(lat), float(lon)],
             "EndCoords": [event.lat, event.lon],
             "StartTime": event.date
         }
-
+        app.logger.info("BODY:\t"+repr(body))
         r       = requests.post(URL_TRIP_FOLLOWER + "/get_trips", json=body)
         trips   = r.json()
+        app.logger.info("IPTF RESPONSE:\t"+repr(trips))
         url_review = URL_REVIEW + "avgRating/"
 
         for t in trips:
