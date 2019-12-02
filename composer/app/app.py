@@ -231,6 +231,26 @@ def end_trip():
 
     return "ERROR"
 
+
+@app.route("/probe_trip", methods=['GET'])
+def probe_trip()->str:
+    body        = request.json
+
+    event_id    = request.args.get('event_id')
+
+    if set(["StartCoords", "Consumption", "AvoidTolls",
+                "MaxDetour", "FuelType"]).issubset(set(body.keys())) and\
+                    any(e in body.keys() for e in ["StartTime", "EndTime"]) and\
+                        event_id is not None:
+
+        event = get_event(session, event_id)
+        if event is not None:
+            body["EndCoords"] = [event.lat, event.lon]
+            r = requests.post(URL_TRIP_FOLLOWER + "probe_trip", json=body)
+            return jsonify(r.json())
+
+    return "ERROR"
+
 @app.route("/create_event", methods=['POST'])
 def make_event()->str:
     body = request.json
