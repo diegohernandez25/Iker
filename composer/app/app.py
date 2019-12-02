@@ -468,8 +468,14 @@ def get_usr_profile_api():
 
         response = usr.get_dict_profile()
         r = requests.get(URL_REVIEW + "review", data={'reviewdObjectID': usr.mail})
-        response["reviews"] = r.json()
+        r = r.json()
+        for e in r:
+            mail = e['authorID']
+            tmp_usr = get_usr_from_mail(session, mail)
+            if tmp_usr is not None:
+                e['img_url'] = tmp_usr.img_url
 
+        response["reviews"] = r
         return jsonify(response)
 
     return "ERROR"
