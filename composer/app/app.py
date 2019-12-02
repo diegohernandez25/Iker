@@ -458,10 +458,24 @@ def reserve_seat():
         return "TRIP UNAVAILABLE"
     return "ERROR"
 
+@app.route("/get_usr_profile", methods=['GET'])
+def get_usr_profile_api():
+
+    usr_mail    = request.args.get('usr_mail')
+    usr         = get_usr_from_mail(session, usr_mail)
+    if usr is not None:
+
+        response = usr.get_dict_profile()
+        r = requests.get(URL_REVIEW + "review", data={'reviewdObjectID': usr.mail})
+        response["reviews"] = r.json()
+
+        return jsonify(response)
+
+    return "ERROR"
+
 @app.route("/get_all_events", methods=['GET'])
 def get_all_events_api():
     return jsonify(get_all_events(session))
-
 
 if __name__ == '__main__':
     if not check_service():

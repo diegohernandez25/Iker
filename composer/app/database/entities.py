@@ -126,5 +126,13 @@ class User(Base):
             "usr_mail"          : self.mail
         }
 
+    def get_dict_profile(self):
+        return {
+            "id"                : self.id,
+            "usr_name"          : self.name,
+            "img_url"           : self.img_url,
+            "usr_mail"          : self.mail
+        }
+
 def epoch_to_date(epoch)->str:
     return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(epoch))
