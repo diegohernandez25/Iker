@@ -53,6 +53,8 @@ dictConfig({
     }
 })
 
+
+#TODO Adicionar add sub trip no reserve seat.
 app = Flask(__name__)
 
 session = Session()
@@ -78,7 +80,6 @@ def createUser():
 
     body = request.json
 
-    app.logger.info("BODY:\t"+repr(body))
     if usr_exists(session, authentication_id):
         return "LOGGED IN"
 
@@ -207,17 +208,8 @@ def search_trip()->str:
     else:
         return "ERROR"
 
-#TODO: Mapeamento de operação para verificar se pagou
-#Get specific transaction
-
 @app.route("/remove_trip", methods=['DELETE'])
 def remove_trip()->str:
-
-
-    #TODO: No pagamento:
-    #Utilizar CreatePayment
-    #TargetID => email COndutor
-    #SourceID 0> nosso email
 
     global BOOKING_SERVICE_ID
 
@@ -247,7 +239,6 @@ def remove_trip()->str:
 
     return "ERROR"
 
-#TODO:
 @app.route("/end_trip", methods=['POST'])
 def end_trip():
     global BOOKING_SERVICE_ID
@@ -459,7 +450,7 @@ def reserve_seat():
 
     if usr_exists(session, user_id) and\
         trip_exists_id(session, trip_id) and\
-        set(["name", "information"]).issubset(set(body.keys())):
+        set(["name", "information", "lat", "lon"]).issubset(set(body.keys())):
 
         user = get_usr_by_idauth(session, user_id)
         trip = get_trip(session, trip_id)
@@ -496,7 +487,6 @@ def reserve_seat():
             res     = r.json()
             res["token"] = pay_response["ttoken"]
 
-            app.logger.info("res:\t"+repr(res))
             #Analyses available elements and updates number of elements avaiable
             r       = requests.get(URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" +\
                         str(trip.id_domain_booking) + "/get_aval_elems")
@@ -504,6 +494,21 @@ def reserve_seat():
             if len(r.json()) == 0:
                 trip.available = False
                 session.commit()
+
+            #Add sub-trip.
+            event = get_event(session, trip.id_event)
+
+            subtrip_bdy = {
+                "StartCoords"   : [body["lat"], body["lon"]],
+                "EndCoords"     : [event.lat, event.lon],
+                "TripId"        : trip.id_iptf
+            }
+
+            r = requests.post(URL_TRIP_FOLLOWER + "add_subtrip",
+                                json=subtrip_bdy)
+
+            if r.status_code != 200:
+                app.logger.error("Could't add subtrip.")
 
             return jsonify(res)
 
