@@ -158,7 +158,7 @@ public class ItineraryPlannerAPI{
 		try{
 			return new ResponseEntity<ProbeResponse>(getTripDetails(null,pr),HttpStatus.OK);
 		}catch(Exception e){
-			e.printStackTrace();
+			//e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -236,8 +236,8 @@ public class ItineraryPlannerAPI{
 				if(getTripDetails(Waypoint.toListWaypoints(llf),pr).getDist()<t.getMaxDetour()+t.getDist())
 					ls.add(t.getId());
 			}catch(Exception e){
-				e.printStackTrace();
-				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	
+				//e.printStackTrace();
+				//return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	
 			}
 		}
 		//Response: 200 (array),400
@@ -268,7 +268,7 @@ public class ItineraryPlannerAPI{
 		try{
 			prr = getTripDetails(Waypoint.toListWaypoints(llf),pr);
 		}catch(Exception e){
-			e.printStackTrace();
+			//e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	
 		}	
 
