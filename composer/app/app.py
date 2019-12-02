@@ -307,6 +307,7 @@ def find_available_event_trips_api():
                     response.append({
                         "id"        : trip.id,
                         "city"      : trip.city,
+                        "usr_id"    : user.id,
                         "usr_name"  : user.name,
                         "user_img"  : user.img_url,
                         "mail"      : user.mail,
