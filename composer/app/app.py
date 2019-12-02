@@ -482,7 +482,10 @@ def get_usr_profile_api():
         r = requests.get(URL_REVIEW + "avgRating/" + usr.mail)
         app.logger.info("r:\t"+ r.text)
         r = r.json()
-        response["avgRating"] = r["avgRating"]
+        if "avgRating" in r.keys():
+            response["avgRating"] = r["avgRating"]
+        else:
+            response["avgRating"] = 0
 
         return jsonify(response)
 
