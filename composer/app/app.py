@@ -478,11 +478,11 @@ def get_usr_profile_api():
         response["reviews"] = r
 
         #get Avg Review of user.
-        url = URL_REVIEW + "/avgRating/" + usr.mail
         r = requests.get(URL_REVIEW + "/avgRating/" + usr.mail)
+        app.logger.info("r:\t"+ r.text)
         r = r.json()
         response["avgRating"] = r["avgRating"]
-        
+
         return jsonify(response)
 
     return "ERROR"
