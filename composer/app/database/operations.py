@@ -160,14 +160,17 @@ def get_usr_by_idclient(session, id_client_booking):
                 one()
 
 def get_usr_from_ownerid(session, id_iptf)->Trip:
-    if trip_exists:
-        return session.query(Trip).\
+    return session.query(Trip).\
                 filter(Trip.id_iptf==id_iptf).\
                 options(load_only("id")).\
                 one()
 
-    return None
 
+def get_usr_from_mail(session, mail)->User:
+    return session.query(User).\
+            filter(User.mail==mail).\
+            options(load_only("id")).\
+            one()
 
 def trip_belongs_usr(session, usr_id, trip_id)->Boolean:
 
