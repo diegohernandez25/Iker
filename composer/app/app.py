@@ -303,7 +303,7 @@ def find_available_event_trips_api():
         body = {
             "StartCoords": [float(lat), float(lon)],
             "EndCoords": [event.lat, event.lon],
-            "StartTime": event.date
+            "EndTime": event.date
         }
 
         r       = requests.post(URL_TRIP_FOLLOWER + "/get_trips", json=body)
