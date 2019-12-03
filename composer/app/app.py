@@ -55,8 +55,6 @@ dictConfig({
 
 app = Flask(__name__)
 
-session = Session()
-
 @app.route("/create_usr", methods=['POST'])
 def createUser():
     global BOOKING_SERVICE_ID
@@ -65,7 +63,10 @@ def createUser():
 
     body = request.json
 
+    session = Session()
+
     if usr_exists(session, authentication_id):
+        session.close()
         return "LOGGED IN"
 
     elif set(["name", "information"]).issubset(set(body.keys())):
@@ -84,12 +85,14 @@ def createUser():
                             access_token, body["name"],body["img_url"],
                             body["mail"])
 
-        return json.dumps({"id": usr.id, "access_token":usr.access_token})
+        response = {"id": usr.id, "access_token":usr.access_token}
+        session.close()
+        return json.dumps(response)
 
-    else:
-        app.logger.error('Invalid JSON body. "name" or "information" fields may\
-            not be explicit.')
-        return "ERROR"
+
+    app.logger.error('Invalid JSON body. "name" or "information" fields may not be explicit.')
+    session.close()
+    return "ERROR"
 
 @app.route("/register_trip", methods=['POST'])
 def book_trip()->str:
@@ -98,7 +101,7 @@ def book_trip()->str:
     user_id         = request.args.get('usr_id')
     body            = request.json
 
-
+    session = Session()
 
     if set(["EventID","StartTime", "City", "StartCoords","Consumption","AvoidTolls",
             "MaxDetour","FuelType", "name", "information", "Price",
@@ -108,7 +111,7 @@ def book_trip()->str:
 
         event = get_event(session, body["EventID"])
         body["EndCoords"] = [event.lat, event.lon]
-        body["StartTime"] = event.date + body["StartTime"]
+        body["EndTime"] = event.date
 
         r       = requests.post(URL_TRIP_FOLLOWER + "register_trip", json=body)
         id_iptf = r.json()
@@ -118,7 +121,10 @@ def book_trip()->str:
         owner_id    = user.id_owner_booking
         url         = URL_RESERVATION + str(BOOKING_SERVICE_ID) +"/owner/"+str(owner_id)+"/domain"
         d_json      = {"name": body["name"], "information": body["information"]}
+        app.logger.info('URL:\t'+ url)
+        app.logger.info("BODY:\t"+repr(d_json))
         r           = requests.post(url, json=d_json)
+        app.logger.info("R TEXT:\t"+r.text)
         id_domain_booking   = r.json()['id']
 
         #Create Elements
@@ -144,17 +150,19 @@ def book_trip()->str:
 
         #Save trip mapping
         trip = create_trip(session, id_domain_booking, id_iptf, body["City"], True, user, event)
+        response = trip.get_dict()
+        session.close()
+        return json.dumps(response)
 
-        return json.dumps(trip.get_dict())
-
-    else:
-        return "ERROR"
+    session.close()
+    return "ERROR"
 
 @app.route("/search_trip", methods=['GET'])
 def search_trip()->str:
     global BOOKING_SERVICE_ID
 
-    body            = request.json
+    body    = request.json
+    session = Session()
 
     if set(["StartCoords", "EndCoords", "StartTime"]).issubset(set(body.keys())):
 
@@ -187,8 +195,10 @@ def search_trip()->str:
                         "price"     : r["elements"][0]["price"],
                         "aval"      : count_aval
                     })
-
+        session.close()
         return json.dumps(response)
+
+    session.close()
     return "ERROR"
 
 @app.route("/end_trip", methods=['POST'])
@@ -197,6 +207,8 @@ def end_trip():
 
     user_id         = request.args.get('usr_id')
     trip_id         = request.args.get('trip_id')
+
+    session = Session()
 
     if usr_exists(session, user_id):
         user = get_usr_by_idauth(session, user_id)
@@ -228,35 +240,37 @@ def end_trip():
 
                 requests.post(URL_PAYMENT + "completePayment", json=payment_bdy)
                 #Return list of tokens
+                session.close()
                 return jsonify(token_list)
 
+    session.close()
     return "ERROR"
 
 
 @app.route("/probe_trip", methods=['POST'])
 def probe_trip()->str:
     body        = request.json
-    app.logger.info("BODY:\t"+repr(body))
     event_id    = request.args.get('event_id')
-    app.logger.info("event_id:\t"+repr(event_id))
 
     if set(["StartCoords", "Consumption", "AvoidTolls",
                 "MaxDetour", "FuelType"]).issubset(set(body.keys())) and\
                     any(e in body.keys() for e in ["StartTime", "EndTime"]) and\
                         event_id is not None:
-        app.logger.info("Entered.")
         event = get_event(session, event_id)
         if event is not None:
             body["EndCoords"] = [event.lat, event.lon]
             r = requests.post(URL_TRIP_FOLLOWER + "probe_trip", json=body)
+            session.close()
             return jsonify(r.json())
 
+    session.close()
     return "ERROR"
 
 @app.route("/create_event", methods=['POST'])
 def make_event()->str:
     body = request.json
 
+    session = Session()
     if set(["Name", "Description", "Category", "ImageUrl", "City", "SubCity",
                 "Lat", "Lon", "Date"]).issubset(set(body.keys())):
 
@@ -264,8 +278,11 @@ def make_event()->str:
                 body["ImageUrl"], body["City"], body["Lat"],body["Lon"],
                 body["Date"], sub_city=body["SubCity"])
 
-        return json.dumps(event.get_dict())
+        response = event.get_dict()
+        session.close()
+        return json.dumps(response)
 
+    session.close()
     return "ERROR"
 
 @app.route("/remove_event", methods=['DELETE'])
@@ -273,26 +290,34 @@ def remove_event()->str:
 
     event_id = request.args.get('event_id')
 
+    session = Session()
     if event_exist(session, event_id):
         delete_event(session, id=event_id)
+        session.close()
         return "DELETED"
 
+    session.close()
     return "ERROR"
 
 @app.route("/get_event", methods=['GET'])
 def find_event()->str:
-
+    session = Session()
     event_id = request.args.get('event_id')
     if event_exist(session, event_id):
         event = get_event(session, event_id)
-        return json.dumps(event.get_dict())
+        response = event.get_dict()
+        session.close()
+        return json.dumps(response)
 
+    session.close()
     return "ERROR"
 
 @app.route("/get_av_trips_event", methods=['GET'])
 def find_available_event_trips_api():
 
     event_id    = request.args.get('event_id')
+
+    session     = Session()
     event       = get_event(session,event_id)
 
     if event is not None:
@@ -303,7 +328,7 @@ def find_available_event_trips_api():
         body = {
             "StartCoords": [float(lat), float(lon)],
             "EndCoords": [event.lat, event.lon],
-            "EndTime": event.date
+            "StartTime": event.date
         }
 
         r       = requests.post(URL_TRIP_FOLLOWER + "/get_trips", json=body)
@@ -338,7 +363,10 @@ def find_available_event_trips_api():
                             "price"     : price
                             })
 
+        session.close()
         return jsonify(response)
+
+    session.close()
     return "ERROR"
 
 @app.route("/get_events", methods=['GET'])
@@ -350,6 +378,7 @@ def get_events()->str:
 
     events = None
 
+    session = Session()
     if event_name is not None:
         events = get_event_by_name(session, event_name)
 
@@ -361,6 +390,7 @@ def get_events()->str:
         e = get_event_by_category(session, event_category)
         events = e if events is None else list(set(e) & set(events))
 
+    session.close()
     return repr(events) if events is not None else repr(lst())
 
 @app.route("/get_aval_seats", methods=['GET'])
@@ -369,6 +399,7 @@ def get_aval_seats():
 
     trip_id         = request.args.get('trip_id')
 
+    session = Session()
     if trip_exists_id(session, trip_id):
 
         trip = get_trip(session, trip_id)
@@ -377,25 +408,17 @@ def get_aval_seats():
                     str(trip.id_domain_booking) + "/get_aval_elems")
 
             r = r.json()
+            session.close()
             return jsonify(r)
 
+        session.close()
         return jsonify(list())
 
+    session.close()
     return "ERROR"
 
 def epoch_to_date(epoch)->str:
     return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(epoch))
-
-def create_service():
-    global BOOKING_SERVICE_ID
-
-    body = {    'name': 'carpooling-es-19',
-                'information':{
-                    'authors':['Diego','Andre','Rodrigo','Dinis']
-                }
-            }
-    r = requests.post(URL_RESERVATION + "service", json=body)
-    BOOKING_SERVICE_ID = r.json()['id']
 
 def check_service()->Boolean:
     global BOOKING_SERVICE_ID
@@ -411,10 +434,12 @@ def check_service()->Boolean:
 def reserve_seat():
     global BOOKING_SERVICE_ID
 
+
     user_id = request.args.get('usr_id') #Auth id
     trip_id = request.args.get('trip_id')
     body    = request.json
 
+    session = Session()
     if usr_exists(session, user_id) and\
         trip_exists_id(session, trip_id) and\
         set(["name", "information", "lat", "lon"]).issubset(set(body.keys())):
@@ -477,15 +502,20 @@ def reserve_seat():
             if r.status_code != 200:
                 app.logger.error("Could't add subtrip.")
 
+            session.close()
             return jsonify(res)
 
+        session.close()
         return "TRIP UNAVAILABLE"
+
+    session.close()
     return "ERROR"
 
 @app.route("/get_usr_profile", methods=['GET'])
 def get_usr_profile_api():
-
     usr_mail    = request.args.get('usr_mail')
+
+    session = Session()
     usr         = get_usr_from_mail(session, usr_mail)
     if usr is not None:
 
@@ -510,13 +540,31 @@ def get_usr_profile_api():
         else:
             response["avgRating"] = 0
 
+        session.close()
         return jsonify(response)
 
+    session.close()
     return "ERROR"
 
 @app.route("/get_all_events", methods=['GET'])
 def get_all_events_api():
-    return jsonify(get_all_events(session))
+    session = Session()
+    response = get_all_events(session)
+    session.close()
+
+    return jsonify(response)
+
+def create_service():
+    global BOOKING_SERVICE_ID
+
+    body = {    'name': 'carpooling-es-19',
+                'information':{
+                    'authors':['Diego','Andre','Rodrigo','Dinis']
+                }
+            }
+    r = requests.post(URL_RESERVATION + "service", json=body)
+    BOOKING_SERVICE_ID = r.json()['id']
+
 
 if __name__ == '__main__':
     if not check_service():
