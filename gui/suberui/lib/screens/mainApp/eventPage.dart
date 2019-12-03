@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:suberui/screens/mainApp/_____createTripHome.dart';
+import 'package:suberui/screens/mainApp/createTrip.dart';
 import 'package:suberui/screens/mainApp/locationPicker.dart';
 import 'package:suberui/services/auth.dart';
 import 'package:suberui/models/event.dart';
@@ -126,7 +128,10 @@ class EventPage extends StatelessWidget {
             label: 'Create Trip',
             labelStyle: TextStyle(fontSize: 18.0),
             onTap: () {
-
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CreateTrip(event: event,))
+              );
             },
           ),
 

@@ -20,8 +20,8 @@ class Trip {
       authorName: json['usr_name'] as String,
       authorImage: NetworkImage(json['user_img']),
       authorRtng: json['review'] as num,
-     // price: json['price'] as num,
-      price: 9.8
+      price: json['price'] as num,
+      //price: json['pro']
     );
   }
 }

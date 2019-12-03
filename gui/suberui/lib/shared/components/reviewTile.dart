@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:suberui/models/review.dart';
 import 'starDisplay.dart';
 
 
 class ReviewTile extends StatelessWidget {
+
+  final Review review;
+  ReviewTile({this.review});
+
   @override
   Widget build(BuildContext context) {
+
     return Container(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -13,7 +19,8 @@ class ReviewTile extends StatelessWidget {
             padding: const EdgeInsets.all(4.0),
             child: CircleAvatar(
               radius:20,
-              backgroundColor: Colors.red,
+              //backgroundColor: Colors.red,
+              backgroundImage: review.image,
             ),
           ),
           SizedBox(width: 10,),
@@ -21,7 +28,7 @@ class ReviewTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text('Name',style: TextStyle(
+                Text(review.authorId,style: TextStyle(
                   fontSize: 20
                 )),
                 IconTheme(
@@ -29,10 +36,10 @@ class ReviewTile extends StatelessWidget {
                     color: Colors.grey[700],
                     size: 20,
                   ),
-                  child: StarDisplay(value: 5),
+                  child: StarDisplay(value: review.rating.round()),
                 ),
                 SizedBox(height: 10,),
-                Text('olaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaolaola'
+                Text(review.reviewText
                 )
               ],
 

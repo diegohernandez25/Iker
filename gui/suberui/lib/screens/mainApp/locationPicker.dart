@@ -23,7 +23,7 @@ class _LocationPickerState extends State<LocationPicker> {
   Location _selectedLocation= null;
   String _selectedLocationText= null;
 
-  //TODO Escape query
+
   Future<List<Location>>  _getSuggestions (String query) async {
     final _authority = "maps.googleapis.com";
     final _path = "maps/api/geocode/json";

@@ -109,11 +109,14 @@ class _TripSearchState extends State<TripSearch> {
                             context,
                             MaterialPageRoute(builder: (context) => TripPurchase()),
                           );*/
+
+
                           showDialog(
                             context: context,
                             builder: (BuildContext context) => PurchaseDialog(
                               trip: _fetchedListOfTrips[index],
                               event: widget.event,
+                              location: widget.location,
                             ),
                           );
                         },

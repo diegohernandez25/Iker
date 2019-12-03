@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class WebDialog extends StatefulWidget {
+  final String trid;
+  WebDialog({this.trid});
+
   @override
   _WebDialogState createState() => _WebDialogState();
 }
@@ -18,7 +21,7 @@ class _WebDialogState extends State<WebDialog> {
       Completer<WebViewController>();
 
 
-    WebViewController _controller2=null;
+    //WebViewController _controller2=null;
 
 
 
@@ -32,12 +35,11 @@ class _WebDialogState extends State<WebDialog> {
         ),
         backgroundColor: Colors.white,
         child: WebView(
-          initialUrl: "http://168.63.30.192:8080/sign_in?token=5",
+          initialUrl: "http://168.63.30.192:8080/sign_in?token="+widget.trid,
           onPageFinished: (String url){
             print(url);
-            Uri finalUri = Uri.parse(url);
-            print(finalUri.path);
-            if(url=='http://168.63.30.192:8080/done'){
+
+            if(Uri.parse(url).path=='/done' || Uri.parse(url).path=='/invalid'){
               print('hello');
               var count = 0;
               Navigator.popUntil(context, (route) {
