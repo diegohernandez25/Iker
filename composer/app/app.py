@@ -313,7 +313,7 @@ def find_available_event_trips_api():
             for t in trips:
 
                 trip    = get_trip_from_iptf(session, t)
-                if trip.available:
+                if trip.available and trip.id_event == event_id:
                     url = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" + \
                             str(trip.id_domain_booking) + "/get_aval_elems"
 
