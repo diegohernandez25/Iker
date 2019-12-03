@@ -312,30 +312,31 @@ def find_available_event_trips_api():
             url_review = URL_REVIEW + "avgRating/"
 
             for t in trips:
+                if trip_exists(session,t):
+                    trip    = get_trip_from_iptf(session, t)
 
-                trip    = get_trip_from_iptf(session, t)
-                if trip.available and trip.id_event == event_id:
-                    url = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" + \
-                            str(trip.id_domain_booking) + "/get_aval_elems"
+                    if trip.available and trip.id_event == event_id:
+                        url = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" + \
+                                str(trip.id_domain_booking) + "/get_aval_elems"
 
-                    r = requests.get(url)
-                    r = r.json()
-                    price = r[0]["price"]
+                        r = requests.get(url)
+                        r = r.json()
+                        price = r[0]["price"]
 
-                    user    = get_usr(session, trip.id_user)
-                    r       = requests.get(url_review + user.mail)
-                    r       = r.json()
+                        user    = get_usr(session, trip.id_user)
+                        r       = requests.get(url_review + user.mail)
+                        r       = r.json()
 
-                    response.append({
-                        "id"        : trip.id,
-                        "city"      : trip.city,
-                        "usr_id"    : user.id,
-                        "usr_name"  : user.name,
-                        "user_img"  : user.img_url,
-                        "mail"      : user.mail,
-                        "review"    : (r["avgRating"] if len(r)!=0 else 0),
-                        "price"     : price
-                        })
+                        response.append({
+                            "id"        : trip.id,
+                            "city"      : trip.city,
+                            "usr_id"    : user.id,
+                            "usr_name"  : user.name,
+                            "user_img"  : user.img_url,
+                            "mail"      : user.mail,
+                            "review"    : (r["avgRating"] if len(r)!=0 else 0),
+                            "price"     : price
+                            })
 
         return jsonify(response)
     return "ERROR"
