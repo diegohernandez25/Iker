@@ -98,6 +98,8 @@ def book_trip()->str:
     user_id         = request.args.get('usr_id')
     body            = request.json
 
+
+
     if set(["EventID","StartTime", "City", "StartCoords","Consumption","AvoidTolls",
             "MaxDetour","FuelType", "name", "information", "Price",
             "NumSeats"]).issubset(set(body.keys())) and\
@@ -124,7 +126,7 @@ def book_trip()->str:
         elem_bdy = {
             "name"          : body["name"] + "_elem",
             "information"   : body["information"],
-            "init_time"     : body["StartTime"],
+            "init_time"     : body["StartTime"] + event.date,
             "end_time"      : event.date,
             "price"         : body["Price"]
         }
@@ -166,8 +168,6 @@ def search_trip()->str:
             trips = r.json()
 
             url = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/"
-
-
             for t in trips: #t_iptf
 
                 if trip_exists(session,t):
