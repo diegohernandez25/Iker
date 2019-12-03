@@ -98,8 +98,8 @@ def book_trip()->str:
     user_id         = request.args.get('usr_id')
     body            = request.json
 
-    if set(["EventID", "City", "StartCoords","Consumption","AvoidTolls","StartTime",
-            "EndTime","MaxDetour","FuelType", "name", "information", "Price",
+    if set(["EventID","StartTime", "City", "StartCoords","Consumption","AvoidTolls",
+            "MaxDetour","FuelType", "name", "information", "Price",
             "NumSeats"]).issubset(set(body.keys())) and\
             usr_exists(session, user_id) and\
             event_exist(session, body["EventID"]):
@@ -125,7 +125,7 @@ def book_trip()->str:
             "name"          : body["name"] + "_elem",
             "information"   : body["information"],
             "init_time"     : body["StartTime"],
-            "end_time"      : body["EndTime"],
+            "end_time"      : event.date,
             "price"         : body["Price"]
         }
 
