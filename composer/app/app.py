@@ -111,7 +111,7 @@ def book_trip()->str:
 
         event = get_event(session, body["EventID"])
         body["EndCoords"] = [event.lat, event.lon]
-        body["EndTime"] = event.date
+        body["StartTime"] += event.date
 
         r       = requests.post(URL_TRIP_FOLLOWER + "register_trip", json=body)
         id_iptf = r.json()
