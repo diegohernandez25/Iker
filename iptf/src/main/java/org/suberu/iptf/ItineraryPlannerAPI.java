@@ -218,6 +218,7 @@ public class ItineraryPlannerAPI{
 		List<List<Float>> llf;
 		ProbeRequest pr;
 		for(Trip t : it){
+			System.out.println(t);
 			if(t.getMaxDetour()==0) continue;
 
 			pr= new ProbeRequest();
@@ -233,6 +234,7 @@ public class ItineraryPlannerAPI{
 			llf.add(llf.size()-1,gtr.getEndCoords());
 
 			try{
+				System.out.println(getTripDetails(Waypoint.toListWaypoints(llf),pr).getDist());
 				if(getTripDetails(Waypoint.toListWaypoints(llf),pr).getDist()<t.getMaxDetour()+t.getDist())
 					ls.add(t.getId());
 			}catch(Exception e){
