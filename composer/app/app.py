@@ -252,6 +252,7 @@ def probe_trip()->str:
     body        = request.json
     event_id    = request.args.get('event_id')
 
+    session = Session()
     if set(["StartCoords", "Consumption", "AvoidTolls",
                 "MaxDetour", "FuelType"]).issubset(set(body.keys())) and\
                     any(e in body.keys() for e in ["StartTime", "EndTime"]) and\
