@@ -112,7 +112,7 @@ public class ItineraryPlannerAPI{
 							.getJSONArray("summaries")
 							.getJSONObject(0);
 		int consumption=summary.getInt("consumption");
-		int tollCost=summary.getJSONObject("tollCost").getInt("car");
+		float tollCost=summary.getJSONObject("tollCost").getInt("car")/100.0;
 		int totalDist=summary.getInt("totalDist");
 		int totalTime=summary.getInt("totalTime");
 
