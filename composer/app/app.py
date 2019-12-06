@@ -111,7 +111,7 @@ def book_trip()->str:
 
         event = get_event(session, body["EventID"])
         body["EndCoords"] = [event.lat, event.lon]
-        body["EndTime"] = event.date
+        body["StartTime"] += event.date
 
         r       = requests.post(URL_TRIP_FOLLOWER + "register_trip", json=body)
         id_iptf = r.json()
@@ -252,6 +252,7 @@ def probe_trip()->str:
     body        = request.json
     event_id    = request.args.get('event_id')
 
+    session = Session()
     if set(["StartCoords", "Consumption", "AvoidTolls",
                 "MaxDetour", "FuelType"]).issubset(set(body.keys())) and\
                     any(e in body.keys() for e in ["StartTime", "EndTime"]) and\

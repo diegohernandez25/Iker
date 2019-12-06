@@ -112,7 +112,7 @@ public class ItineraryPlannerAPI{
 							.getJSONArray("summaries")
 							.getJSONObject(0);
 		int consumption=summary.getInt("consumption");
-		int tollCost=summary.getJSONObject("tollCost").getInt("car");
+		float tollCost=summary.getJSONObject("tollCost").getInt("car")/(float) 100.0;
 		int totalDist=summary.getInt("totalDist");
 		int totalTime=summary.getInt("totalTime");
 
@@ -147,6 +147,7 @@ public class ItineraryPlannerAPI{
 		resp.setDist((float) totalDist);
 		resp.setTime(new BigDecimal(time));
 
+		System.out.println(resp);
 		return resp;
 
 	}
@@ -156,9 +157,10 @@ public class ItineraryPlannerAPI{
 		System.out.printf("probeTrip: %s\n",pr.toString());
 		//ProbeResponse
 		try{
+			System.out.println(getTripDetails(null,pr));
 			return new ResponseEntity<ProbeResponse>(getTripDetails(null,pr),HttpStatus.OK);
 		}catch(Exception e){
-			//e.printStackTrace();
+			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -186,13 +188,14 @@ public class ItineraryPlannerAPI{
 							prr.getWaypoints(),
 							start,
 							end,
-							pr.getMaxDetour().intValue()*1000, //Meters to KM
+							pr.getMaxDetour().intValue()*1000, //KM to Meters
 							pr.isAvoidTolls(),
 							pr.getFuelType(),
 							pr.getConsumption(),
 							prr.getDist());
 		
 		//Response: 201,400,409
+		System.out.println(t);
 		return new ResponseEntity<Integer>(triprep.save(t).getId(),HttpStatus.OK);
 	}
 	
@@ -218,13 +221,14 @@ public class ItineraryPlannerAPI{
 		List<List<Float>> llf;
 		ProbeRequest pr;
 		for(Trip t : it){
+			System.out.println(t);
 			if(t.getMaxDetour()==0) continue;
 
 			pr= new ProbeRequest();
 			pr.setConsumption(t.getConsumption());
 			pr.setAvoidTolls(t.getAvoidTolls());
-			pr.setStartTime(new BigDecimal(t.getStartTime().getTime()));
-			pr.setEndTime(new BigDecimal(t.getEndTime().getTime()));
+			pr.setStartTime(new BigDecimal(t.getStartTime().getTime()/1000));
+			pr.setEndTime(new BigDecimal(t.getEndTime().getTime()/1000));
 			pr.setMaxDetour(new BigDecimal(t.getMaxDetour()));
 			pr.setFuelType(t.getFuelType());
 
@@ -233,6 +237,7 @@ public class ItineraryPlannerAPI{
 			llf.add(llf.size()-1,gtr.getEndCoords());
 
 			try{
+				System.out.println(getTripDetails(Waypoint.toListWaypoints(llf),pr).getDist());
 				if(getTripDetails(Waypoint.toListWaypoints(llf),pr).getDist()<t.getMaxDetour()+t.getDist())
 					ls.add(t.getId());
 			}catch(Exception e){
@@ -241,6 +246,7 @@ public class ItineraryPlannerAPI{
 			}
 		}
 		//Response: 200 (array),400
+		System.out.println(ls.size());
 		return new ResponseEntity<List<Integer>>(ls,HttpStatus.OK); 
 	}
 
@@ -249,8 +255,10 @@ public class ItineraryPlannerAPI{
 		System.out.printf("addSubTrip: %s\n",asr.toString());
 		Trip t=triprep.findById(asr.getTripId().intValue()).get();
 
-		if(t.getMaxDetour()==0)
+		if(t.getMaxDetour()==0){
+			System.out.println("BAD REQUEST ON ADD_SUBTRIP");
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 
 		ProbeRequest pr= new ProbeRequest();
 		pr.setConsumption(t.getConsumption());
@@ -268,12 +276,14 @@ public class ItineraryPlannerAPI{
 		try{
 			prr = getTripDetails(Waypoint.toListWaypoints(llf),pr);
 		}catch(Exception e){
-			//e.printStackTrace();
+			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	
 		}	
 
-		if(prr.getDist()>t.getMaxDetour()+t.getDist())
+		if(prr.getDist()>t.getMaxDetour()+t.getDist()){
+			System.out.println("BAD REQUEST ON ADD_SUBTRIP1");
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 
 		//t.setMaxDetour(0); //Doesnt allow for more than one subtrip
 		t.setDist(prr.getDist());
