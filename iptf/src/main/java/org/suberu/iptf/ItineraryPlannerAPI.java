@@ -186,7 +186,7 @@ public class ItineraryPlannerAPI{
 							prr.getWaypoints(),
 							start,
 							end,
-							pr.getMaxDetour().intValue()*1000, //Meters to KM
+							pr.getMaxDetour().intValue()*1000, //KM to Meters
 							pr.isAvoidTolls(),
 							pr.getFuelType(),
 							pr.getConsumption(),
@@ -223,8 +223,8 @@ public class ItineraryPlannerAPI{
 			pr= new ProbeRequest();
 			pr.setConsumption(t.getConsumption());
 			pr.setAvoidTolls(t.getAvoidTolls());
-			pr.setStartTime(new BigDecimal(t.getStartTime().getTime()));
-			pr.setEndTime(new BigDecimal(t.getEndTime().getTime()));
+			pr.setStartTime(new BigDecimal(t.getStartTime().getTime()/1000));
+			pr.setEndTime(new BigDecimal(t.getEndTime().getTime()/1000));
 			pr.setMaxDetour(new BigDecimal(t.getMaxDetour()));
 			pr.setFuelType(t.getFuelType());
 
