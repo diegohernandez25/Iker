@@ -111,11 +111,12 @@ public class Trip implements Serializable {
     public String toString(){
         return (new StringBuilder())
                 .append("Trip(Coords:").append(coords)
-                .append("StartTime:").append(startTime)
-				.append(",EndTime:").append(endTime)
-				.append(",Waypoints:").append(waypoints)
-				.append(",MaxDetour:").append(maxDetour)
-				.append(",Finished:").append(finished)
+                .append("\nStartTime:").append(startTime)
+				.append("\nEndTime:").append(endTime)
+				.append("\nDistance:").append(dist)
+				.append("\nWaypoints:").append(waypoints)
+				.append("\nMaxDetour:").append(maxDetour)
+				.append("\nFinished:").append(finished)
 				.append(")").toString();
     }
 }
