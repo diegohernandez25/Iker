@@ -337,6 +337,8 @@ def find_available_event_trips_api():
         r = requests.post(URL_TRIP_FOLLOWER + "/get_trips", json=body)
         if r.text != '':
             app.logger.info("Response exists")
+			app.logger.info(r)
+			app.logger.info(r.json())
             trips = r.json()
             url_review = URL_REVIEW + "avgRating/"
 
