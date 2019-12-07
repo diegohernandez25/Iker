@@ -322,6 +322,7 @@ def find_available_event_trips_api():
     event       = get_event(session,event_id)
 
     if event is not None:
+		print("Event exists")
         response = list()
 
         lat = request.args.get('lat')
@@ -332,16 +333,20 @@ def find_available_event_trips_api():
             "StartTime": event.date
         }
 
-        r       = requests.post(URL_TRIP_FOLLOWER + "/get_trips", json=body)
+        r = requests.post(URL_TRIP_FOLLOWER + "/get_trips", json=body)
         if r.text != '':
-            trips   = r.json()
+			print("Response exists")
+            trips = r.json()
             url_review = URL_REVIEW + "avgRating/"
 
             for t in trips:
+				print("This trip")
                 if trip_exists(session,t):
+					print("Trip exists")
                     trip    = get_trip_from_iptf(session, t)
 
                     if trip.available and trip.id_event == event_id:
+						print("Trip available")
                         url = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" + \
                                 str(trip.id_domain_booking) + "/get_aval_elems"
 
