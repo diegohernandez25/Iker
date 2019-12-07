@@ -321,6 +321,7 @@ def find_available_event_trips_api():
     session     = Session()
     event       = get_event(session,event_id)
 
+    app.logger.info("Event???????????????")
     if event is not None:
         app.logger.info("Event exists")
         response = list()
