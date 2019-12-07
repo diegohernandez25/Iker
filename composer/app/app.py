@@ -322,7 +322,7 @@ def find_available_event_trips_api():
     event       = get_event(session,event_id)
 
     if event is not None:
-        print("Event exists")
+        app.logger.info("Event exists")
         response = list()
 
         lat = request.args.get('lat')
@@ -335,18 +335,18 @@ def find_available_event_trips_api():
 
         r = requests.post(URL_TRIP_FOLLOWER + "/get_trips", json=body)
         if r.text != '':
-            print("Response exists")
+            app.logger.info("Response exists")
             trips = r.json()
             url_review = URL_REVIEW + "avgRating/"
 
             for t in trips:
-                print("This trip")
+                app.logger.info("This trip")
                 if trip_exists(session,t):
-                    print("Trip exists")
+                    app.logger.info("Trip exists")
                     trip    = get_trip_from_iptf(session, t)
 
                     if trip.available and trip.id_event == event_id:
-                        print("Trip available")
+                        app.logger.info("Trip available")
                         url = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" + \
                                 str(trip.id_domain_booking) + "/get_aval_elems"
 
@@ -576,7 +576,7 @@ if __name__ == '__main__':
     if not check_service():
         create_service()
     else:
-        print("Service was already created")
+        app.logger.info("Service was already created")
 
     Base.metadata.create_all(engine)
     app.run(host='0.0.0.0')
