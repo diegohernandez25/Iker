@@ -135,7 +135,7 @@ def book_trip()->str:
             "information"   : body["information"],
             "init_time"     : event.date - body["StartTime"],
             "end_time"      : event.date,
-            "price"         : body["Price"]
+            "price"         : body["Price"]+2.9
         }
 
         if 'NumSeats' in set(body.keys()):
@@ -334,6 +334,7 @@ def find_available_event_trips_api():
             "StartTime": event.date
         }
 
+
         r = requests.post(URL_TRIP_FOLLOWER + "/get_trips", json=body)
         if r.text != '':
             app.logger.info("Response exists")
@@ -348,7 +349,7 @@ def find_available_event_trips_api():
                     app.logger.info("Trip exists")
                     trip    = get_trip_from_iptf(session, t)
 
-                    if trip.available and trip.id_event == event_id:
+                    if trip.available and trip.id_event == int(event_id):
                         app.logger.info("Trip available")
                         url = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" + \
                                 str(trip.id_domain_booking) + "/get_aval_elems"
