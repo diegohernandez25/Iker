@@ -585,7 +585,7 @@ def get_my_trips_api():
             r   = requests.get(URL_TRIP_FOLLOWER + "get_trip", params={"TripId":t.id_iptf})
             r   = r.json()
 
-            tmp["Coords"] = r["Coords"]
+            tmp["trip"] = r
             response.append(tmp)
 
         session.close()
