@@ -253,6 +253,24 @@ def get_domain_reservations(session, id=None, domain=None)->list:
 
     return res
 
+def get_client_reservations(session, id=None, client=None)->list:
+
+    res = list()
+    if id is not None:
+        client = get_client(session, id)
+
+    if client is not None:
+        for r in client.reservation:
+            tmp_element = get_element(session, r.id_element)
+            res.append({
+                'id_domain'             : tmp_element.id_domain,
+                'id_reservation_date'   : r.date,
+                'init_time'             : tmp_element.init_time,
+                'price'                 : tmp_element.price
+            })
+
+    return res
+
 
 if __name__ == "__main__":
     from base import Base, engine, Session
