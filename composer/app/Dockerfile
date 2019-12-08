@@ -6,6 +6,7 @@ WORKDIR /app
 
 COPY requirements.txt /app
 COPY database /app/database
+COPY views /app/views
 
 RUN pip install -r requirements.txt
 
