@@ -43,6 +43,13 @@ def get_trip(session, id)->Trip:
 
     return session.query(Trip).get(id)
 
+def get_trip_by_domainid(session, id_domain_booking)->Trip:
+
+    return session.query(Trip).\
+                filter(Trip.id_domain_booking == id_domain_booking).\
+                options(load_only("id")).\
+                one()
+
 
 def create_trip(session, id_domain_booking, id_iptf, city, available, user,
                 event)->Trip:
@@ -57,6 +64,60 @@ def create_trip(session, id_domain_booking, id_iptf, city, available, user,
     session.commit()
 
     return trip
+
+
+def create_review(session, user_from, user_to)->Review:
+    review = None
+
+    review = Review(id_usr_to = user_to.id)
+    user_from.review_from.append(review)
+
+    session.add(review)
+    session.commit()
+
+    return review
+
+def get_review(session, id)->Review:
+
+    return session.query(Review).get(id)
+
+def delete_review(session, id=None, review=None):
+    if id is not None:
+        review = get_review(session, id)
+
+    if review is not None:
+        session.delete(review)
+        session.commit()
+
+def list_reviews(session, user) -> list:
+    res = list()
+    if user is not None:
+        res = [e for e in user.review_from]
+    return res
+
+def review_to_usr_exist(session, user, user_to_id) -> Boolean:
+
+    return session.query(exists().where(
+                and_(Review.id_usr_from==user.id,
+                    Review.id_usr_to==user_to_id))).scalar()
+
+def review_detail_exist(session, user, user_to, review_id)->Boolean:
+
+    return session.query(exists().where(
+                and_(Review.id_usr_from==user.id,
+                    Review.id_usr_to==user_to.id,
+                    Review.id == review_id))).scalar()
+
+def get_review_by_usrs(session, user, user_to_id)->Review:
+    res = list()
+
+    review = session.query(Review).filter(and_(Review.id_usr_from==user.id,
+                Review.id_usr_to==user_to_id)).options(load_only("id")).\
+                all()
+
+    return review[0]
+
+
 
 def create_event(session, name, description, category, image_url, city, lat,
                     lon, date, sub_city=None)->Event:
@@ -120,6 +181,7 @@ def delete_event(session, id=None, event=None):
     if event is not None:
         session.delete(event)
         session.commit()
+
 
 
 def trip_exists(session,id_iptf)->Boolean:
@@ -187,6 +249,15 @@ def find_event_trips(session, event_id, src_addr)->list:
             res.append(t.id)
     return res
 
+def get_usr_trips(session, usr_id)->list:
+
+    res = list()
+    usr = get_usr(session, usr_id)
+    if usr is not None:
+        res = [e for e in usr.trip]
+
+    return res
+
 def find_available_event_trips(session, event_id, src_addr)->list:
 
     res = list()
@@ -213,6 +284,11 @@ if __name__ == '__main__':
 
     Base.metadata.create_all(engine)
     session = Session()
+    usr = get_usr_by_idauth(session, 15)
+    usr_to = get_usr_from_mail(session, "diego2")
 
-    res = find_available_event_trips(session, 1, "Aveiro")
-    print(repr(res))
+
+    review = get_review_by_usrs(session, usr, usr_to.id)
+    print(review)
+
+    session.close()
