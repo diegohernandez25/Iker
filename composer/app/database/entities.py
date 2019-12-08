@@ -87,8 +87,6 @@ class Trip(Base):
             "available"         : self.available
         }
 
-
-
 class User(Base):
     __tablename__ = 'user'
 
@@ -102,7 +100,8 @@ class User(Base):
     img_url = Column(String(200), nullable=False)
     mail    = Column(String(50), unique=True, nullable=False)
 
-    trip        = relationship("Trip", backref="user", cascade="all, delete-orphan", lazy='dynamic')
+    trip            = relationship("Trip", backref="user", cascade="all, delete-orphan", lazy='dynamic')
+    review_from     = relationship("Review", backref="user", cascade="all, delete-orphan", lazy='dynamic')
 
     def __str__(self):
         return "         id: %s\n" % (str(self.id)) +\
@@ -132,6 +131,25 @@ class User(Base):
             "usr_name"          : self.name,
             "img_url"           : self.img_url,
             "usr_mail"          : self.mail
+        }
+
+class Review(Base):
+    __tablename__ = 'review'
+
+    id          = Column(Integer, primary_key=True)
+    id_usr_from = Column(Integer, ForeignKey('user.id'), nullable=False)
+    id_usr_to   = Column(Integer, nullable=False)
+
+    def __str__(self):
+        return "          id:%s\n" % (str(self.id)) +\
+                "id_usr_from:%s\n" % (str(self.id_usr_from)) +\
+                "  id_usr_to:%s\n" % (str(self.id_usr_to))
+
+    def get_dict(self):
+        return {
+            "id"            : self.id,
+            "id_usr_from"   : self.id_usr_from,
+            "id_usr_to"     : self.id_usr_to
         }
 
 def epoch_to_date(epoch)->str:

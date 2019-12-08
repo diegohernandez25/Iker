@@ -30,7 +30,7 @@ BOOKING_SERVICE_ID = 1
 URL_RESERVATION     = "http://localhost:5002/"
 URL_TRIP_FOLLOWER   = "http://localhost:8081/"
 URL_PAYMENT         = "http://localhost:8080/"
-URL_REVIEW          = "http://168.63.30.192:3000/"
+URL_REVIEW          = "http://localhost:3000/"
 
 IKER_MAIL = "accounting@iker.pt"
 
@@ -115,16 +115,14 @@ def book_trip()->str:
 
         r       = requests.post(URL_TRIP_FOLLOWER + "register_trip", json=body)
         id_iptf = r.json()
+        app.logger.info('IPTF Response:\t'+str(id_iptf))
 
         #user        = get_usr(session, user_id)
         user        = get_usr_by_idauth(session, user_id)
         owner_id    = user.id_owner_booking
         url         = URL_RESERVATION + str(BOOKING_SERVICE_ID) +"/owner/"+str(owner_id)+"/domain"
         d_json      = {"name": body["name"], "information": body["information"]}
-        app.logger.info('URL:\t'+ url)
-        app.logger.info("BODY:\t"+repr(d_json))
         r           = requests.post(url, json=d_json)
-        app.logger.info("R TEXT:\t"+r.text)
         id_domain_booking   = r.json()['id']
 
         #Create Elements
@@ -223,7 +221,7 @@ def end_trip():
             token_list = list()
 
             for res in reservations:
-                usr = get_usr_by_idclient(session, res["client_id"])
+                usr_client = get_usr_by_idclient(session, res["client_id"])
                 payment_info = json.loads(res["information"])
                 payment_bdy = {
                     "targetID"  : user.mail,
@@ -233,12 +231,16 @@ def end_trip():
                 }
 
                 token_list.append({
-                    "usr_id"        : usr.id,
+                    "usr_id"        : usr_client.id,
                     "payment_token" : payment_info["ttoken"],
                     "amount"        : res["price"]
                     })
 
                 requests.post(URL_PAYMENT + "completePayment", json=payment_bdy)
+
+                #create pending reviews for the users
+                create_review(session, usr_client, user)
+
                 #Return list of tokens
                 session.close()
                 return jsonify(token_list)
@@ -321,7 +323,6 @@ def find_available_event_trips_api():
     session     = Session()
     event       = get_event(session,event_id)
 
-    app.logger.info("Event???????????????")
     if event is not None:
         app.logger.info("Event exists")
         response = list()
@@ -525,7 +526,7 @@ def reserve_seat():
 def get_usr_profile_api():
     usr_mail    = request.args.get('usr_mail')
 
-    session = Session()
+    session     = Session()
     usr         = get_usr_from_mail(session, usr_mail)
     if usr is not None:
 
@@ -541,9 +542,7 @@ def get_usr_profile_api():
         response["reviews"] = r
 
         #get Avg Review of user.
-        app.logger.info("url:\t"+ URL_REVIEW + "avgRating/" + usr.mail)
         r = requests.get(URL_REVIEW + "avgRating/" + usr.mail)
-        app.logger.info("r:\t"+ r.text)
         r = r.json()
         if "avgRating" in r.keys():
             response["avgRating"] = r["avgRating"]
@@ -563,6 +562,122 @@ def get_all_events_api():
     session.close()
 
     return jsonify(response)
+
+@app.route("/get_my_trips", methods=['GET'])
+def get_my_trips_api():
+    session = Session()
+
+    user_id = request.args.get('usr_id') #Auth id
+
+    if usr_exists(session, user_id):
+        response = list()
+        usr     = get_usr_by_idauth(session, user_id)
+        trips   = get_usr_trips(session, usr.id)
+
+        for t in trips:
+            tmp = t.get_dict()
+
+            event = get_event(session, t.id_event)
+            tmp['eventName'] = event.name
+            tmp['eventImg'] = event.image_url
+
+            #TODO Or use probetrip
+            r   = requests.get(URL_TRIP_FOLLOWER + "get_trip", params={"TripId":t.id_iptf})
+            r   = r.json()
+
+            tmp["Coords"] = r["Coords"]
+            response.append(tmp)
+
+        session.close()
+        return jsonify(response)
+
+    session.close()
+    return "ERROR"
+
+
+
+@app.route("/list_pending_reviews", methods=['GET'])
+def list_pending_reviews_api():
+    session = Session()
+
+    user_id = request.args.get('usr_id') #Auth id
+    if usr_exists(session, user_id):
+        user        = get_usr_by_idauth(session, user_id)
+        response    = [ get_usr(session,e.id_usr_to).get_dict_profile() for e in list_reviews(session, user)]
+        session.close()
+        return jsonify(response)
+
+    session.close()
+    return "ERROR"
+
+@app.route("/get_my_reservations", methods=['GET'])
+def list_my_reservations_api():
+    session = Session()
+    user_id = request.args.get('usr_id') #Auth id
+
+    if usr_exists(session, user_id):
+        user = get_usr_by_idauth(session, user_id)
+        url = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/client/" + str(user.id_client_booking) + "/reservation"
+        r   = requests.get(url)
+        r_list  = r.json()
+
+        response = list()
+        for e in r_list:
+            trip = get_trip_by_domainid(session, e["id_domain"])
+            if trip is not None:
+                elem    = dict()
+                event   = get_event(session, trip.id_event)
+                driver  = get_usr(session, trip.id_user)
+                elem['event']   = event.get_dict()
+                elem['driver']  = driver.get_dict_profile()
+                elem['trip']    = e
+                response.append(elem)
+
+        session.close()
+        return jsonify(response)
+
+    session.close()
+    return "ERROR"
+
+#TODO: Test
+@app.route("/create_review", methods=['POST'])
+def create_review_api():
+    session = Session()
+
+    user_id = request.args.get('usr_id')
+    body = request.json
+
+    if usr_exists(session, user_id) and\
+        set(["rating", "reviewText", "reviewdObjectID"]).issubset(set(body.keys())):
+
+        usr = get_usr_by_idauth(session, user_id)
+        usr_to = get_usr_from_mail(session, body["reviewdObjectID"])
+        review = None
+
+        if usr_to is None or not review_to_usr_exist(session, usr, usr_to.id):
+            session.close()
+            return "ERROR"
+
+        if not "reviewID" in body.keys():
+            review = get_review_by_usrs(session, usr, usr_to.id)
+        else:
+            review = get_review(session,body["reviewID"])
+
+        if review is not None and\
+            review_detail_exist(session, usr, usr_to, review.id):
+
+            body["authorID"] = usr.mail
+            app.logger.info('BODY REVIEW:\t'+repr(body))
+            r = requests.post(URL_REVIEW + "review", json=body)
+            app.logger.info("REVIEW RESPONSE:\t"+repr(r.text))
+            delete_review(session, id=review.id)
+            session.close()
+            return "OK"
+
+        app.logger.info("REVIEW DOES NOT EXIST.")
+
+    session.close()
+    return "ERROR"
 
 def create_service():
     global BOOKING_SERVICE_ID

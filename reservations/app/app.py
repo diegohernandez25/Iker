@@ -439,6 +439,22 @@ def create_reservation_api(id, id_owner, id_domain, id_element)->str:
     session.close()
     return "ERROR"
 
+@app.route('/<id>/client/<id_client>/reservation', methods=['GET'])
+def get_client_reservations_api(id, id_client):
+    session = Session()
+    service = get_service(session, id)
+    client  = get_client(session, id_client)
+
+    if (service is not None) and (client is not None) and\
+        (client in service.client):
+
+        response = get_client_reservations(session, client=client)
+        session.close()
+        return jsonify(response)
+
+    session.close()
+    return "ERROR"
+
 @app.route('/<id>/client/<id_client>/reservation/<id_reservation>', methods=['GET', 'DELETE', 'PUT'])
 def get_reservation_api(id, id_client, id_reservation)->str:
 
