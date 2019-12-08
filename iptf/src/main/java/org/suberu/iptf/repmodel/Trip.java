@@ -82,6 +82,9 @@ public class Trip implements Serializable {
 	public List<List<Float>> getWaypoints(){
 		return Waypoint.toListLists(waypoints);
 	}
+	public void setWaypoints(List<List<Float>> llf){
+		waypoints=Waypoint.toListWaypoints(llf); 
+	}
 
 	public String getFuelType(){ return fuelType; }
 	public boolean getAvoidTolls(){ return avoidTolls; }

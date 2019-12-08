@@ -16,6 +16,10 @@ import javax.validation.constraints.*;
 @Validated
 
 public class TripResponse{
+  @JsonProperty(required=true,value="Waypoints")
+  @Valid
+  private List<List<Float>> waypoints = new ArrayList<>();
+
   @JsonProperty(required=true,value="Coords")
   @Valid
   private List<List<Float>> coords = new ArrayList<>();
@@ -28,6 +32,19 @@ public class TripResponse{
 
   @JsonProperty(required=true,value="MaxDetour")
   private BigDecimal maxDetour = null;
+
+  public TripResponse waypoints(List<List<Float>> waypoints) {
+    this.waypoints = waypoints;
+    return this;
+  }
+
+  public List<List<Float>> getWaypoints() {
+    return waypoints;
+  }
+
+  public void setWaypoints(List<List<Float>> waypoints) {
+    this.waypoints = waypoints;
+  }
 
   public TripResponse coords(List<List<Float>> coords) {
     this.coords = coords;
@@ -100,6 +117,7 @@ public class TripResponse{
     }
     TripResponse tripResponse = (TripResponse) o;
     return Objects.equals(this.coords, tripResponse.coords) &&
+        Objects.equals(this.waypoints, tripResponse.waypoints) &&
         Objects.equals(this.startTime, tripResponse.startTime) &&
         Objects.equals(this.endTime, tripResponse.endTime) &&
         Objects.equals(this.maxDetour, tripResponse.maxDetour);
@@ -116,6 +134,7 @@ public class TripResponse{
     sb.append("class TripResponse {\n");
     
     sb.append("    coords: ").append(toIndentedString(coords)).append("\n");
+    sb.append("    waypoints: ").append(toIndentedString(waypoints)).append("\n");
     sb.append("    startTime: ").append(toIndentedString(startTime)).append("\n");
     sb.append("    date: ").append(toIndentedString(endTime)).append("\n");
     sb.append("    maxDetour: ").append(toIndentedString(maxDetour)).append("\n");

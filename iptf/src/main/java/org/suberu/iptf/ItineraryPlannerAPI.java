@@ -286,8 +286,10 @@ public class ItineraryPlannerAPI{
 		}
 
 		//t.setMaxDetour(0); //Doesnt allow for more than one subtrip
+
 		t.setDist(prr.getDist());
 		t.setCoords(llf);
+		t.setWaypoints(prr.getWaypoints());
 	
 		triprep.save(t);	
 	
@@ -305,6 +307,7 @@ public class ItineraryPlannerAPI{
 		Trip t = ot.get();
 		TripResponse tr=new TripResponse();
 		tr.setCoords(t.getCoords());
+		tr.setWaypoints(t.getWaypoints());
 		tr.setStartTime(t.getStartTime().getTime()/1000);
 		tr.setEndTime(t.getEndTime().getTime()/1000);
 		tr.setMaxDetour(new BigDecimal(t.getMaxDetour()));
