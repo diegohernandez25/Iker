@@ -16,9 +16,9 @@ class ReviewPage extends StatefulWidget {
   final String usrEmail;
 
   ReviewPage({
-    this.usrRating,
-    this.usrEmail,
-    this.usrName
+    @required this.usrRating,
+    @required this.usrEmail,
+    @required this.usrName
   });
 
 
@@ -56,8 +56,7 @@ class _ReviewPageState extends State<ReviewPage> {
         final _uri =  Uri.http(_authority, _path,_params);
         
         Map<String, dynamic> body={
-         "reviewdObjectID" : "oioi",
-          "authorID" : "ola",
+         "reviewdObjectID" : widget.usrEmail,
           "rating": _rating,
           "reviewText": _reviewText
         };

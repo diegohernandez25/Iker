@@ -8,9 +8,10 @@ class PendingRevTile extends StatelessWidget {
   final String imgURI;
   final String targetEmail;
   final String targetName;
+  final int rating;
 
 
-  PendingRevTile ({Key key,@required this.id, @required this.imgURI, @required this.targetName, @required this.targetEmail}) : super(key: key);
+  PendingRevTile ({Key key,@required this.id, @required this.imgURI, @required this.targetName, @required this.targetEmail,@required this.rating} ) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +19,11 @@ class PendingRevTile extends StatelessWidget {
     return GestureDetector(
       onTap: (){
         Navigator.push(context, MaterialPageRoute(
-          builder: (context)=> ReviewPage()
+          builder: (context)=> ReviewPage(
+          usrRating: rating,
+          usrName: targetName,
+          usrEmail:targetEmail
+          )
         ));
       },
       child: Padding(

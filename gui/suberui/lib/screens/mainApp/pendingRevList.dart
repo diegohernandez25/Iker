@@ -46,7 +46,8 @@ class _PendingRevListState extends State<PendingRevList> {
         id: item['id'],
         imgURI: item['img_url'],
         targetEmail: item['usr_mail'],
-        targetName: item['usr_name']
+        targetName: item['usr_name'],
+        rating: item['avgRating']
         ),
       )
           .toList();
