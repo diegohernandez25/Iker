@@ -45,7 +45,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   english_words: ^3.1.0
 
-  google_maps_flutter: ^0.4.0
+  google_maps_flutter: ^0.5.19
 
 dev_dependencies:
   flutter_test:

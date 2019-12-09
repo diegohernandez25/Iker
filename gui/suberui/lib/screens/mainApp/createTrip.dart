@@ -104,7 +104,7 @@ class _CreateTripState extends State<CreateTrip> {
           headers: { "accept": "application/json", "content-type": "application/json" },
           body: json.encode(body));
 
-      //print(_uri.toString());
+      print(json.encode(body));
 
       return res.body;
 

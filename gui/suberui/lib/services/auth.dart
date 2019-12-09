@@ -24,6 +24,7 @@ class AuthService{
 
   //Future<FirebaseUser> signInGoogle() async{
   Future<User> signInGoogle() async{
+    print("------------------------Im signing in------------------------------------");
     try {
       GoogleSignInAccount googleSignInAccount = await _googleSignIn.signIn();
       GoogleSignInAuthentication gSA = await googleSignInAccount.authentication;

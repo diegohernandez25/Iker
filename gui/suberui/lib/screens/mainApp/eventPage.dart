@@ -44,7 +44,7 @@ class EventPage extends StatelessWidget {
 
               flexibleSpace: FlexibleSpaceBar(
                   centerTitle: true,
-                  title: Text(event.name,
+                  title: Text(event.name ,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16.0,
@@ -63,7 +63,7 @@ class EventPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(event.name,
+                Text(event.name+event.eid.toString(),
                   style: Theme.of(context).textTheme.title),
                 SizedBox(height: 30),
                 Text(event.description,

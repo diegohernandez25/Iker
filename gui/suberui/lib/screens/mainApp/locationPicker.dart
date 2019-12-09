@@ -101,7 +101,9 @@ class _LocationPickerState extends State<LocationPicker> {
             ),
            // SizedBox(height: 100,),
             RaisedButton(
+
               onPressed: (){
+                print('------------------------------------- id'+widget.event.eid.toString());
                 if(this._formKey.currentState.validate()) {
                   Navigator.push(
                     context,

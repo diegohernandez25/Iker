@@ -17,6 +17,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
 
+  TextEditingController editingController = TextEditingController();
 
 
   final List<Event> listOfEvents=[
@@ -40,14 +41,43 @@ class _HomeState extends State<Home> {
         date: DateTime.now(),
         location: 'Lisboa'
     ),
-
   ];
+
+  List<Event> _filteredListOfEvents=[];
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _getEvents();
+   // _filteredListOfEvents=_fetchedListOfEvents;
+
+  }
+
+
+  void filterSearchResults(String query) {
+    List<Event> tempSearchList = List<Event>();
+    tempSearchList.addAll(_fetchedListOfEvents);
+    if(query.isNotEmpty) {
+      List<Event> tempListData = List<Event>();
+      tempSearchList.forEach((item) {
+
+        if(item.name.toLowerCase().contains(query.toLowerCase(),0)) {
+          print('contains');
+          tempListData.add(item);
+        }
+      });
+      setState(() {
+        _filteredListOfEvents.clear();
+        _filteredListOfEvents.addAll(tempListData);
+      });
+      return;
+    } else {
+      setState(() {
+        _filteredListOfEvents.clear();
+        _filteredListOfEvents.addAll(_fetchedListOfEvents);
+      });
+    }
   }
 
 
@@ -66,23 +96,18 @@ class _HomeState extends State<Home> {
 
       List<Event> eventList = body.map((dynamic item) => Event.fromJson(item),)
           .toList();
-      //print(eventList.length);
-      for (int i = 0; i < eventList.length; i++) {
-
-        //print(eventList[i].eid);
-        print(eventList[i].eventImage);
-        /*print(eventList[i].eventImage);
-        print(eventList[i].description);
-        print(eventList[i].date);
-        print(eventList[i].location);
-        print('..............');*/
-      }
-
 
       setState(() { _fetchedListOfEvents = eventList; });
+      setState(() {
+        _filteredListOfEvents.addAll(_fetchedListOfEvents);
+      });
+      print('length filter'+_filteredListOfEvents.length.toString());
     }
     else{
       setState(() { _fetchedListOfEvents = listOfEvents; });
+      setState(() {
+        _filteredListOfEvents = listOfEvents;
+      });
     }
 
   }
@@ -184,21 +209,40 @@ class _HomeState extends State<Home> {
                   ),
 
                 ),
-                GridView.builder(
-                    shrinkWrap: true,
-                    gridDelegate:
-                    new SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2),
-                    itemCount: _fetchedListOfEvents.length  ,
+                Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: TextField(
+                        onChanged: (value) {
+                          filterSearchResults(value);
+                        },
+                        controller: editingController,
+                        decoration: InputDecoration(
+                            labelText: "Search",
+                            hintText: "Search",
+                            prefixIcon: Icon(Icons.search),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(50.0)))),
+                      ),
+                    ),
+                    GridView.builder(
+                        shrinkWrap: true,
+                        gridDelegate:
+                        new SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2),
+                        itemCount: _filteredListOfEvents.length  ,
 
-                    itemBuilder: (context, index) {
-                      return Padding(
-                          padding: const EdgeInsets.all(5.0),
-                          child: EventTile(
-                              event:  _fetchedListOfEvents[index]
-                          )
-                      );
-                    }
+                        itemBuilder: (context, index) {
+                          return Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: EventTile(
+                                  event:  _filteredListOfEvents[index]
+                              )
+                          );
+                        }
+                    ),
+                  ],
                 ),
 
               ]

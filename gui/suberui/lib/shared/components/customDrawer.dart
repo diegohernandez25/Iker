@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:suberui/screens/mainApp/myTripsPage.dart';
 import 'package:suberui/screens/mainApp/profileScreen.dart';
+import 'package:suberui/screens/mainApp/reviewPage.dart';
 import 'package:suberui/services/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:suberui/models/user.dart';
@@ -53,9 +55,32 @@ class CustomDrawer extends StatelessWidget {
             title: Text('Profile'),
             leading: Icon(Icons.person),
             onTap: () {
+
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ProfileScreen()),
+                MaterialPageRoute(builder: (context) => ProfileScreen(email: user.email,)),
+              );
+              //Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: Text('My Trips'),
+            leading: Icon(Icons.person),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyTripsPage()),
+              );
+              //Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            title: Text('Pending Reviews'),
+            leading: Icon(Icons.star),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ReviewPage()),
               );
               //Navigator.pop(context);
             },
@@ -70,7 +95,6 @@ class CustomDrawer extends StatelessWidget {
               Navigator.of(context)
                   .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
               //}
-
               await _auth.signOutGoogle();
               //
             },

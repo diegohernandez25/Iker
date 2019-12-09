@@ -31,6 +31,9 @@ class _TripSearchState extends State<TripSearch> {
 
   void _getTrips () async {
 
+
+    print('-----------------------------------------event ID'+widget.event.eid.toString());
+
     final _authority = "168.63.30.192:5000";
     final _path = "/get_av_trips_event";
     final _params = {
@@ -48,15 +51,11 @@ class _TripSearchState extends State<TripSearch> {
 
       List<Trip> tripList = body.map((dynamic item) => Trip.fromJson(item),)
           .toList();
+
+
       //print(eventList.length);
       for (int i = 0; i < tripList.length; i++) {
         print(tripList[i].tid);
-        /* print(eventList[i].name);
-        print(eventList[i].eventImage);
-        print(eventList[i].description);
-        print(eventList[i].date);
-        print(eventList[i].location);
-        print('..............');*/
       }
 
       setState(() { _fetchedListOfTrips = tripList; });
