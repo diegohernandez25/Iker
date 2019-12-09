@@ -3,8 +3,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:suberui/models/mytrip.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:suberui/models/user.dart';
 import 'package:suberui/shared/components/GPSignaler.dart';
 import 'package:suberui/shared/components/customDrawer.dart';
 import 'package:http/http.dart' as http;
@@ -54,6 +56,8 @@ class _tripScreenState extends State<tripScreen> {
 
 
     http.Response res = await http.get(_uri.toString());
+    print(res.body);
+    print(res.statusCode);
 
     if (res.statusCode == 200) {
       List<dynamic> body = json.decode(res.body)['snappedPoints'];
@@ -105,6 +109,27 @@ class _tripScreenState extends State<tripScreen> {
           ));
         });
     }
+  }
+
+  Future  _notifyStop(BuildContext context) async {
+    //TODO HERE
+    final _authority = "168.63.30.192:5000";
+    final _path = "/end_trip";
+    final _params={
+      'usr_id': Provider.of<User>(context).uid.toString(),
+      'trip_id': widget.mtrip.id.toString()
+    };
+
+
+    final _uri =  Uri.http(_authority, _path, _params);
+
+    print(_uri.toString());
+
+    http.Response res = await http.post(_uri);
+    print(res.body);
+
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
   }
 
   @override
@@ -178,6 +203,11 @@ class _tripScreenState extends State<tripScreen> {
                   onPressed: () {
                     if(_ongoing){
                       gpsig.stopSignaling();
+
+
+                      _notifyStop(context);
+
+
                       setState(() {
                         _ongoing=!_ongoing;
                       });
