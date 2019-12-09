@@ -65,6 +65,14 @@ def create_trip(session, id_domain_booking, id_iptf, city, available, user,
 
     return trip
 
+def delete_trip(session, id=None, trip=None):
+    if id is not None:
+        trip = get_trip(session, id)
+
+    if trip is not None:
+        session.delete(trip)
+        session.commit()
+
 
 def create_review(session, user_from, user_to)->Review:
     review = None

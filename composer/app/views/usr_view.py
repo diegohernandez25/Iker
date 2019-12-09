@@ -161,7 +161,18 @@ def list_pending_reviews_api():
     user_id = request.args.get('usr_id')
     if usr_exists(session, user_id):
         user        = get_usr_by_idauth(session, user_id)
-        response    = [ get_usr(session,e.id_usr_to).get_dict_profile() for e in list_reviews(session, user)]
+        response    = list()
+        for e in list_reviews(session, user):
+            tmp_usr = get_usr(session, e.id_usr_to)
+            tmp_dict = tmp_usr.get_dict_profile()
+            r = requests.get(URL_REVIEW + "avgRating/" + tmp_usr.mail)
+            r = r.json()
+            if "avgRating" in r.keys():
+                tmp_dict["avgRating"] = r["avgRating"]
+            else:
+                tmp_dict["avgRating"] = 0
+            response.append(tmp_dict)
+
         session.close()
         return jsonify(response)
 
