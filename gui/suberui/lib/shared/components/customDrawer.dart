@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:suberui/screens/mainApp/myTripsPage.dart';
+import 'package:suberui/screens/mainApp/pendingRevList.dart';
 import 'package:suberui/screens/mainApp/profileScreen.dart';
 import 'package:suberui/screens/mainApp/reviewPage.dart';
 import 'package:suberui/services/auth.dart';
@@ -80,7 +81,7 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ReviewPage()),
+                MaterialPageRoute(builder: (context) => PendingRevList()),
               );
               //Navigator.pop(context);
             },

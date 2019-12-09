@@ -27,43 +27,44 @@ class _tripScreenState extends State<tripScreen> {
   GPSignaler gpsig;
   Completer<GoogleMapController> _controller = Completer();
 
-
-  Future<List<LatLng>> _snapToRoad(List<LatLng> initWay) async{
-    String path="";
-
-    for(int i = 0; i<initWay.length;i++){
-      path+=initWay[i].latitude.toString()+','+initWay[i].longitude.toString()+'|';
-    }
-
-    print(widget.mtrip.waypoints.toString());
-
-
-
-    path=path.substring(0,path.length-1);
+  Future<List<LatLng>>_callroads(String path) async {
     final _authority = "roads.googleapis.com";
     final _path = "/v1/snapToRoads";
     final _params = {
-      "path": path,
+      "path": path = path.substring(0, path.length - 1),
       "interpolate": "true",
-      "key":"AIzaSyDDuuTiQwp9tXWUTWE1tRs3oYCr90Lz6YE"
+      "key": "AIzaSyDDuuTiQwp9tXWUTWE1tRs3oYCr90Lz6YE"
     };
-
-    final _uri =  Uri.https(_authority, _path,_params);
+    final _uri = Uri.https(_authority, _path, _params);
     print(_uri.toString());
-
-
-
     http.Response res = await http.get(_uri.toString());
-
     if (res.statusCode == 200) {
       List<dynamic> body = json.decode(res.body)['snappedPoints'];
-
-      List<LatLng> snapedWaypoints = body.map((dynamic item) => LatLng(item['location']['latitude'],item['location']['longitude']))
+      return body.map((dynamic item) =>
+          LatLng(item['location']['latitude'], item['location']['longitude']))
           .toList();
-
-      return snapedWaypoints;
     }
-    return null;
+    else{
+      return [];
+    }
+  }
+
+  Future<List<LatLng>> _snapToRoad(List<LatLng> initWay) async{
+    String path="";
+    List<LatLng> snapedWaypoints=[];
+    for(int i = 0; i<initWay.length;i++){
+      path+=initWay[i].latitude.toString()+','+initWay[i].longitude.toString()+'|';
+      if((i+1)%100==0){
+        List<LatLng> l= await _callroads(path);
+          snapedWaypoints.addAll(l);
+          path="";
+        }
+      }
+    if(path!=""){
+      List<LatLng> l= await _callroads(path);
+      snapedWaypoints.addAll(l);
+    }
+    return snapedWaypoints;
   }
 
   void _onMapCreated(GoogleMapController controller) async{
