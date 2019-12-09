@@ -52,62 +52,6 @@ app.register_blueprint(event_blueprint)
 app.register_blueprint(trip_blueprint)
 app.register_blueprint(review_blueprint)
 
-#TODO Delete Trip iptf
-#TODO Delete trip composer db
-@app.route("/end_trip", methods=['POST'])
-def end_trip():
-    user_id         = request.args.get('usr_id')
-    trip_id         = request.args.get('trip_id')
-    app.logger.info('END_TRIP')
-    app.logger.info('user_id:\t'+ str(user_id))
-    app.logger.info('trip_id:\t'+ str(trip_id))
-
-    session = Session()
-
-    if usr_exists(session, user_id):
-        user = get_usr_by_idauth(session, user_id)
-        trip = get_trip(session, trip_id)
-        app.logger.info('trip:\t'+ repr(trip))
-        app.logger.info('user:\t'+ repr(user))
-        app.logger.info('trip_belongs_usr:\t'+ repr(trip_belongs_usr(session, user.id, int(trip_id))))
-
-        if (trip is not None) and trip_belongs_usr(session, user.id, int(trip_id)):
-            url = URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" +\
-                    str(trip.id_domain_booking) + "/get_dom_reservations"
-
-            r = requests.get(url)
-            reservations = r.json()
-            token_list = list()
-
-            #End Trip Trip Follower
-            requests.post(URL_TRIP_FOLLOWER + "/end_trip", params={'TripId':trip.id_iptf})
-
-            for res in reservations:
-                usr_client = get_usr_by_idclient(session, res["client_id"])
-                payment_info = json.loads(res["information"])
-                payment_bdy = {
-                    "targetID"  : user.mail,
-                    "sourceID"  : IKER_MAIL,
-                    "amount"    : res["price"],
-                    "briefDescription": "None"
-                }
-
-                token_list.append({
-                    "usr_id"        : usr_client.id,
-                    "payment_token" : payment_info["ttoken"],
-                    "amount"        : res["price"]
-                    })
-
-                requests.post(URL_PAYMENT + "completePayment", json=payment_bdy)
-
-                create_review(session, usr_client, user)
-
-            session.close()
-            return jsonify(token_list)
-
-    session.close()
-    return "ERROR"
-
 def check_service()->Boolean:
     global BOOKING_SERVICE_ID
 
