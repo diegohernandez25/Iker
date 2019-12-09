@@ -292,6 +292,7 @@ def end_trip():
 
                 create_review(session, usr_client, user)
 
+            delete_trip(session, trip=trip)
             session.close()
             return jsonify(token_list)
 
