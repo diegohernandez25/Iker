@@ -22,7 +22,8 @@ class PendingRevTile extends StatelessWidget {
           builder: (context)=> ReviewPage(
           usrRating: rating,
           usrName: targetName,
-          usrEmail:targetEmail
+          usrEmail:targetEmail,
+          image: imgURI
           )
         ));
       },

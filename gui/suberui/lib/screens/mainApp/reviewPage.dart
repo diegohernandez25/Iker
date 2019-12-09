@@ -14,11 +14,13 @@ class ReviewPage extends StatefulWidget {
   final int usrRating;
   final String usrName;
   final String usrEmail;
+  final String image;
 
   ReviewPage({
     @required this.usrRating,
     @required this.usrEmail,
-    @required this.usrName
+    @required this.usrName,
+    @required this.image
   });
 
 
@@ -117,10 +119,10 @@ class _ReviewPageState extends State<ReviewPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 CircleAvatar(
-                  backgroundColor: Colors.red,
+                  backgroundImage: NetworkImage(widget.image),
                   radius: 50,
                 ),
-                Text('Name',
+                Text(widget.usrName,
                   style: TextStyle(
                     fontSize: 20,
                   ),
