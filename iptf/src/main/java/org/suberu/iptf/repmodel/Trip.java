@@ -33,11 +33,15 @@ public class Trip implements Serializable {
 	private Date endTime;
 
 	@OneToMany(cascade = {CascadeType.ALL})
+	@OrderColumn
 	private List<Waypoint> history;
 
 	@OneToMany(cascade = {CascadeType.ALL})
+	@OrderColumn
 	private List<Waypoint> coords;
+
 	@OneToMany(cascade = {CascadeType.ALL})
+	@OrderColumn
 	private List<Waypoint> waypoints;
 
 

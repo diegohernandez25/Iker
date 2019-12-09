@@ -28,6 +28,8 @@ public class TripFollowerAPI{
 
 	@RequestMapping(value="/start_trip",method=RequestMethod.POST)
 	public ResponseEntity startTrip(@RequestParam("TripId") int tripid,HttpServletRequest ht){
+		System.out.printf("startTrip: %d\n",tripid);
+
 		Trip t = triprep.findById(tripid).get();
 
 		if(t.isFinished() || t.isOngoing()) return new ResponseEntity<>(HttpStatus.CONFLICT);
@@ -39,6 +41,8 @@ public class TripFollowerAPI{
 	
 	@RequestMapping(value="/trip_update",method=RequestMethod.POST)
 	public ResponseEntity tripUpdate(@RequestBody TripUpdateBody tub,HttpServletRequest ht){
+		System.out.printf("tripUpdate: %s\n",tub.toString());
+
 		Trip t = triprep.findById(tub.getTripId().intValue()).get();
 		
 		if(t.isFinished() || !t.isOngoing()) return new ResponseEntity<>(HttpStatus.CONFLICT);
@@ -53,6 +57,8 @@ public class TripFollowerAPI{
 	
 	@RequestMapping(value="/get_last_pos",method=RequestMethod.GET)
 	public ResponseEntity getLastPos(@RequestParam("TripId") int tripid,HttpServletRequest ht){
+		System.out.printf("getLastPos: %d\n",tripid);
+
 		Optional<Trip> ot = triprep.findById(tripid);
 		if(!ot.isPresent()) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		Trip t = triprep.findById(tripid).get();
@@ -67,6 +73,8 @@ public class TripFollowerAPI{
 
 	@RequestMapping(value="/end_trip",method=RequestMethod.POST)
 	public ResponseEntity endTrip(@RequestParam("TripId") int tripid,HttpServletRequest ht){
+		System.out.printf("endTrip: %d\n",tripid);
+
 		Trip t = triprep.findById(tripid).get();
 
 		if(t.isFinished() || !t.isOngoing()) return new ResponseEntity<>(HttpStatus.CONFLICT);
