@@ -60,10 +60,9 @@ class _PendingRevListState extends State<PendingRevList> {
   @override
   void initState() {
     // TODO: implement initState
-/*
     Future.delayed(Duration.zero,() {
       _getPending(Provider.of<User>(context));
-    });*/
+    });
     super.initState();
   }
 
