@@ -130,7 +130,6 @@ def search_trip()->str:
 
 #TODO Delete Trip iptf
 #TODO Delete trip composer db
-#TODO End Trip Trip Follower
 @trip_blueprint.route("/end_trip", methods=['POST'])
 def end_trip():
     user_id         = request.args.get('usr_id')
