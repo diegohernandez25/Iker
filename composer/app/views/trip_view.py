@@ -127,6 +127,10 @@ def search_trip()->str:
     return "ERROR"
 
 
+
+#TODO Delete Trip iptf
+#TODO Delete trip composer db
+#TODO End Trip Trip Follower
 @trip_blueprint.route("/end_trip", methods=['POST'])
 def end_trip():
     user_id         = request.args.get('usr_id')
@@ -144,6 +148,9 @@ def end_trip():
             r = requests.get(url)
             reservations = r.json()
             token_list = list()
+
+            #End Trip Trip Follower
+            requests.post(URL_TRIP_FOLLOWER + "/end_trip", params={'TripId':trip.id_iptf})
 
             for res in reservations:
                 usr_client = get_usr_by_idclient(session, res["client_id"])
