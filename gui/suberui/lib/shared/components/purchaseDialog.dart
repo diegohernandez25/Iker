@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:suberui/models/event.dart';
 import 'package:suberui/models/location.dart';
 import 'package:suberui/models/trip.dart';
@@ -67,27 +68,25 @@ class _PurchaseDialogState extends State<PurchaseDialog> {
                 ),
                 ),
                 IconTheme( data: IconThemeData(color: Colors.amber, size: 30,),child: StarDisplay(value: widget.trip.authorRtng.round())),
-                Text(
-                    'See profile'
-                ),
+
                 SizedBox(height: 40,),
                 Row(
                   children: <Widget>[
                     Icon(
                         Icons.pin_drop
                     ),
-                    Text(widget.event.name)
+                    Expanded(child: Text(widget.event.name))
                   ],
                 ),
                 Row(
                   children: <Widget>[
                     Icon(
-                        Icons.event
+                        Icons.watch_later
                     ),
-                    Text(widget.event.date.toIso8601String())
+                    Text(DateFormat("HH:mm").format(DateTime.fromMillisecondsSinceEpoch(widget.trip.hour * 1000)))
                   ],
                 ),
-                Text(widget.trip.price.toString() + '€', style: TextStyle(
+                Text(widget.trip.price.toStringAsPrecision(2) + '€', style: TextStyle(
                     fontSize: 30
                 ),),
                 SizedBox(height: 10,),
@@ -113,13 +112,7 @@ class _PurchaseDialogState extends State<PurchaseDialog> {
                     http.Response res = await http.post(_uri.toString(),
                         headers: { "accept": "application/json", "content-type": "application/json" },
                         body: json.encode(body));
-
-                    print("oooooooooooooooooooooooooooooooooooooooooooo");
                     print(res.statusCode);
-                    print("http://168.63.30.192:8080/sign_in?token="+json.decode(res.body)['token'].toString());
-
-
-
                     showDialog(
                         context: context,
                         builder: (BuildContext context) => WebDialog(trid: json.decode(res.body)['token'].toString()),

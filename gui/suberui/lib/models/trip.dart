@@ -9,9 +9,11 @@ class Trip {
   final ImageProvider authorImage;
   final num authorRtng;
   final num price;
+  final int hour;
 
 
-  Trip ({this.tid, this.authorEmail,this.authorName, this.authorImage,this.authorRtng,this.price});
+
+  Trip ({this.tid, this.authorEmail,this.authorName, this.authorImage,this.authorRtng,this.price, this.hour});
 
   factory Trip.fromJson(Map<String, dynamic> json) {
     return Trip(
@@ -21,6 +23,7 @@ class Trip {
       authorImage: NetworkImage(json['user_img']),
       authorRtng: json['review'] as num,
       price: json['price'] as num,
+      hour: json['hour'] as int
       //price: json['pro']
     );
   }

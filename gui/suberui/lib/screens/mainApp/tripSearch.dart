@@ -98,9 +98,10 @@ class _TripSearchState extends State<TripSearch> {
             padding: EdgeInsets.all(0.0),
             child: ListView.builder(
                 shrinkWrap: true,
-                itemCount: _fetchedListOfTrips.length,
+                itemCount: _fetchedListOfTrips.isEmpty?1:_fetchedListOfTrips.length,
                 itemBuilder: (context, index) {
-                  return  Padding(
+                  return _fetchedListOfTrips.isNotEmpty
+                    ?Padding(
                       padding: const EdgeInsets.all(0.0),
                       child: GestureDetector(
                         onTap: (){
@@ -123,8 +124,20 @@ class _TripSearchState extends State<TripSearch> {
                           trip: _fetchedListOfTrips[index]
                         ),
                       ),
-
-                  );
+                  )
+                  :
+                  Padding(
+                      padding: const EdgeInsets.only(top: 100),
+                      child:  Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Text('No Trips Found', style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold
+                          ),)
+                        ],
+                      ));
                 }
             )
           

@@ -65,6 +65,8 @@ class _ConfirmTripCreationState extends State<ConfirmTripCreation> {
 
     final user= Provider.of<User>(context);
 
+    bool _pressed=false;
+
     void _sendFormInfo() async{
       final _authority = "168.63.30.192:5000";
       final _path = "register_trip";
@@ -87,6 +89,8 @@ class _ConfirmTripCreationState extends State<ConfirmTripCreation> {
       http.Response res = await http.post(_uri.toString(),
           headers: { "accept": "application/json", "content-type": "application/json" },
           body: json.encode(jsonBody));
+
+      _pressed=false;
       print(res.statusCode);
       print(res.body);
       Navigator.of(context)
@@ -176,36 +180,42 @@ class _ConfirmTripCreationState extends State<ConfirmTripCreation> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
-                          Text('Number of available seats:  ', style: TextStyle(
-                            fontSize: 20
-                          ),),
-                          DropdownButton<String>(
-                            value: _seats,
-                            icon: Icon(Icons.arrow_downward),
-                            iconSize: 24,
-                            elevation: 16,
-                            style: TextStyle(
-                                color: Colors.deepPurple
+                          Flexible(
+                            fit: FlexFit.loose,
+                            child: Text('Number of available seats:  ', style: TextStyle(
+                              fontSize: 20
+                            ),),
+                          ),
+                          Flexible(
+                            fit: FlexFit.loose,
+                            child: DropdownButton<String>(
+                              value: _seats,
+                              icon: Icon(Icons.arrow_downward),
+                              iconSize: 24,
+                              elevation: 16,
+                              style: TextStyle(
+                                  color: Colors.deepPurple
+                              ),
+                              underline: Container(
+                                height: 2,
+                                color: Colors.deepPurpleAccent,
+                              ),
+                              onChanged: (String newValue) {
+                                setState(() {
+                                  _seats = newValue;
+                                  _price =  widget.cost/(int.parse(_seats)+1);
+                                });
+                                _textFormPriceController.text=_price.toStringAsFixed(2);
+                              },
+                              items: <String>['1', '2', '3','4', '5', '6','7', '8']
+                                  .map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value,style: TextStyle(fontSize: 20)),
+                                );
+                              })
+                                  .toList(),
                             ),
-                            underline: Container(
-                              height: 2,
-                              color: Colors.deepPurpleAccent,
-                            ),
-                            onChanged: (String newValue) {
-                              setState(() {
-                                _seats = newValue;
-                                _price =  widget.cost/(int.parse(_seats)+1);
-                              });
-                              _textFormPriceController.text=_price.toStringAsFixed(2);
-                            },
-                            items: <String>['1', '2', '3','4', '5', '6','7', '8']
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value,style: TextStyle(fontSize: 20)),
-                              );
-                            })
-                                .toList(),
                           ),
                         ],
                       ),
@@ -279,8 +289,8 @@ class _ConfirmTripCreationState extends State<ConfirmTripCreation> {
                 children: <Widget>[
                   RaisedButton(
                     onPressed: () async{
-
-                      if(this._formKey.currentState.validate()) {
+                      if(this._formKey.currentState.validate() && !_pressed ) {
+                        _pressed=true;
                         _sendFormInfo();
                       }
                     },

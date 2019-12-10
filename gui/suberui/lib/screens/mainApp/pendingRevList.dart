@@ -22,14 +22,7 @@ class PendingRevList extends StatefulWidget {
 
 
 class _PendingRevListState extends State<PendingRevList> {
-  List<PendingRevTile> _fetchedListOfPendingRev = [
-    PendingRevTile(
-      id: 1,
-      imgURI: "https://cdn.discordapp.com/attachments/498949663513116673/653621965831012367/l7kP8PxFksl3VvLF4AAAAASUVORK5CYII.png",
-      targetEmail: "ruddirudellas",
-      targetName: "Rodrigo",
-    )
-  ];
+  List<PendingRevTile> _fetchedListOfPendingRev = [];
 
   void _getPending (User user) async {
     final _authority = "168.63.30.192:5000";
@@ -72,7 +65,7 @@ class _PendingRevListState extends State<PendingRevList> {
     return Scaffold(
       drawer: CustomDrawer(),
       appBar: AppBar(
-        title: Text("Trip Search"),
+        title: Text("Pending Reviews"),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.home),
@@ -88,13 +81,26 @@ class _PendingRevListState extends State<PendingRevList> {
           padding: EdgeInsets.all(0.0),
           child: ListView.builder(
               shrinkWrap: true,
-              itemCount: _fetchedListOfPendingRev.length,
+              itemCount: _fetchedListOfPendingRev.isEmpty? 1:_fetchedListOfPendingRev.length,
               itemBuilder: (context, index) {
-                return  Padding(
-                  padding: const EdgeInsets.all(0.0),
-                  child: _fetchedListOfPendingRev[index]
-
-                );
+                return _fetchedListOfPendingRev.isNotEmpty
+                  ? Padding(
+                    padding: const EdgeInsets.all(0.0),
+                    child: _fetchedListOfPendingRev[index]
+                )
+                    :
+                    Padding(
+                      padding: const EdgeInsets.only(top: 100),
+                      child:  Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Text('No Pending Reviews', style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold
+                          ),)
+                        ],
+                ));
               }
           )
 

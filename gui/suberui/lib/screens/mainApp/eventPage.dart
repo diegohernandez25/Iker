@@ -63,7 +63,7 @@ class EventPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(event.name+event.eid.toString(),
+                Text(event.name,
                   style: Theme.of(context).textTheme.title),
                 SizedBox(height: 30),
                 Text(event.description,
@@ -75,7 +75,8 @@ class EventPage extends StatelessWidget {
                   children: <Widget>[
                     Icon(Icons.place,size: 40),
                     SizedBox(width: 10),
-                    Text(event.location,style: Theme.of(context).textTheme.subhead,)
+
+                    Expanded(child: Text(event.location,style: Theme.of(context).textTheme.subhead,))
                   ],
                 ),
                 SizedBox(height: 30),
@@ -84,7 +85,7 @@ class EventPage extends StatelessWidget {
                   children: <Widget>[
                     Icon(Icons.calendar_today,size: 40),
                     SizedBox(width: 10),
-                    Text(DateFormat('yyyy-MM-dd ').format(event.date),style: Theme.of(context).textTheme.subhead,)
+                    Text(DateFormat('yyyy-MM-dd').format(event.date),style: Theme.of(context).textTheme.subhead,)
                   ],
                 ),
                 SizedBox(height: 60),

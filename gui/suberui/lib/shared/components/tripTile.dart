@@ -66,7 +66,7 @@ class TripTile extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
-                              Text(trip.price.toString()+'€',
+                              Text(trip.price.toStringAsPrecision(2)+'€',
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:suberui/screens/mainApp/MyBookedTrips.dart';
 import 'package:suberui/screens/mainApp/myTripsPage.dart';
 import 'package:suberui/screens/mainApp/pendingRevList.dart';
 import 'package:suberui/screens/mainApp/profileScreen.dart';
@@ -53,6 +54,16 @@ class CustomDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
+            title: Text('Home'),
+            leading: Icon(Icons.home),
+            onTap: () {
+
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
+              //Navigator.pop(context);
+            },
+          ),
+          ListTile(
             title: Text('Profile'),
             leading: Icon(Icons.person),
             onTap: () {
@@ -65,8 +76,8 @@ class CustomDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            title: Text('My Trips'),
-            leading: Icon(Icons.person),
+            title: Text('Active Trips'),
+            leading: Icon(Icons.directions_car),
             onTap: () {
               Navigator.push(
                 context,
@@ -75,6 +86,20 @@ class CustomDrawer extends StatelessWidget {
               //Navigator.pop(context);
             },
           ),
+
+
+          ListTile(
+            title: Text('Booked Trips'),
+            leading: Icon(Icons.book),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyBookedTrips()),
+              );
+              //Navigator.pop(context);
+            },
+          ),
+
           ListTile(
             title: Text('Pending Reviews'),
             leading: Icon(Icons.star),

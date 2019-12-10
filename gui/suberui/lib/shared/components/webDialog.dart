@@ -41,10 +41,8 @@ class _WebDialogState extends State<WebDialog> {
 
             if(Uri.parse(url).path=='/done' || Uri.parse(url).path=='/invalid'){
               print('hello');
-              var count = 0;
-              Navigator.popUntil(context, (route) {
-                return count++ == 2;
-              });
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
             }
 
           },

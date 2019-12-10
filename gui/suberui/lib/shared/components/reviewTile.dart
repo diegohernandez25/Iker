@@ -28,7 +28,7 @@ class ReviewTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(review.authorId,style: TextStyle(
+                Text(review.usrName,style: TextStyle(
                   fontSize: 20
                 )),
                 IconTheme(

@@ -9,8 +9,9 @@ class Review {
   final String reviewText;
   final DateTime rdate;
   final ImageProvider image;
+  final String usrName;
 
-  Review({this.rid,this.authorId,this.reviewedObjectID,this.rating, this.reviewText, this.rdate,this.image});
+  Review({this.rid,this.authorId,this.reviewedObjectID,this.rating, this.reviewText, this.rdate,this.image,this.usrName});
 
   factory Review.fromJson(Map<String, dynamic> json) {
     print('-------------------------'+json['img_url']);
@@ -21,7 +22,8 @@ class Review {
       rating: json['rating'] as num ,
       reviewText: json['reviewText'] as String,
       rdate: DateTime.parse(json['date']),
-      image: NetworkImage(json['img_url'])
+      image: NetworkImage(json['img_url']),
+      usrName: json['name'] as String
       //price: json['pro']
     );
   }

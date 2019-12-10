@@ -1,58 +1,33 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:suberui/models/event.dart';
-import 'package:suberui/models/location.dart';
-import 'package:suberui/models/mytrip.dart';
+import 'package:suberui/models/bookedTrip.dart';
 import 'package:suberui/models/user.dart';
-import 'package:suberui/screens/mainApp/_____tripDetail.dart';
-import 'package:suberui/screens/mainApp/tripPurchase.dart';
-import 'package:suberui/screens/mainApp/tripScreen.dart';
-import 'package:suberui/services/auth.dart';
-import 'package:suberui/shared/components/purchaseDialog.dart';
-import 'package:suberui/shared/components/tripTile.dart';
-import 'package:suberui/shared/components/myTripTile.dart';
-import 'package:suberui/models/trip.dart';
+import 'package:suberui/shared/components/MyBookedTripTile.dart';
 import 'package:suberui/shared/components/customDrawer.dart';
 import 'package:http/http.dart' as http;
 
-class MyTripsPage extends StatefulWidget {
-  final Event event;
-  final Location location;
-  MyTripsPage({this.event,this.location});
+class MyBookedTrips extends StatefulWidget {
   @override
-  _MyTripsPageState createState() => _MyTripsPageState();
+  _MyBookedTripsState createState() => _MyBookedTripsState();
 }
 
-
-
-class _MyTripsPageState extends State<MyTripsPage> {
-  final AuthService _auth = AuthService();
-
-  List<MyTrip> _fetchedListOfTrips = [];
-
+class _MyBookedTripsState extends State<MyBookedTrips> {
+  List<BookedTrip> _fetchedListOfTrips = [];
   void _getTrips (User user) async {
-
-    //print('-----------------------------------------event ID'+widget.event.eid.toString());
-
     final _authority = "168.63.30.192:5000";
-    final _path = "/get_my_trips";
+    final _path = "/get_my_reservations";
     final _params={
       "usr_id": user.uid
     };
-
     final _uri =  Uri.http(_authority, _path,_params);
     print(_uri.toString());
-
     http.Response res = await http.get(_uri.toString());
     print(res.statusCode);
-
     if (res.statusCode == 200) {
       List<dynamic> body = json.decode(res.body);
-      List<MyTrip> tripList = body.map((dynamic item) => MyTrip.fromJson(item),)
+      List<BookedTrip> tripList = body.map((dynamic item) => BookedTrip.fromJson(item),)
           .toList();
-
       setState(() { _fetchedListOfTrips = tripList; });
     }
     else{
@@ -77,7 +52,7 @@ class _MyTripsPageState extends State<MyTripsPage> {
     return Scaffold(
       drawer: CustomDrawer(),
       appBar: AppBar(
-        title: Text("Active Trips"),
+        title: Text("Booked Trips"),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.home),
@@ -96,17 +71,13 @@ class _MyTripsPageState extends State<MyTripsPage> {
               itemCount: _fetchedListOfTrips.isEmpty?1:_fetchedListOfTrips.length,
               itemBuilder: (context, index) {
                 return  _fetchedListOfTrips.isNotEmpty
-                ?Padding(
+                  ?Padding(
                   padding: const EdgeInsets.all(0.0),
                   child: GestureDetector(
                     onTap: (){
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => tripScreen(mtrip:_fetchedListOfTrips[index])));
-
-                     //introduce logic here
+                      //showDialog(context: null);
                     },
-                    child: MyTripTile(
+                    child: MyBookedTripTile(
                         trip: _fetchedListOfTrips[index]
                     ),
                   ),
@@ -118,7 +89,7 @@ class _MyTripsPageState extends State<MyTripsPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        Text('No Active Trips', style: TextStyle(
+                        Text('No Booked Trips', style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold
                         ),)

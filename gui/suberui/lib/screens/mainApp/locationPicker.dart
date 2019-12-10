@@ -63,15 +63,12 @@ class _LocationPickerState extends State<LocationPicker> {
         child: Column(
           children: <Widget>[
             Text('Starting location:', style: TextStyle(fontSize: 30),),
-            Expanded(
-              child: Form(
+            Form(
                 key:  this._formKey,
                 child: TypeAheadFormField(
-
                   textFieldConfiguration: TextFieldConfiguration(
                       controller: this._typeAheadController,
                       decoration: InputDecoration(
-
                           labelText: 'Location'
                       )
                   ),
@@ -89,7 +86,7 @@ class _LocationPickerState extends State<LocationPicker> {
                     this._selectedLocation=suggestion;
                   },
                   validator: (value) {
-                    if (value.isEmpty && this._selectedLocation!=null) {
+                    if (value.isEmpty && this._selectedLocation==null) {
                       return 'Please select a Location';
                     }
                     return null;
@@ -98,20 +95,21 @@ class _LocationPickerState extends State<LocationPicker> {
 
                 ),
               ),
-            ),
-           // SizedBox(height: 100,),
-            RaisedButton(
 
-              onPressed: (){
-                print('------------------------------------- id'+widget.event.eid.toString());
-                if(this._formKey.currentState.validate()) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => TripSearch(event: widget.event,location: _selectedLocation)),
-                  );
-                }
-              },
-              child: Text('Search Trips'),
+           SizedBox(height: 100,),
+            Flexible(
+              child: RaisedButton(
+                onPressed: (){
+
+                  if(this._formKey.currentState.validate()) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => TripSearch(event: widget.event,location: _selectedLocation)),
+                    );
+                  }
+                },
+                child: Text('Search Trips'),
+              ),
             )
           ],
         ),

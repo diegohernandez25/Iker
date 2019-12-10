@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:suberui/models/event.dart';
-import 'package:suberui/models/trip.dart';
-import 'package:suberui/models/mytrip.dart';
-import 'package:suberui/shared/components/starDisplay.dart';
+import 'package:suberui/models/bookedTrip.dart';
 
-class MyTripTile extends StatelessWidget {
-  final MyTrip trip;
-  MyTripTile ({Key key,@required this.trip}) : super(key: key);
+
+class MyBookedTripTile extends StatelessWidget {
+  final BookedTrip trip;
+  MyBookedTripTile ({Key key,@required this.trip}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +57,7 @@ class MyTripTile extends StatelessWidget {
                                   SizedBox(height: 12,),
                                   FittedBox(
                                     fit:BoxFit.fitWidth,
-                                    child: Text(DateFormat('yyyy-MM-dd kk:mm').format(trip.startTime),
+                                    child: Text(DateFormat('yyyy-MM-dd kk:mm').format(trip.tripDate),
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
@@ -84,7 +82,7 @@ class MyTripTile extends StatelessWidget {
               left: 0,
               child: CircleAvatar(
                   radius: 35,
-                  backgroundImage: trip.eventImg
+                  backgroundImage: trip.driverImage
               ),
             )
           ]

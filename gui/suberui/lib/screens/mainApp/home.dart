@@ -43,7 +43,19 @@ class _HomeState extends State<Home> {
     ),
   ];
 
-  List<Event> _filteredListOfEvents=[];
+  List<Event> _filteredListOfEvents=[
+
+  ];
+  List<Event> _concertListOfEvents=[
+
+  ];
+
+  List<Event> _theaterListOfEvents=[
+
+  ];
+  List<Event> _sportListOfEvents=[
+
+  ];
 
   @override
   void initState() {
@@ -97,7 +109,12 @@ class _HomeState extends State<Home> {
       List<Event> eventList = body.map((dynamic item) => Event.fromJson(item),)
           .toList();
 
-      setState(() { _fetchedListOfEvents = eventList; });
+      setState(() {
+        _fetchedListOfEvents = eventList;
+        _concertListOfEvents = eventList.where((i)=>i.category=="Concert").toList();
+        _theaterListOfEvents = eventList.where((i)=>i.category=="Theater").toList();
+        _sportListOfEvents = eventList.where((i)=>i.category=="Sport").toList();
+      });
       setState(() {
         _filteredListOfEvents.addAll(_fetchedListOfEvents);
       });
@@ -108,6 +125,7 @@ class _HomeState extends State<Home> {
       setState(() {
         _filteredListOfEvents = listOfEvents;
       });
+
     }
 
   }
@@ -124,6 +142,7 @@ class _HomeState extends State<Home> {
       child: new Scaffold(
           appBar: AppBar(
             title: Text("Main Page"),
+
             //backgroundColor: Colors.teal[500],
 
           ),
@@ -133,15 +152,15 @@ class _HomeState extends State<Home> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      RaisedButton(
+                      /*RaisedButton(
                         child: Text('Test'),
                         onPressed: () async{
                           _getEvents();
                         },
-                      ),
+                      ),*/
                       SizedBox(height: 25.0),
                       Text(
-                        'Events Near You',
+                        'Concerts',
                         style: TextStyle(
                             color: Colors.teal,
                             fontSize: 30.0,
@@ -151,7 +170,7 @@ class _HomeState extends State<Home> {
                       ),
                       CarouselSlider(
                         height: 200.0,
-                        items: _fetchedListOfEvents.map((i) {
+                        items: _concertListOfEvents.map((i) {
                           return Builder(
                               builder: (BuildContext context){
                                 return EventTile(event: i);
@@ -163,7 +182,7 @@ class _HomeState extends State<Home> {
 
                       SizedBox(height: 25.0),
                       Text(
-                        'Soccer Games',
+                        'Sport Events',
                         textAlign: TextAlign.left,
                         style: TextStyle(
                             color: Colors.teal,
@@ -174,7 +193,7 @@ class _HomeState extends State<Home> {
                       ),
                       CarouselSlider(
                         height: 200.0,
-                        items: _fetchedListOfEvents.map((i) {
+                        items: _sportListOfEvents.map((i) {
                           return Builder(
                               builder: (BuildContext context){
                                 return EventTile(event: i,);
@@ -184,7 +203,7 @@ class _HomeState extends State<Home> {
                       ),
                       SizedBox(height: 25.0),
                       Text(
-                        'Soccer Games',
+                        'Theater events',
                         textAlign: TextAlign.left,
                         style: TextStyle(
                             color: Colors.teal,
@@ -196,7 +215,7 @@ class _HomeState extends State<Home> {
 
                       CarouselSlider(
                         height: 200.0,
-                        items: _fetchedListOfEvents.map((i) {
+                        items: _theaterListOfEvents.map((i) {
                           return Builder(
                               builder: (BuildContext context){
                                 return EventTile(event: i,);
@@ -226,21 +245,23 @@ class _HomeState extends State<Home> {
                                 borderRadius: BorderRadius.all(Radius.circular(50.0)))),
                       ),
                     ),
-                    GridView.builder(
-                        shrinkWrap: true,
-                        gridDelegate:
-                        new SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2),
-                        itemCount: _filteredListOfEvents.length  ,
+                    Expanded(
+                      child: GridView.builder(
+                          shrinkWrap: true,
+                          gridDelegate:
+                          new SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2),
+                          itemCount: _filteredListOfEvents.length  ,
 
-                        itemBuilder: (context, index) {
-                          return Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: EventTile(
-                                  event:  _filteredListOfEvents[index]
-                              )
-                          );
-                        }
+                          itemBuilder: (context, index) {
+                            return Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: EventTile(
+                                    event:  _filteredListOfEvents[index]
+                                )
+                            );
+                          }
+                      ),
                     ),
                   ],
                 ),

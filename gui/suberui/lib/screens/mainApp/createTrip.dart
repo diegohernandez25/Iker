@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:provider/provider.dart';
 import 'package:suberui/models/event.dart';
@@ -32,7 +33,7 @@ class _CreateTripState extends State<CreateTrip> {
   TextEditingController _textFormController3;
 
   //Variables
-  List<String> _dropVals=['diesel','gpl','petrol'];
+
 
   Location _selectedLocation= null;
   String _selectedLocationText= null;
@@ -40,7 +41,7 @@ class _CreateTripState extends State<CreateTrip> {
   num _cons50=0.0;
   num _cons90=0.0;
   num _cons120=0.0;
-  String _fuelType = 'diesel';
+  String _fuelType = 'Diesel';
   String _body;
 
   //Functions
@@ -90,7 +91,7 @@ class _CreateTripState extends State<CreateTrip> {
         "Consumption": [_cons50,_cons90,_cons120],
         "AvoidTolls": _tolls,
         "StartTime": 0,
-        "FuelType": _fuelType
+        "FuelType": _fuelType.toLowerCase()
       };
 
       setState(() {
@@ -172,10 +173,15 @@ class _CreateTripState extends State<CreateTrip> {
                         children: <Widget>[
                           Flexible(
                             child: TextFormField(
+                              inputFormatters: <TextInputFormatter>[
+                                //WhitelistingTextInputFormatter(RegExp("[0-9]+(\.[0-9]+)?"))
+                                WhitelistingTextInputFormatter(RegExp("[0-9\.]"))
+
+                              ],
                               controller: _textFormController,
                               //initialValue: '0.0',
                               decoration: const InputDecoration(
-                                labelText: 'at 50 km',
+                                labelText: 'at 50 km/h',
                                 labelStyle: TextStyle(
                                   fontSize: 20
                                 )
@@ -197,7 +203,7 @@ class _CreateTripState extends State<CreateTrip> {
                               controller: _textFormController2,
                               //initialValue: '0.0',
                               decoration: const InputDecoration(
-                                  labelText: 'at 90 km',
+                                  labelText: 'at 90 km/h',
                                   labelStyle: TextStyle(
                                       fontSize: 20
                                   )
@@ -221,7 +227,7 @@ class _CreateTripState extends State<CreateTrip> {
                               //initialValue: '0.0',
                               controller: _textFormController3,
                               decoration: const InputDecoration(
-                                  labelText: 'at 120 km',
+                                  labelText: 'at 120 km/h',
                                   labelStyle: TextStyle(
                                       fontSize: 20
                                   )
@@ -284,7 +290,7 @@ class _CreateTripState extends State<CreateTrip> {
                                 _fuelType = newValue;
                               });
                             },
-                            items: <String>['diesel', 'petrol', 'gpl']
+                            items: <String>['Diesel', 'Petrol', 'GPL']
                                 .map<DropdownMenuItem<String>>((String value) {
                               return DropdownMenuItem<String>(
                                 value: value,

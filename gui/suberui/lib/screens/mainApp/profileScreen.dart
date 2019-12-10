@@ -21,7 +21,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen>  {
 
 
-  String _name='Dummy';
+  String _name='';
   List<Review> _lRev=[];
   NetworkImage _pImage;
   num _rat=5;
@@ -130,12 +130,26 @@ class _ProfileScreenState extends State<ProfileScreen>  {
       ),
       body: ListView.builder(
         shrinkWrap: true,
-        itemCount: _lRev.length,
+        itemCount: _lRev.isEmpty? 1:_lRev.length,
         itemBuilder: (context, index) {
-          return Padding(
+          return _lRev.isNotEmpty
+            ?Padding(
             padding: const EdgeInsets.only(left: 20,right: 20,bottom: 10,top: 10),
             child: ReviewTile(review: _lRev[index] ),
-          );
+          )
+              :
+          Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child:  Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Text('No Reviews', style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold
+                  ),)
+                ],
+              ));
         }
     )
 

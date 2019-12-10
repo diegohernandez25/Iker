@@ -128,7 +128,6 @@ class _ReviewPageState extends State<ReviewPage> {
                   ),
                 ),
 
-
                 Form(
                   key: this._formKey,
                   child:
@@ -189,7 +188,7 @@ class _ReviewPageState extends State<ReviewPage> {
                   onPressed: (){
                     if(_formKey.currentState.validate()){
                       print('form validated');
-                      //_sendForm();
+                      _sendForm();
                     }
                   },
                   child: Text('Submit'),
