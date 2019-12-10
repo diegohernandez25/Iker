@@ -63,38 +63,6 @@ def createUser():
     session.close()
     return "ERROR"
 
-@usr_blueprint.route("/get_usr_profile", methods=['GET'])
-def get_usr_profile_api():
-    usr_mail    = request.args.get('usr_mail')
-
-    session     = Session()
-    usr         = get_usr_from_mail(session, usr_mail)
-    if usr is not None:
-
-        response = usr.get_dict_profile()
-        r = requests.get(URL_REVIEW + "review", data={'reviewdObjectID': usr.mail})
-        r = r.json()
-        for e in r:
-            mail = e['authorID']
-            tmp_usr = get_usr_from_mail(session, mail)
-            if tmp_usr is not None:
-                e['img_url'] = tmp_usr.img_url
-
-        response["reviews"] = r
-
-        r = requests.get(URL_REVIEW + "avgRating/" + usr.mail)
-        r = r.json()
-        if "avgRating" in r.keys():
-            response["avgRating"] = r["avgRating"]
-        else:
-            response["avgRating"] = 0
-
-        session.close()
-        return jsonify(response)
-
-    session.close()
-    return "ERROR"
-
 @usr_blueprint.route("/get_my_trips", methods=['GET'])
 def get_my_trips_api():
     session = Session()
@@ -172,6 +140,40 @@ def list_pending_reviews_api():
             else:
                 tmp_dict["avgRating"] = 0
             response.append(tmp_dict)
+
+        session.close()
+        return jsonify(response)
+
+    session.close()
+    return "ERROR"
+
+@usr_blueprint.route("/get_usr_profile", methods=['GET'])
+def get_usr_profile_api():
+    usr_mail    = request.args.get('usr_mail')
+
+    session     = Session()
+    usr         = get_usr_from_mail(session, usr_mail)
+    if usr is not None:
+
+        response = usr.get_dict_profile()
+        r = requests.get(URL_REVIEW + "review", params={'reviewdObjectID': usr.mail})
+        r = r.json()
+        for e in r:
+            mail = e['authorID']
+            tmp_usr = get_usr_from_mail(session, mail)
+            if tmp_usr is not None:
+                e['img_url']    = tmp_usr.img_url
+                e['name']       = tmp_usr.name
+                e['mail']       = tmp_usr.mail
+
+        response["reviews"] = r
+
+        r = requests.get(URL_REVIEW + "avgRating/" + usr.mail)
+        r = r.json()
+        if "avgRating" in r.keys():
+            response["avgRating"] = r["avgRating"]
+        else:
+            response["avgRating"] = 0
 
         session.close()
         return jsonify(response)

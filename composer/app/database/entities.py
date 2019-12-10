@@ -49,7 +49,8 @@ class Event(Base):
             "sub_city"      : self.sub_city,
             "lat"           : self.lat,
             "lon"           : self.lon,
-            "date"          : epoch_to_date(self.date)
+            "date"          : epoch_to_date(self.date),
+            "date_epoch"    : self.date
         }
 
 class Trip(Base):

@@ -60,7 +60,9 @@ def book_trip()->str:
         elem_bdy = {
             "name"          : body["name"] + "_elem",
             "information"   : body["information"],
-            "init_time"     : event.date - body["StartTime"],
+            "init_time"     : body["StartTime"],
+            #"init_time"     : event.date + body["StartTime"],
+            #"init_time"     : event.date - body["StartTime"],
             "end_time"      : event.date,
             "price"         : body["Price"]+2.9
         }

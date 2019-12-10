@@ -292,11 +292,10 @@ if __name__ == '__main__':
 
     Base.metadata.create_all(engine)
     session = Session()
-    usr = get_usr_by_idauth(session, 15)
-    usr_to = get_usr_from_mail(session, "diego2")
 
-
-    review = get_review_by_usrs(session, usr, usr_to.id)
-    print(review)
+    usr_to = get_usr_from_mail(session, "u2")
+    print(usr_to)
+    usr_to = get_usr_from_mail(session, "u1")
+    print(usr_to)
 
     session.close()
