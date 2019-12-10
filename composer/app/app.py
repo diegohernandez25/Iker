@@ -52,6 +52,7 @@ app.register_blueprint(event_blueprint)
 app.register_blueprint(trip_blueprint)
 app.register_blueprint(review_blueprint)
 
+
 def check_service()->Boolean:
     global BOOKING_SERVICE_ID
 

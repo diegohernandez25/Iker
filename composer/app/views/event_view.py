@@ -75,6 +75,38 @@ def find_event()->str:
     session.close()
     return "ERROR"
 
+@event_blueprint.route("/get_events", methods=['GET'])
+def get_events()->str:
+
+    event_name      = request.args.get('name')
+    event_city      = request.args.get('city')
+    event_category  = request.args.get('category')
+
+    events = None
+
+    session = Session()
+    if event_name is not None:
+        events = get_event_by_name(session, event_name)
+
+    if event_city is not None:
+        e = get_event_by_city(session, event_city)
+        events = e if events is None else list(set(e) & set(events))
+
+    if event_category is not None:
+        e = get_event_by_category(session, event_category)
+        events = e if events is None else list(set(e) & set(events))
+
+    session.close()
+    return repr(events) if events is not None else repr(lst())
+
+@event_blueprint.route("/get_all_events", methods=['GET'])
+def get_all_events_api():
+    session = Session()
+    response = get_all_events(session)
+    session.close()
+
+    return jsonify(response)
+
 @event_blueprint.route("/get_av_trips_event", methods=['GET'])
 def find_available_event_trips_api():
 
@@ -114,51 +146,26 @@ def find_available_event_trips_api():
                         r       = requests.get(url_review + user.mail)
                         r       = r.json()
 
-                        response.append({
-                            "id"        : trip.id,
-                            "city"      : trip.city,
-                            "usr_id"    : user.id,
-                            "usr_name"  : user.name,
-                            "user_img"  : user.img_url,
-                            "mail"      : user.mail,
-                            "review"    : (r["avgRating"] if len(r)!=0 else 0),
-                            "price"     : price
-                            })
+
+                        r_booking = requests.get(URL_RESERVATION + str(BOOKING_SERVICE_ID) + "/domain/" + str(trip.id_domain_booking))
+                        r_booking = r_booking.json()
+
+                        if "elements" in r_booking.keys() and len(r_booking["elements"])>0:
+
+                            response.append({
+                                "id"        : trip.id,
+                                "city"      : trip.city,
+                                "usr_id"    : user.id,
+                                "usr_name"  : user.name,
+                                "user_img"  : user.img_url,
+                                "mail"      : user.mail,
+                                "review"    : (r["avgRating"] if len(r)!=0 else 0),
+                                "price"     : price,
+                                "hour"      : int(r_booking["elements"][0]["init_time"]) - event.date
+                                })
 
         session.close()
         return jsonify(response)
 
     session.close()
     return "ERROR"
-
-@event_blueprint.route("/get_events", methods=['GET'])
-def get_events()->str:
-
-    event_name      = request.args.get('name')
-    event_city      = request.args.get('city')
-    event_category  = request.args.get('category')
-
-    events = None
-
-    session = Session()
-    if event_name is not None:
-        events = get_event_by_name(session, event_name)
-
-    if event_city is not None:
-        e = get_event_by_city(session, event_city)
-        events = e if events is None else list(set(e) & set(events))
-
-    if event_category is not None:
-        e = get_event_by_category(session, event_category)
-        events = e if events is None else list(set(e) & set(events))
-
-    session.close()
-    return repr(events) if events is not None else repr(lst())
-
-@event_blueprint.route("/get_all_events", methods=['GET'])
-def get_all_events_api():
-    session = Session()
-    response = get_all_events(session)
-    session.close()
-
-    return jsonify(response)
