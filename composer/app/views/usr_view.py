@@ -162,7 +162,9 @@ def get_usr_profile_api():
             mail = e['authorID']
             tmp_usr = get_usr_from_mail(session, mail)
             if tmp_usr is not None:
-                e['img_url'] = tmp_usr.img_url
+                e['img_url']    = tmp_usr.img_url
+                e['name']       = tmp_usr.name
+                e['mail']       = tmp_usr.mail
 
         response["reviews"] = r
 
